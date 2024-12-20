@@ -8,7 +8,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const handleLogout = async () => {
         try {
             await signOut();
-            navigate("/login"); // Redirect to login page after logout
+            navigate("/");
         } catch (error) {
             console.error("Error logging out:", error);
         }
@@ -17,7 +17,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <div>
             <header style={{ display: "flex", justifyContent: "space-between", padding: "1rem", background: "#f5f5f5" }}>
-                <h1>My App</h1>
+                <h1>Ben is awesome</h1>
                 <button onClick={handleLogout} style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>
                     Logout
                 </button>
