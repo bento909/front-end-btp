@@ -1,5 +1,6 @@
 
 const AdminMenu = () => {
+    console.log('Im gahhhyyye');
     return (
         <main>
             <h1>Hello, this is the space for Ben and Only Ben</h1>
