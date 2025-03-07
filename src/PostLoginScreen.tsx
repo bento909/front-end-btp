@@ -1,10 +1,16 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { getCurrentUser } from 'aws-amplify/auth';
 
 async function fetchUserRole() {
     try {
-        // const user = await Auth.currentAuthenticatedUser();
+        console.log('What is going on?')
+        const { username, userId, signInDetails } = await getCurrentUser();
+        console.log('Yo` Mamma`s G-HAT')
+        console.log(username)
+        console.log(userId)
+        console.log(signInDetails)
+        console.log('Every moment in lieu of a lifetime SUCKS')
         // const userRole = user.attributes['custom:role']; // Retrieve custom role
         // return userRole;
     } catch (error) {
