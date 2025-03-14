@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from 'aws-amplify/auth';
+import { UserTypes } from './constants.ts';
 
 async function fetchUserRole() {
     try {
@@ -16,7 +17,7 @@ async function fetchUserRole() {
     } catch (error) {
         console.error('Error fetching user role:', error);
     }
-    return 'admin'; // Temporary role assignment for demonstration
+    return UserTypes.ADMIN; // Temporary role assignment for demonstration
 }
 
 const PostLoginScreen = () => {
@@ -25,19 +26,18 @@ const PostLoginScreen = () => {
     useEffect(() => {
         const handleUserLogin = async () => {
             const role = await fetchUserRole();
-            if (role === 'admin') {
+            if (role === UserTypes.ADMIN) {
                 navigate('/adminMenu');
-            } else if (role === 'tester') {
+            } else if (role === UserTypes.TESTER) {
                 navigate('/testerMenu');
-            } else if (role === 'trainer') {
+            } else if (role === UserTypes.TRAINER) {
                 navigate('/trainerMenu');
-            } else if (role === 'trainer_user') {
+            } else if (role === UserTypes.TRAINER_USER) {
                 navigate('/trainerUserMenu');
-            } else if (role === 'basic_user') {
+            } else if (role === UserTypes.BASIC_USER) {
                 navigate('/basicUserMenu');
             }
         };
-
         handleUserLogin();
     }, [navigate]);
 
