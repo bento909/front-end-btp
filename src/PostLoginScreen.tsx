@@ -7,7 +7,7 @@ async function fetchUserRole() {
     try {
         const theUser = await getCurrentUser();
         const twammer = await fetchUserAttributes();
-
+        console.log('profile:', twammer.profile);
         console.log('Full user object:', theUser);
         console.log('Full authenticated user object:', twammer);
 
