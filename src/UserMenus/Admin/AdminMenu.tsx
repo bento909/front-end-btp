@@ -3,7 +3,7 @@ import SignUp from '../../Components/CreateUser';
 const AdminMenu = () => {
     return (
         <main>
-            <h1>Hello, this is the space for Ben and Only Ben</h1>
+            <h1>lyra da cat *wah* lyra da cat *wah</h1>
             <h2>Here you will be able to</h2>
             <ul>
                 <li>Create Trainers and Self-Trainers</li>
