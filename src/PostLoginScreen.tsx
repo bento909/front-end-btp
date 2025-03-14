@@ -5,12 +5,14 @@ import { UserTypes } from './constants.ts';
 
 async function fetchUserRole() {
     try {
+        const theUser = await getCurrentUser();
+        console.log('Full user object:', theUser);
+
         console.log('What is going on?')
-        const { username, userId, signInDetails } = await getCurrentUser();
         console.log('Yo` Mamma`s G-HAT')
-        console.log(username)
-        console.log(userId)
-        console.log(signInDetails)
+        console.log(theUser.username)
+        console.log(theUser.userId)
+        console.log(theUser.signInDetails)
         console.log('Every moment in lieu of a lifetime SUCKS')
         // const userRole = user.attributes['custom:role']; // Retrieve custom role
         // return userRole;
