@@ -3,7 +3,6 @@ export enum Config {
     COGNITO_CLIENT = "2smsm5p4lopf156dbja707il5n"
 }
 
-
 export enum UserTypes {
     ADMIN = 'admin',
     TESTER = 'tester',
