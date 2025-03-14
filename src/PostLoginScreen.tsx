@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, currentAuthenticatedUser } from 'aws-amplify/auth';
+import { getCurrentUser, fetchUserAttributes  } from 'aws-amplify/auth';
 import { UserTypes } from './constants.ts';
 
 async function fetchUserRole() {
     try {
         const theUser = await getCurrentUser();
-        const twammer = await currentAuthenticatedUser();
+        const twammer = await fetchUserAttributes();
 
         console.log('Full user object:', theUser);
         console.log('Full authenticated user object:', twammer);
