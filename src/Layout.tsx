@@ -1,12 +1,14 @@
 import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
+import { userCache } from "./PermissionsProvider/userCache.tsx";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
+            userCache.clearCache();
             await signOut();
             navigate("/");
         } catch (error) {

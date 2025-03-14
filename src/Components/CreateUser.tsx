@@ -1,5 +1,5 @@
 import {CognitoIdentityProviderClient, SignUpCommand} from "@aws-sdk/client-cognito-identity-provider";
-import {Config, UserTypes} from '../constants.ts'
+import {Config, UserTypes} from '../Constants/constants.ts'
 import {useState} from "react";
 
 const client = new CognitoIdentityProviderClient({

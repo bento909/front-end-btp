@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, fetchUserAttributes  } from 'aws-amplify/auth';
-import { UserTypes } from './constants.ts';
+import { UserTypes } from './Constants/constants.ts';
+import { userCache } from './PermissionsProvider/userCache.tsx'
 
 async function fetchUserRole() {
     try {
@@ -19,10 +20,10 @@ async function fetchUserRole() {
 
         console.log('Every moment in lieu of a lifetime SUCKS')
 
-
-
         // const userRole = user.attributes['custom:role']; // Retrieve custom role
-        // return userRole;
+        console.log('This should print out the user:')
+        console.log(userCache.getUser());
+
     } catch (error) {
         console.error('Error fetching user role:', error);
     }
@@ -31,7 +32,7 @@ async function fetchUserRole() {
 
 const PostLoginScreen = () => {
     const navigate = useNavigate();
-
+//TODO don't do this, Just navigate to a Main Page and Show Bits by Permissions
     useEffect(() => {
         const handleUserLogin = async () => {
             const role = await fetchUserRole();
