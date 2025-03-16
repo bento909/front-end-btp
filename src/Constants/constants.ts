@@ -6,12 +6,12 @@ export enum Config {
 export interface User {
     name: string;
     emailAddress: string;
-    userType: UserTypes;
+    profile: Profile;
     creator: string;
     permissions: Permissions
 }
 
-export enum UserTypes {
+export enum Profile {
     ADMIN = 'admin',
     TESTER = 'tester',
     TRAINER = 'trainer',
@@ -33,7 +33,7 @@ export enum CreatePlan {
 }
 
 export interface Permissions {
-    createUsers: UserTypes[],
+    createUsers: Profile[],
     viewUsers: ViewUsers,
     createPlan: CreatePlan,
     createExercise: boolean,

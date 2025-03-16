@@ -4,7 +4,7 @@ const AdminMenu = () => {
     return (
         <main>
             <h1>lyra da cat *wah* lyra da cat *wah</h1>
-            <h2>Here you will be able to</h2>
+            <h2>TODO this should be the ONE PAGE to rule them all</h2>
             <ul>
                 <li>Create Trainers and Self-Trainers</li>
                 <li>View all the data</li>

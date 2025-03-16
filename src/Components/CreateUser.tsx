@@ -1,19 +1,21 @@
 import {CognitoIdentityProviderClient, SignUpCommand} from "@aws-sdk/client-cognito-identity-provider";
-import {Config, UserTypes} from '../Constants/constants.ts'
-import {useState} from "react";
+import {Config, Profile, User} from '../Constants/constants.ts'
+import { userCache } from './../PermissionsProvider/userCache.tsx'
+import { useState, useEffect } from "react";
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION, // Change to your AWS region
 });
 
-export const signUpUser = async (email: string, password: string, profile: UserTypes) => {
+export const signUpUser = async (email: string, password: string, newUserProfile: Profile, creatorEmail: string) => {
     const command = new SignUpCommand({
         ClientId: Config.COGNITO_CLIENT, // Replace with your actual Cognito Client ID
         Username: email,
         Password: password,
         UserAttributes: [
-            { Name: "email", Value: email },
-            { Name: "profile", Value: profile }
+            {Name: "email", Value: email},
+            {Name: "profile", Value: newUserProfile},
+            {Name: "zoneinfo", Value: creatorEmail}
         ],
     });
 
@@ -27,15 +29,20 @@ export const signUpUser = async (email: string, password: string, profile: UserT
     }
 };
 
-const Signup = () => {
+// Define props type correctly
+interface UserFormProps {
+    user: User
+}
+
+const UserForm: React.FC<UserFormProps> = ( { user } ) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [profile, setProfile] = useState("");
+    const [profile, setProfile] = useState(Profile.BASIC_USER);
     const [message, setMessage] = useState("");
 
     const handleSignUp = async () => {
         try {
-            await signUpUser(email, password, UserTypes.BASIC_USER);
+            await signUpUser(email, password, profile, user.emailAddress);
             setMessage("Signup successful! Check your email for verification.");
         } catch (error) {
             setMessage("Error signing up. Please try again.");
@@ -43,8 +50,8 @@ const Signup = () => {
     };
 
     return (
-        <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md">
-            <h2 className="text-xl font-bold">Sign Up</h2>
+        <div>
+            <h2 className="text-xl font-bold">Add a user</h2>
             <input
                 className="border p-2 w-full mt-2"
                 type="email"
@@ -59,19 +66,37 @@ const Signup = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
-            <input
+            {/* Profile Dropdown */}
+            <select
                 className="border p-2 w-full mt-2"
-                type="text"
-                placeholder="Profile"
                 value={profile}
-                onChange={(e) => setProfile(e.target.value)}
-            />
+                onChange={(e) => setProfile(e.target.value as Profile)}
+            >
+                <option value="">Select User Type</option>
+                {user.permissions.createUsers.map((type: Profile) => (
+                    <option key={type} value={type}>
+                        {type}
+                    </option>
+                ))}
+            </select>
             <button className="bg-blue-500 text-white p-2 mt-4 w-full" onClick={handleSignUp}>
                 Sign Up
             </button>
             {message && <p className="mt-2 text-red-500">{message}</p>}
         </div>
     );
+};
+
+const Signup: React.FC = () => {
+    const [thisUser, setThisUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        userCache.getUser().then(setThisUser);
+    }, []);
+
+    if (!thisUser) return <p>Loading...</p>;
+
+    return <UserForm user={thisUser} />;
 };
 
 export default Signup;

@@ -1,5 +1,5 @@
 import { fetchUserAttributes  } from 'aws-amplify/auth';
-import {CreatePlan, Permissions, UserTypes, ViewUsers, User} from '../Constants/constants.ts';
+import {CreatePlan, Permissions, Profile, ViewUsers, User} from '../Constants/constants.ts';
 
 class UserCache {
     private static instance: UserCache;
@@ -27,11 +27,11 @@ class UserCache {
             console.log("Fetching user from Cognito...");
             const attributes = await fetchUserAttributes();
             const userTypeString = attributes.profile ? attributes.profile : 'basic_user'
-            const userType: UserTypes = (userTypeString as UserTypes)
+            const userType: Profile = (userTypeString as Profile)
             this.user = {
                 name: attributes.name || "You",
                 emailAddress: attributes.email || "",
-                userType: userType,
+                profile: userType,
                 creator: attributes.zoneinfo || "",
                 permissions: this.getPermissions(userType)
             };
@@ -42,37 +42,37 @@ class UserCache {
         }
     }
 
-    private getPermissions(userType: UserTypes): Permissions {
-        const permissionsMap: Record<UserTypes, Permissions> = {
-            [UserTypes.ADMIN]: {
-                createUsers: [UserTypes.ADMIN, UserTypes.TESTER, UserTypes.TRAINER, UserTypes.TRAINER_USER, UserTypes.BASIC_USER],
+    private getPermissions(userType: Profile): Permissions {
+        const permissionsMap: Record<Profile, Permissions> = {
+            [Profile.ADMIN]: {
+                createUsers: [Profile.ADMIN, Profile.TESTER, Profile.TRAINER, Profile.TRAINER_USER, Profile.BASIC_USER],
                 viewUsers: ViewUsers.ALL,
                 createPlan: CreatePlan.MY_OWN,
                 createExercise: false,
                 viewMyPlan: false
             },
-            [UserTypes.TESTER]: {
+            [Profile.TESTER]: {
                 createUsers: [],
                 viewUsers: ViewUsers.NONE,
                 createPlan: CreatePlan.NONE,
                 createExercise: false,
                 viewMyPlan: false
             },
-            [UserTypes.TRAINER]: {
-                createUsers: [UserTypes.BASIC_USER],
+            [Profile.TRAINER]: {
+                createUsers: [Profile.BASIC_USER],
                 viewUsers: ViewUsers.MY_USERS,
                 createPlan: CreatePlan.MY_USERS,
                 createExercise: true,
                 viewMyPlan: false
             },
-            [UserTypes.TRAINER_USER]: {
+            [Profile.TRAINER_USER]: {
                 createUsers: [],
                 viewUsers: ViewUsers.NONE,
                 createPlan: CreatePlan.MY_OWN,
                 createExercise: true,
                 viewMyPlan: true
             },
-            [UserTypes.BASIC_USER]: {
+            [Profile.BASIC_USER]: {
                 createUsers: [],
                 viewUsers: ViewUsers.NONE,
                 createPlan: CreatePlan.NONE,
