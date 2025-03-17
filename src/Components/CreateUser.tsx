@@ -7,10 +7,16 @@ const client = new CognitoIdentityProviderClient({
     region: Config.REGION, // Change to your AWS region
 });
 
+const generateTemporaryPassword = () => {
+    return Math.random().toString(36).slice(-12) + "Aa1!"; // Ensures complexity
+};
+
 export const signUpUser = async (email: string, name: string, newUserProfile: Profile, creatorEmail: string) => {
+    const temporaryPassword = generateTemporaryPassword();
     const command = new SignUpCommand({
         ClientId: Config.COGNITO_CLIENT,
         Username: email,
+        Password: temporaryPassword,
         UserAttributes: [
             { Name: "email", Value: email },
             { Name: "name", Value: name }, // Added name attribute
