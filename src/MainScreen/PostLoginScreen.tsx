@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Profile } from '../Constants/constants.ts';
-import {useUserAttributes} from "../PermissionsProvider/UserAttributesContext.tsx";
+import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx"
 
 const PostLoginScreen = () => {
     const blollokc = useUserAttributes();
