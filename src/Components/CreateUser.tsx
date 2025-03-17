@@ -51,7 +51,7 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
     };
 
     return (
-        <div>
+        <ul>
             <h2>Add a user</h2>
             <input
                 type="email"
@@ -82,7 +82,7 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
                 Sign Up
             </button>
             {message && <p>{message}</p>}
-        </div>
+        </ul>
     );
 };
 
