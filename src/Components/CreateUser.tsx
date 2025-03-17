@@ -39,9 +39,11 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
 // User Form Component
 interface UserFormProps {
     user: User;
+    toggleForm: () => void;
+    isFormVisible: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user }) => {
+const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) => {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [profile, setProfile] = useState<Profile | "">("");
@@ -75,8 +77,33 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
             gap: "10px",
             padding: "20px",
             border: "1px solid #ccc",
-            borderRadius: "8px"
+            borderRadius: "8px",
+            position: "relative"
         }}>
+            {/* Header with Button */}
+            <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "10px"
+            }}>
+                <h2 style={{ margin: 0 }}>Add a user</h2>
+                <button
+                    onClick={toggleForm}
+                    style={{
+                        padding: "8px 12px",
+                        backgroundColor: isFormVisible ? "#000" : "#fff",
+                        color: isFormVisible ? "#fff" : "#000",
+                        border: "1px solid #000",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        borderRadius: "5px"
+                    }}
+                >
+                    {isFormVisible ? "Close Form" : "Add a User"}
+                </button>
+            </div>
+
             <input
                 type="email"
                 placeholder="Email"
@@ -87,7 +114,7 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
 
             <input
                 type="text"
-                placeholder="Name (First, Full, or Nickname)"
+                placeholder="Name (e.g. Ben, Ben Thomas, or El Benjyrino, if you're not into the whole brevity thing)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 style={{ padding: "8px", fontSize: "16px" }}
@@ -111,7 +138,8 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                 color: "#ffffff",
                 border: "none",
                 cursor: "pointer",
-                fontSize: "16px"
+                fontSize: "16px",
+                marginTop: "10px"
             }}>
                 Sign Up
             </button>
@@ -126,24 +154,30 @@ const Signup: React.FC = () => {
     const user = useUserAttributes();
     const [isFormVisible, setIsFormVisible] = useState(false);
 
+    const toggleForm = () => setIsFormVisible(!isFormVisible);
+
     return user.permissions.createUsers.length > 0 && (
         <div style={{ padding: "20px" }}>
-            <button
-                onClick={() => setIsFormVisible(!isFormVisible)}
-                style={{
-                    padding: "10px",
-                    backgroundColor: isFormVisible ? "#dc3545" : "#28a745",
-                    color: "#ffffff",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "16px",
-                    marginBottom: "10px"
-                }}
-            >
-                {isFormVisible ? "Close Form" : "Add a User"}
-            </button>
-
-            {isFormVisible && <UserForm user={user} />}
+            {isFormVisible && <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />}
+            {!isFormVisible && (
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <h2 style={{ margin: 0 }}>Line 164</h2>
+                    <button
+                        onClick={toggleForm}
+                        style={{
+                            padding: "8px 12px",
+                            backgroundColor: "#fff",
+                            color: "#000",
+                            border: "1px solid #000",
+                            cursor: "pointer",
+                            fontSize: "14px",
+                            borderRadius: "5px"
+                        }}
+                    >
+                        Line 177
+                    </button>
+                </div>
+            )}
         </div>
     );
 };
