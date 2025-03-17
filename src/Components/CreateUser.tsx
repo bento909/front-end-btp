@@ -17,7 +17,6 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
         UserPoolId: Config.USER_POOL_ID,
         Username: email,
         TemporaryPassword: "Pa55w0rd!",
-        MessageAction: "SUPPRESS",
         UserAttributes: [
             { Name: "email", Value: email },
             { Name: "name", Value: name },
