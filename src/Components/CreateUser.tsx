@@ -66,11 +66,15 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
             setMessage("Error signing up. Please try again.");
         }
     };
-
     return (
-        <div  style={{
+        <div style={{
             backgroundColor: "#ffffff",
             color: "#000000",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px", // Adds spacing between elements
+            width: "300px", // Adjust width as needed
+            padding: "20px"
         }}>
             <h2>Add a user</h2>
             <input
@@ -78,6 +82,7 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                style={{ padding: "8px", fontSize: "16px" }}
             />
 
             {/* New name input field */}
@@ -86,12 +91,14 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                 placeholder="Name (First, Full, or Nickname)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                style={{ padding: "8px", fontSize: "16px" }}
             />
 
             {/* Profile Dropdown */}
             <select
                 value={profile}
                 onChange={(e) => setProfile(e.target.value as Profile)}
+                style={{ padding: "8px", fontSize: "16px" }}
             >
                 {user.permissions.createUsers.map((type: Profile) => (
                     <option key={type} value={type}>
@@ -99,9 +106,18 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                     </option>
                 ))}
             </select>
-            <button onClick={handleSignUp}>
+
+            <button onClick={handleSignUp} style={{
+                padding: "10px",
+                backgroundColor: "#007bff",
+                color: "#ffffff",
+                border: "none",
+                cursor: "pointer",
+                fontSize: "16px"
+            }}>
                 Sign Up
             </button>
+
             {message && <p>{message}</p>}
         </div>
     );
