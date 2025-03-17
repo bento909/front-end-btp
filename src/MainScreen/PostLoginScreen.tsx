@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, fetchUserAttributes  } from 'aws-amplify/auth';
-import { Profile } from './Constants/constants.ts';
-import { userCache } from './PermissionsProvider/userCache.tsx'
+import { Profile } from '../Constants/constants.ts';
+import { userCache } from '../PermissionsProvider/userCache.tsx'
+import {useUserAttributes} from "../PermissionsProvider/UserAttributesContext.tsx";
 
 async function fetchUserRole() {
     try {
@@ -14,15 +15,19 @@ async function fetchUserRole() {
 
         console.log('What is going on?')
         console.log('Yo` Mamma`s G-HAT')
-        console.log(theUser.username)
-        console.log(theUser.userId)
-        console.log(theUser.signInDetails)
-
         console.log('Every moment in lieu of a lifetime SUCKS')
 
         // const userRole = user.attributes['custom:role']; // Retrieve custom role
         console.log('This should print out the user:')
-        console.log(userCache.getUser());
+        const user = userCache.getUser();
+        console.log(user);
+
+
+        const blollokc = useUserAttributes();
+        console.log('About to give it bifters:')
+        console.log(blollokc)
+        console.log('We just gave it bifters:')
+
 
     } catch (error) {
         console.error('Error fetching user role:', error);

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PostLoginScreen from './PostLoginScreen.tsx';
+import PostLoginScreen from './MainScreen/PostLoginScreen.tsx';
 import AdminMenu from './UserMenus/Admin/AdminMenu.tsx';
 import TesterMenu from './UserMenus/Tester/TesterMenu.tsx';
 import TrainerMenu from './UserMenus/Trainer/TrainerMenu.tsx';
