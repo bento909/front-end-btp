@@ -1,22 +1,21 @@
 import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
-import {Config, Profile, User} from '../Constants/constants.ts'
-import { useState } from "react";
-import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx"
+import { Config, Profile, User } from '../Constants/constants.ts';
+import { useState, useEffect } from "react";
+import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION, // Change to your AWS region
 });
 
-export const signUpUser = async (email: string, password: string, newUserProfile: Profile, creatorEmail: string) => {
+export const signUpUser = async (email: string, name: string, newUserProfile: Profile, creatorEmail: string) => {
     const command = new SignUpCommand({
         ClientId: Config.COGNITO_CLIENT,
         Username: email,
-        Password: password,
         UserAttributes: [
-            {Name: "email", Value: email},
-            {Name: "profile", Value: newUserProfile},
-            {Name: "zoneinfo", Value: creatorEmail}
-            //TODO add name
+            { Name: "email", Value: email },
+            { Name: "name", Value: name }, // Added name attribute
+            { Name: "profile", Value: newUserProfile },
+            { Name: "zoneinfo", Value: creatorEmail }
         ],
     });
 
@@ -32,18 +31,29 @@ export const signUpUser = async (email: string, password: string, newUserProfile
 
 // Define props type correctly
 interface UserFormProps {
-    user: User
+    user: User;
 }
 
-const UserForm: React.FC<UserFormProps> = ( { user } ) => {
+const UserForm: React.FC<UserFormProps> = ({ user }) => {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [profile, setProfile] = useState(Profile.BASIC_USER);
+    const [name, setName] = useState(""); // New state for name
+    const [profile, setProfile] = useState<Profile | "">("");
     const [message, setMessage] = useState("");
 
+    // Set default profile to first available option
+    useEffect(() => {
+        if (user.permissions.createUsers.length > 0) {
+            setProfile(user.permissions.createUsers[0]);
+        }
+    }, [user.permissions.createUsers]);
+
     const handleSignUp = async () => {
+        if (!profile || !name) {
+            setMessage("Please enter a name and select a profile.");
+            return;
+        }
         try {
-            await signUpUser(email, password, profile, user.emailAddress);
+            await signUpUser(email, name, profile, user.emailAddress);
             setMessage("Signup successful! Check your email for verification.");
         } catch (error) {
             setMessage("Error signing up. Please try again.");
@@ -59,19 +69,20 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
-            //TODO add name, remove password... let AWS create random password innit
+
+            {/* New name input field */}
             <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="text"
+                placeholder="Name (First, Full, or Nickname)"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
             />
+
             {/* Profile Dropdown */}
             <select
                 value={profile}
                 onChange={(e) => setProfile(e.target.value as Profile)}
             >
-                <option value="" />
                 {user.permissions.createUsers.map((type: Profile) => (
                     <option key={type} value={type}>
                         {type}
@@ -88,10 +99,11 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
 
 const Signup: React.FC = () => {
     const user = useUserAttributes();
-    return user.permissions.createUsers.length > 0 &&
+    return user.permissions.createUsers.length > 0 && (
         <ul>
             <UserForm user={user} />
-        </ul>;
+        </ul>
+    );
 };
 
 export default Signup;
