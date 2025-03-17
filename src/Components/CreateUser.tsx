@@ -1,4 +1,4 @@
-import {CognitoIdentityProviderClient, SignUpCommand} from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
 import {Config, Profile, User} from '../Constants/constants.ts'
 import { useState } from "react";
 import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx"
@@ -52,9 +52,8 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
 
     return (
         <div>
-            <h2 className="text-xl font-bold">Add a user</h2>
+            <h2>Add a user</h2>
             <input
-                className="border p-2 w-full mt-2"
                 type="email"
                 placeholder="Email"
                 value={email}
@@ -62,7 +61,6 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
             />
             //TODO add name, remove password... let AWS create random password innit
             <input
-                className="border p-2 w-full mt-2"
                 type="password"
                 placeholder="Password"
                 value={password}
@@ -70,28 +68,27 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
             />
             {/* Profile Dropdown */}
             <select
-                className="border p-2 w-full mt-2"
                 value={profile}
                 onChange={(e) => setProfile(e.target.value as Profile)}
             >
-                <option value="">Select User Type</option>
+                <option value="" />
                 {user.permissions.createUsers.map((type: Profile) => (
                     <option key={type} value={type}>
                         {type}
                     </option>
                 ))}
             </select>
-            <button className="bg-blue-500 text-white p-2 mt-4 w-full" onClick={handleSignUp}>
+            <button onClick={handleSignUp}>
                 Sign Up
             </button>
-            {message && <p className="mt-2 text-red-500">{message}</p>}
+            {message && <p>{message}</p>}
         </div>
     );
 };
 
 const Signup: React.FC = () => {
     const user = useUserAttributes();
-    return user.permissions.createUsers.length() > 0 &&
+    return user.permissions.createUsers.length > 0 &&
         <ul>
             <UserForm user={user} />
         </ul>;
