@@ -22,13 +22,6 @@ async function fetchUserRole() {
         const user = userCache.getUser();
         console.log(user);
 
-
-        const blollokc = useUserAttributes();
-        console.log('About to give it bifters:')
-        console.log(blollokc)
-        console.log('We just gave it bifters:')
-
-
     } catch (error) {
         console.error('Error fetching user role:', error);
     }
@@ -36,6 +29,11 @@ async function fetchUserRole() {
 }
 
 const PostLoginScreen = () => {
+    const blollokc = useUserAttributes();
+    console.log('About to give it bifters:')
+    console.log(blollokc)
+    console.log('We just gave it bifters:')
+
     const navigate = useNavigate();
 //TODO don't do this, Just navigate to a Main Page and Show Bits by Permissions
     useEffect(() => {
