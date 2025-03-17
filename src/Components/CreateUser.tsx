@@ -89,7 +89,7 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
 
 const Signup: React.FC = () => {
     const [thisUser, setThisUser] = useState<User | null>(null);
-
+console.log('why are you like this')
     useEffect(() => {
         userCache.getUser().then(setThisUser);
     }, []);
