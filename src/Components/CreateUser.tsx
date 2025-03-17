@@ -11,11 +11,10 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
     const command = new AdminCreateUserCommand({
         UserPoolId: Config.USER_POOL_ID,
         Username: email,
-        TemporaryPassword: Math.random().toString(36).slice(-8) + "Aa1!",
-        MessageAction: "SUPPRESS",
+        TemporaryPassword: "pa55w0rd",
         UserAttributes: [
             { Name: "email", Value: email },
-            { Name: "name", Value: name }, // Added name attribute
+            { Name: "name", Value: name },
             { Name: "profile", Value: newUserProfile },
             { Name: "zoneinfo", Value: creatorEmail }
         ],
