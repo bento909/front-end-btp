@@ -1,8 +1,8 @@
-import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { Config, Profile, User } from '../Constants/constants.ts';
 import { useState, useEffect } from "react";
 import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
+import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
+import { Config, Profile, User } from "../Constants/constants.ts";
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -17,6 +17,7 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
         UserPoolId: Config.USER_POOL_ID,
         Username: email,
         TemporaryPassword: "Pa55w0rd!",
+        MessageAction: "SUPPRESS",
         UserAttributes: [
             { Name: "email", Value: email },
             { Name: "name", Value: name },
@@ -35,18 +36,17 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
     }
 };
 
-// Define props type correctly
+// User Form Component
 interface UserFormProps {
     user: User;
 }
 
 const UserForm: React.FC<UserFormProps> = ({ user }) => {
     const [email, setEmail] = useState("");
-    const [name, setName] = useState(""); // New state for name
+    const [name, setName] = useState("");
     const [profile, setProfile] = useState<Profile | "">("");
     const [message, setMessage] = useState("");
 
-    // Set default profile to first available option
     useEffect(() => {
         if (user.permissions.createUsers.length > 0) {
             setProfile(user.permissions.createUsers[0]);
@@ -65,16 +65,18 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
             setMessage("Error signing up. Please try again.");
         }
     };
+
     return (
         <div style={{
             backgroundColor: "#ffffff",
             color: "#000000",
             display: "flex",
             flexDirection: "column",
-            gap: "10px", // Adds spacing between elements
-            padding: "20px"
+            gap: "10px",
+            padding: "20px",
+            border: "1px solid #ccc",
+            borderRadius: "8px"
         }}>
-            <h2>Add a user</h2>
             <input
                 type="email"
                 placeholder="Email"
@@ -83,7 +85,6 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                 style={{ padding: "8px", fontSize: "16px" }}
             />
 
-            {/* New name input field */}
             <input
                 type="text"
                 placeholder="Name (First, Full, or Nickname)"
@@ -92,7 +93,6 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                 style={{ padding: "8px", fontSize: "16px" }}
             />
 
-            {/* Profile Dropdown */}
             <select
                 value={profile}
                 onChange={(e) => setProfile(e.target.value as Profile)}
@@ -121,12 +121,30 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
     );
 };
 
+// Signup Component with Toggle Feature
 const Signup: React.FC = () => {
     const user = useUserAttributes();
+    const [isFormVisible, setIsFormVisible] = useState(false);
+
     return user.permissions.createUsers.length > 0 && (
-        <ul>
-            <UserForm user={user} />
-        </ul>
+        <div style={{ padding: "20px" }}>
+            <button
+                onClick={() => setIsFormVisible(!isFormVisible)}
+                style={{
+                    padding: "10px",
+                    backgroundColor: isFormVisible ? "#dc3545" : "#28a745",
+                    color: "#ffffff",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "16px",
+                    marginBottom: "10px"
+                }}
+            >
+                {isFormVisible ? "Close Form" : "Add a User"}
+            </button>
+
+            {isFormVisible && <UserForm user={user} />}
+        </div>
     );
 };
 
