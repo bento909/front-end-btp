@@ -1,7 +1,7 @@
 import {CognitoIdentityProviderClient, SignUpCommand} from "@aws-sdk/client-cognito-identity-provider";
 import {Config, Profile, User} from '../Constants/constants.ts'
-import { userCache } from './../PermissionsProvider/userCache.tsx'
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx"
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION, // Change to your AWS region
@@ -9,13 +9,14 @@ const client = new CognitoIdentityProviderClient({
 
 export const signUpUser = async (email: string, password: string, newUserProfile: Profile, creatorEmail: string) => {
     const command = new SignUpCommand({
-        ClientId: Config.COGNITO_CLIENT, // Replace with your actual Cognito Client ID
+        ClientId: Config.COGNITO_CLIENT,
         Username: email,
         Password: password,
         UserAttributes: [
             {Name: "email", Value: email},
             {Name: "profile", Value: newUserProfile},
             {Name: "zoneinfo", Value: creatorEmail}
+            //TODO add name
         ],
     });
 
@@ -59,6 +60,7 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
+            //TODO add name, remove password... let AWS create random password innit
             <input
                 className="border p-2 w-full mt-2"
                 type="password"
@@ -88,15 +90,8 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
 };
 
 const Signup: React.FC = () => {
-    const [thisUser, setThisUser] = useState<User | null>(null);
-console.log('why are you like this')
-    useEffect(() => {
-        userCache.getUser().then(setThisUser);
-    }, []);
-
-    if (!thisUser) return <p>Loading...</p>;
-
-    return <UserForm user={thisUser} />;
+    const user = useUserAttributes();
+    return user.permissions.createUsers.size > 0 && <UserForm user={user} /> ;
 };
 
 export default Signup;
