@@ -16,7 +16,7 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
     const command = new AdminCreateUserCommand({
         UserPoolId: Config.USER_POOL_ID,
         Username: email,
-        TemporaryPassword: "Pa55w0rd",
+        TemporaryPassword: "Pa55w0rd!",
         MessageAction: "SUPPRESS",
         UserAttributes: [
             { Name: "email", Value: email },
@@ -73,7 +73,6 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
             display: "flex",
             flexDirection: "column",
             gap: "10px", // Adds spacing between elements
-            width: "300px", // Adjust width as needed
             padding: "20px"
         }}>
             <h2>Add a user</h2>
