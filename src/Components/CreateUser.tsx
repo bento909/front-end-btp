@@ -92,8 +92,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) 
                     onClick={toggleForm}
                     style={{
                         padding: "8px 12px",
-                        backgroundColor: isFormVisible ? "#000" : "#fff",
-                        color: isFormVisible ? "#fff" : "#000",
+                        backgroundColor: isFormVisible ? "#fff" : "#000",
+                        color: isFormVisible ? "#000" : "#fff",
                         border: "1px solid #000",
                         cursor: "pointer",
                         fontSize: "14px",
@@ -158,36 +158,34 @@ const Signup: React.FC = () => {
 
     return user.permissions.createUsers.length > 0 && (
         <div style={{ padding: "20px" }}>
+            <div style={{
+                backgroundColor: "#ffffff",
+                color: "#000000",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "20px",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                position: "relative"
+            }}>
+                <h2 style={{ margin: 0 }}>Create a user</h2>
+                <button
+                    onClick={toggleForm}
+                    style={{
+                        padding: "8px 12px",
+                        backgroundColor: isFormVisible ? "#fff" : "#000",
+                        color: isFormVisible ? "#000" : "#fff",
+                        border: "1px solid #000",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        borderRadius: "5px"
+                    }}
+                >
+                    {isFormVisible ? "Close Form" : "View Form"}
+                </button>
+            </div>
             {isFormVisible && <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />}
-            {!isFormVisible && (
-                <div style={{
-                        backgroundColor: "#ffffff",
-                        color: "#000000",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                        padding: "20px",
-                        border: "1px solid #ccc",
-                        borderRadius: "8px",
-                        position: "relative"
-                    }}>
-                    <h2 style={{margin: 0}}>Create a user</h2>
-                    <button
-                        onClick={toggleForm}
-                        style={{
-                            padding: "8px 12px",
-                            backgroundColor: "#fff",
-                            color: "#000",
-                            border: "1px solid #000",
-                            cursor: "pointer",
-                            fontSize: "14px",
-                            borderRadius: "5px"
-                        }}
-                    >
-                        View Form
-                    </button>
-                </div>
-            )}
         </div>
     );
 };
