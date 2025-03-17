@@ -2,9 +2,14 @@ import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/
 import { Config, Profile, User } from '../Constants/constants.ts';
 import { useState, useEffect } from "react";
 import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
+import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 
 const client = new CognitoIdentityProviderClient({
-    region: Config.REGION, // Change to your AWS region
+    region: Config.REGION,
+    credentials: fromCognitoIdentityPool({
+        clientConfig: { region: Config.REGION },
+        identityPoolId: Config.USER_POOL_ID, // Ensure this is correct
+    }),
 });
 
 export const signUpUser = async (email: string, name: string, newUserProfile: Profile, creatorEmail: string) => {
