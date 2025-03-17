@@ -3,6 +3,7 @@ import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { Config, Profile, User } from "../Constants/constants.ts";
+import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -43,7 +44,7 @@ interface UserFormProps {
     isFormVisible: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) => {
+const UserForm: React.FC<UserFormProps> = ({ user }) => {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [profile, setProfile] = useState<Profile | "">("");
@@ -63,93 +64,26 @@ const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) 
         try {
             await signUpUser(email, name, profile, user.emailAddress);
             setMessage("Signup successful! Check your email for verification.");
-        } catch (error) {
+        } catch {
             setMessage("Error signing up. Please try again.");
         }
     };
 
     return (
-        <div style={{
-            backgroundColor: "#ffffff",
-            color: "#000000",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            padding: "20px",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            position: "relative"
-        }}>
-            {/* Header with Button */}
-            <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "10px"
-            }}>
-                <h2 style={{ margin: 0 }}>Create a user</h2>
-                <button
-                    onClick={toggleForm}
-                    style={{
-                        padding: "8px 12px",
-                        backgroundColor: isFormVisible ? "#fff" : "#000",
-                        color: isFormVisible ? "#000" : "#fff",
-                        border: "1px solid #000",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        borderRadius: "5px"
-                    }}
-                >
-                    {isFormVisible ? "Close Form" : "View Form"}
-                </button>
-            </div>
-
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ padding: "8px", fontSize: "16px" }}
-            />
-
-            <input
-                type="text"
-                placeholder="Name (e.g. Ben, Ben Thomas, or El Benjyrino)"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={{ padding: "8px", fontSize: "16px" }}
-            />
-
-            <select
-                value={profile}
-                onChange={(e) => setProfile(e.target.value as Profile)}
-                style={{ padding: "8px", fontSize: "16px" }}
-            >
-                {user.permissions.createUsers.map((type: Profile) => (
-                    <option key={type} value={type}>
-                        {type}
-                    </option>
+        <>
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+            <select value={profile} onChange={(e) => setProfile(e.target.value as Profile)}>
+                {user.permissions.createUsers.map((type) => (
+                    <option key={type} value={type}>{type}</option>
                 ))}
             </select>
-
-            <button onClick={handleSignUp} style={{
-                padding: "10px",
-                backgroundColor: "#007bff",
-                color: "#ffffff",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "16px",
-                marginTop: "10px"
-            }}>
-                Sign Up
-            </button>
-
+            <button onClick={handleSignUp}>Sign Up</button>
             {message && <p>{message}</p>}
-        </div>
+        </>
     );
 };
 
-// Signup Component with Toggle Feature
 const Signup: React.FC = () => {
     const user = useUserAttributes();
     const [isFormVisible, setIsFormVisible] = useState(false);
@@ -157,36 +91,9 @@ const Signup: React.FC = () => {
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
     return user.permissions.createUsers.length > 0 && (
-        <div style={{ padding: "20px" }}>
-            <div style={{
-                backgroundColor: "#ffffff",
-                color: "#000000",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "20px",
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                position: "relative"
-            }}>
-                <h2 style={{ margin: 0 }}>Create a user</h2>
-                <button
-                    onClick={toggleForm}
-                    style={{
-                        padding: "8px 12px",
-                        backgroundColor: isFormVisible ? "#fff" : "#000",
-                        color: isFormVisible ? "#000" : "#fff",
-                        border: "1px solid #000",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        borderRadius: "5px"
-                    }}
-                >
-                    {isFormVisible ? "Close Form" : "View Form"}
-                </button>
-            </div>
-            {isFormVisible && <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />}
-        </div>
+        <CollapsiblePanel title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
+            <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
+        </CollapsiblePanel>
     );
 };
 
