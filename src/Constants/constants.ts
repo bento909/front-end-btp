@@ -1,7 +1,8 @@
 export enum Config {
     REGION = "eu-north-1",
     COGNITO_CLIENT = "2smsm5p4lopf156dbja707il5n",
-    USER_POOL_ID = "eu-north-1_EEqLiHOgL"
+    USER_POOL_ID = "eu-north-1_EEqLiHOgL",
+    IDENTITY_POOL_ID = "eu-north-1:228730fa-d6d4-4866-a22c-ff213c8fea30"
 }
 
 export interface User {

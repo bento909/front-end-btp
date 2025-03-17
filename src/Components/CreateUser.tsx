@@ -8,7 +8,7 @@ const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
     credentials: fromCognitoIdentityPool({
         clientConfig: { region: Config.REGION },
-        identityPoolId: Config.USER_POOL_ID, // Ensure this is correct
+        identityPoolId: Config.IDENTITY_POOL_ID,
     }),
 });
 
