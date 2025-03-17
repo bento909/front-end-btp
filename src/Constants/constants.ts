@@ -1,5 +1,5 @@
 export enum Config {
-    REGION = "eu-north=1",
+    REGION = "eu-north-1",
     COGNITO_CLIENT = "2smsm5p4lopf156dbja707il5n"
 }
 

@@ -61,7 +61,15 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
     };
 
     return (
-        <ul>
+        <div  style={{
+            backgroundColor: "#ffffff", // White background
+            color: "#000000", // Black text
+            padding: "20px",
+            borderRadius: "8px",
+            maxWidth: "400px",
+            margin: "20px auto",
+            boxShadow: "0px 0px 10px rgba(0,0,0,0.1)"
+        }}>
             <h2>Add a user</h2>
             <input
                 type="email"
@@ -93,7 +101,7 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
                 Sign Up
             </button>
             {message && <p>{message}</p>}
-        </ul>
+        </div>
     );
 };
 
