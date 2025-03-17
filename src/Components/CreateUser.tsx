@@ -87,7 +87,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) 
                 alignItems: "center",
                 marginBottom: "10px"
             }}>
-                <h2 style={{ margin: 0 }}>Add a user</h2>
+                <h2 style={{ margin: 0 }}>Create a user</h2>
                 <button
                     onClick={toggleForm}
                     style={{
@@ -100,7 +100,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) 
                         borderRadius: "5px"
                     }}
                 >
-                    {isFormVisible ? "Close Form" : "Add a User"}
+                    {isFormVisible ? "Close Form" : "View Form"}
                 </button>
             </div>
 
@@ -114,7 +114,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, toggleForm, isFormVisible }) 
 
             <input
                 type="text"
-                placeholder="Name (e.g. Ben, Ben Thomas, or El Benjyrino, if you're not into the whole brevity thing)"
+                placeholder="Name (e.g. Ben, Ben Thomas, or El Benjyrino)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 style={{ padding: "8px", fontSize: "16px" }}
@@ -160,8 +160,18 @@ const Signup: React.FC = () => {
         <div style={{ padding: "20px" }}>
             {isFormVisible && <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />}
             {!isFormVisible && (
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h2 style={{ margin: 0 }}>Line 164</h2>
+                <div style={{
+                        backgroundColor: "#ffffff",
+                        color: "#000000",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                        padding: "20px",
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        position: "relative"
+                    }}>
+                    <h2 style={{margin: 0}}>Create a user</h2>
                     <button
                         onClick={toggleForm}
                         style={{
@@ -174,7 +184,7 @@ const Signup: React.FC = () => {
                             borderRadius: "5px"
                         }}
                     >
-                        Line 177
+                        View Form
                     </button>
                 </div>
             )}
