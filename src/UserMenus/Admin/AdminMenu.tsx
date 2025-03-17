@@ -10,10 +10,7 @@ const AdminMenu = () => {
                 <li>View all the data</li>
                 <li>More stuff tbc</li>
             </ul>
-            <ul>
-                <SignUp/>
-            </ul>
-
+            <SignUp/>
         </main>
     );
 };

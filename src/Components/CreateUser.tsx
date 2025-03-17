@@ -91,7 +91,10 @@ const UserForm: React.FC<UserFormProps> = ( { user } ) => {
 
 const Signup: React.FC = () => {
     const user = useUserAttributes();
-    return user.permissions.createUsers.size > 0 && <UserForm user={user} /> ;
+    return user.permissions.createUsers.length() > 0 &&
+        <ul>
+            <UserForm user={user} />
+        </ul>;
 };
 
 export default Signup;
