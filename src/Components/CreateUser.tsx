@@ -1,4 +1,4 @@
-import { CognitoIdentityProviderClient, SignUpCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { Config, Profile, User } from '../Constants/constants.ts';
 import { useState, useEffect } from "react";
 import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
@@ -7,16 +7,12 @@ const client = new CognitoIdentityProviderClient({
     region: Config.REGION, // Change to your AWS region
 });
 
-const generateTemporaryPassword = () => {
-    return Math.random().toString(36).slice(-12) + "Aa1!"; // Ensures complexity
-};
-
 export const signUpUser = async (email: string, name: string, newUserProfile: Profile, creatorEmail: string) => {
-    const temporaryPassword = generateTemporaryPassword();
-    const command = new SignUpCommand({
-        ClientId: Config.COGNITO_CLIENT,
+    const command = new AdminCreateUserCommand({
+        UserPoolId: Config.USER_POOL_ID,
         Username: email,
-        Password: temporaryPassword,
+        TemporaryPassword: Math.random().toString(36).slice(-8) + "Aa1!",
+        MessageAction: "SUPPRESS",
         UserAttributes: [
             { Name: "email", Value: email },
             { Name: "name", Value: name }, // Added name attribute
