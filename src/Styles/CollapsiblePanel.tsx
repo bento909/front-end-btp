@@ -8,8 +8,8 @@ interface CollapsiblePanelProps {
 }
 
 const Panel = styled.div<{ isOpen: boolean }>`
-    background-color: ${({ isOpen }) => (isOpen ? "#fff" : "#000")};
-    color: ${({ isOpen }) => (isOpen ? "#000" : "#fff")};
+    background-color: ${({ isOpen }) => (isOpen ? "#fff" : "#fff")};
+    color: ${({ isOpen }) => (isOpen ? "#000" : "#000")};
     display: flex;
     flex-direction: column;
     gap: 10px;
