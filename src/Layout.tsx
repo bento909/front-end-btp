@@ -19,9 +19,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     return (
         <div>
-            <header style={{ display: "flex", justifyContent: "space-between", padding: "1rem", background: "#f5f5f5" }}>
+            <header style={{ display: "flex", justifyContent: "space-between", padding: "3rem", background: "#f5f5f5" }}>
                 <h1>Hello, {thisUser.name}</h1>
-                <h2>{thisUser.name}</h2>
                 <button onClick={handleLogout} style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>
                     Logout
                 </button>
