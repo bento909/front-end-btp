@@ -26,7 +26,7 @@ const Header = styled.div`
     margin-bottom: 10px;
 `;
 
-const Button = styled.button<{ isOpen: boolean }>`
+export const Button = styled.button<{ isOpen: boolean }>`
     padding: 8px 12px;
     background-color: ${({ isOpen }) => (isOpen ? "#fff" : "#000")};
     color: ${({ isOpen }) => (isOpen ? "#000" : "#fff")};
@@ -36,7 +36,7 @@ const Button = styled.button<{ isOpen: boolean }>`
     border-radius: 5px;
 `;
 
-const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({ title, isOpen, toggle, children }) => {
+const Styles: React.FC<CollapsiblePanelProps> = ({ title, isOpen, toggle, children }) => {
     return (
         <Panel isOpen={isOpen}>
             <Header>
@@ -50,4 +50,4 @@ const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({ title, isOpen, togg
     );
 };
 
-export default CollapsiblePanel;
+export default Styles;

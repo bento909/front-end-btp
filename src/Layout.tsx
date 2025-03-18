@@ -2,6 +2,7 @@ import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 import { useUserAttributes } from "./PermissionsProvider/UserAttributesContext.tsx"
+import { Button } from "./Styles/Styles.tsx"
 import { User } from "./Constants/constants.ts";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -21,9 +22,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <div>
             <header style={{ display: "flex", justifyContent: "space-between", padding: "1rem 2rem", background: "#f5f5f5", gap: "3rem"}}>
                 <h1>Hello, {thisUser.name}</h1>
-                <button onClick={handleLogout} style={{ padding: "0.5rem 1rem", cursor: "pointer" }}>
+                <Button onClick={handleLogout} isOpen={true}>
                     Logout
-                </button>
+                </Button>
             </header>
             <main>{children}</main>
         </div>

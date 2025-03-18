@@ -3,7 +3,7 @@ import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { Config, Profile, User } from "../Constants/constants.ts";
-import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
+import Styles from "../Styles/Styles.tsx";
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -91,9 +91,9 @@ const Signup: React.FC = () => {
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
     return user.permissions.createUsers.length > 0 && (
-        <CollapsiblePanel title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
+        <Styles title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
             <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
-        </CollapsiblePanel>
+        </Styles>
     );
 };
 
