@@ -19,7 +19,6 @@ export enum Profile {
     TRAINER = 'trainer',
     TRAINER_USER = 'trainer_user',
     BASIC_USER = 'basic_user'
-
 }
 
 export enum ViewUsers {

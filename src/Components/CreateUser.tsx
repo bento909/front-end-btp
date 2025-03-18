@@ -63,7 +63,7 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
         }
         try {
             await signUpUser(email, name, profile, user.emailAddress);
-            setMessage("Signup successful! Check your email for verification.");
+            setMessage("Signup successful! User should 1. Sign in with Pa55w0rd! 2. Give a new password, 3. See their email for a security code, and enter it when prompted.");
         } catch {
             setMessage("Error signing up. Please try again.");
         }
