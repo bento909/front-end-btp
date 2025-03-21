@@ -1,13 +1,20 @@
 import { Profile } from "../../Constants/constants.ts";
 import { useUserAttributes } from "../../PermissionsProvider/UserAttributesContext.tsx";
 import { useNavigate } from "react-router-dom";
+import {PermissionService} from "../../PermissionsProvider/PermissionsMap.tsx";
 
 const TesterMenu = () => {
-    const { changeUserAttributes } = useUserAttributes(); // Get changeUserAttributes from context
+    const { changeUserAttributes, user} = useUserAttributes(); // Get changeUserAttributes from context
     const navigate = useNavigate();
 
     function handleNameChange(role: string) {
-        changeUserAttributes({ profile: role as Profile, name: 'Gobshite' });
+        changeUserAttributes({
+            profile: role as Profile,
+            name: 'Gobshite',
+            permissions: PermissionService.getPermissions(role as Profile),
+            emailAddress: 'testy@icicles.cock',
+            creator: user ? user.emailAddress : 'nobody'
+        });
         console.log('You fucken druggo')
         navigate("/");
     }

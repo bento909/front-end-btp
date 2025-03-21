@@ -20,7 +20,6 @@ export const UserAttributesProvider: React.FC<{ children: React.ReactNode }> = (
                 const attributes = await fetchUserAttributes();
                 const userTypeString = attributes.profile ? attributes.profile : 'basic_user';
                 const userType: Profile = userTypeString as Profile;
-
                 setThisUser({
                     name: attributes.name ? attributes.name : 'wonderful human',
                     emailAddress: attributes.email ? attributes.email : '',
@@ -41,8 +40,11 @@ export const UserAttributesProvider: React.FC<{ children: React.ReactNode }> = (
     // Function to update user attributes
     const changeUserAttributes = (updatedAttributes: Partial<User>) => {
         setThisUser((prevUser) => {
-            if (!prevUser) return null; // Handle case where user is not set yet
-            return { ...prevUser, ...updatedAttributes };
+            if (!prevUser) return null;
+            console.log("User has been changed from:", prevUser); // Log old user before updating
+            const newUser = { ...prevUser, ...updatedAttributes };
+            console.log("User has been changed to:", newUser); // Log new user after updating
+            return newUser;
         });
     };
 
