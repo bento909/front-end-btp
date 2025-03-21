@@ -4,11 +4,11 @@ import { Profile } from '../Constants/constants.ts';
 import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx"
 
 const PostLoginScreen = () => {
-    const loggedInUser = useUserAttributes();
+    const { user } = useUserAttributes();
     const navigate = useNavigate();
     useEffect(() => {
         const handleUserLogin = async () => {
-            const role = loggedInUser.profile
+            const role = user ? user.profile : Profile.BASIC_USER
             if (role === Profile.TESTER) {
                 navigate('/testerMenu');
             } else  {

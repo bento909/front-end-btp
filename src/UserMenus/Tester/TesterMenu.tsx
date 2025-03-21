@@ -15,7 +15,7 @@ const TesterMenu = () => {
     return (
         <main>
             <h1>Hello, this is the page for you, the tester</h1>
-            <h2>When you log in you will be able to impersonate all roles</h2>
+            <h2>When you click one of the below roles you will magically take on their powers</h2>
             <ul>
                 {Object.values(Profile).map((role) => (
                     <li key={role as string} onClick={() => handleNameChange(role)}>

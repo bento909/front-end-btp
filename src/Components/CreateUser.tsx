@@ -85,12 +85,12 @@ const UserForm: React.FC<UserFormProps> = ({ user }) => {
 };
 
 const Signup: React.FC = () => {
-    const user = useUserAttributes();
+    const { user } = useUserAttributes();
     const [isFormVisible, setIsFormVisible] = useState(false);
 
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
-    return user.permissions.createUsers.length > 0 && (
+    return user && user.permissions.createUsers.length > 0 && (
         <Styles title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
             <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
         </Styles>
