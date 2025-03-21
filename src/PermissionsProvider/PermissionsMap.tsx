@@ -1,6 +1,5 @@
 import { CreatePlan, Profile, ViewUsers, Permissions } from "../Constants/constants.ts";
 
-
 export class PermissionService {
     public static getPermissions(userType: Profile): Permissions {
         const permissionsMap: Record<Profile, Permissions> = {
