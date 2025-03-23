@@ -8,14 +8,14 @@ const TesterMenu = () => {
     const navigate = useNavigate();
 
     function handleNameChange(role: string) {
+        const testName = role  + ' (test mode)';
         changeUserAttributes({
             profile: role as Profile,
-            name: 'Gobshite',
+            name: testName,
             permissions: PermissionService.getPermissions(role as Profile),
-            emailAddress: 'testy@icicles.cock',
-            creator: user ? user.emailAddress : 'nobody'
+            emailAddress: 'test@test.test',
+            creator: user ? user.emailAddress : 'Something odd has happened!'
         });
-        console.log('You fucken druggo')
         navigate("/");
     }
 

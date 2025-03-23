@@ -49,7 +49,7 @@ export const UserAttributesProvider: React.FC<{ children: React.ReactNode }> = (
     };
 
     if (loading) {
-        return <div>Loading user data...</div>;
+        return <div>Loading...</div>;
     }
 
     return (
