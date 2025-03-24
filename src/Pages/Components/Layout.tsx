@@ -4,15 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../Styles/CollapsiblePanel.tsx"
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store.tsx";
+import { useDispatch } from 'react-redux';
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     const user = useSelector((state: RootState) => state.auth.user); // Extract 'user' instead of using the whole object
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleLogout = async () => {
         try {
             await signOut();
+            dispatch({ type: 'USER_LOGOUT' }); // Reset the Redux state
             navigate("/");
         } catch (error) {
             console.error("Error logging out:", error);

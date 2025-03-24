@@ -13,6 +13,7 @@ const TesterMenu = () => {
 
     function handleNameChange(role: string) {
         const testName = role  + ' (test mode)';
+        dispatch({ type: 'USER_LOGOUT' });
         dispatch(updateAuthUser({
                 profile: role as Profile,
                 name: testName,

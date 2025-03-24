@@ -1,14 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
-import usersReducer from "./usersSlice";
-import authReducer from "./authSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from './rootReducer';
 
 const store = configureStore({
-    reducer: {
-        users: usersReducer, // Add users to Redux store
-        auth: authReducer, // Add authentication state
-    },
+    reducer: rootReducer,
 });
 
+// Export types for use in components
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 

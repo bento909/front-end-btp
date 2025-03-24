@@ -41,6 +41,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
+        resetAuthState: () => initialState,
         updateAuthUser: (state, action: PayloadAction<Partial<User>>) => {
             if (state.user) {
                 state.user = { ...state.user, ...action.payload };
@@ -63,5 +64,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { updateAuthUser } = authSlice.actions;
+export const { resetAuthState, updateAuthUser } = authSlice.actions;
 export default authSlice.reducer;
