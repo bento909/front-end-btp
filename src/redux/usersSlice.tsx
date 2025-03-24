@@ -21,16 +21,12 @@ const transformUserData = (rawUsers: ApiUser[]): User[] => {
             acc[attr.Name] = attr.Value;
             return acc;
         }, {});
-        console.log("here are the attributes:")
-        console.log(user.Attributes);
-        console.log("nice, huh")
-
         return {
             id: user.Username,
             name: attributes.name || "Unknown",
             emailAddress: attributes.email || "No email",
             profile: attributes.profile as Profile || Profile.BASIC_USER,
-            creator: attributes.creatorEmail || "No creator Email",
+            creator: attributes['custom:creatorEmail'] || "No creator Email",
             permissions: PermissionService.getPermissions(attributes.profile as Profile)
         };
     });
