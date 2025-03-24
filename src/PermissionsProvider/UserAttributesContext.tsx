@@ -26,6 +26,7 @@ export const UserAttributesProvider: React.FC<{ children: React.ReactNode }> = (
                     profile: userType,
                     creator: attributes.zoneinfo ? attributes.zoneinfo : '',
                     permissions: PermissionService.getPermissions(userType),
+                    id: '' //TODO Figure this bit out
                 });
             } catch (error) {
                 console.error("Error fetching user attributes:", error);

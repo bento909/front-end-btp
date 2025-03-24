@@ -1,40 +1,35 @@
 import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
-import { User, ViewUsers } from "../Constants/constants.ts";
+import { ViewUsers } from "../Constants/constants.ts";
 import { useEffect, useState } from "react";
 import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
-import { fetchUsers } from "../Api/FetchUsers.tsx"; // Import fetchUsers function
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsersThunk } from "../redux/usersSlice";
+import { RootState, AppDispatch } from "../redux/store";
 
 // User Form Component
 interface GetUserListProps {
-    user: User;
     toggleForm: () => void;
     isFormVisible: boolean;
 }
 
-const UserList: React.FC<GetUserListProps> = ({ user }) => {
-    const [users, setUsers] = useState<User[]>([]);
-
+const UserList: React.FC<GetUserListProps> = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { users, loading, error } = useSelector((state: RootState) => state.users);
     useEffect(() => {
-        console.log("Current User:", user);
+        dispatch(fetchUsersThunk());
+    }, [dispatch]);
 
-        const getUsers = async () => {
-            const data = await fetchUsers();
-            if (data) {
-                console.log("fetchUser has been invoked")
-                setUsers(data);
-            }
-        };
+    if (loading) return <div>Loading users...</div>;
+    if (error) return <div>Error: {error}</div>;
 
-        getUsers();
-    }, [user]);
-
-    return (users ?
+    return users.length ? (
         <ul>
-            {users.map((u) => (
-                <li>{u.name}</li>
+            {users.map((user) => (
+                <li key={user.id}>{user.name} ({user.emailAddress})</li>
             ))}
-        </ul> :
-            <div>You don't have any clients. Loser :p</div>
+        </ul>
+    ) : (
+        <div>No users found.</div>
     );
 };
 
@@ -46,7 +41,7 @@ const ViewAllUsers: React.FC = () => {
 
     return user && user.permissions?.viewUsers !== ViewUsers.NONE ? (
         <CollapsiblePanel title="Users" isOpen={isFormVisible} toggle={toggleForm}>
-            <UserList user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
+            <UserList toggleForm={toggleForm} isFormVisible={isFormVisible} />
         </CollapsiblePanel>
     ) : null;
 };
