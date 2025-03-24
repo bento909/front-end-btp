@@ -1,21 +1,25 @@
 import { Profile } from "../../Constants/constants.ts";
-import { useUserAttributes } from "../../PermissionsProvider/UserAttributesContext.tsx";
 import { useNavigate } from "react-router-dom";
-import {PermissionService} from "../../PermissionsProvider/PermissionsMap.tsx";
+import { PermissionService } from "../../PermissionsProvider/PermissionsMap.tsx";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../redux/store";
+import {updateAuthUser} from "../../redux/authSlice.tsx";
 
 const TesterMenu = () => {
-    const { changeUserAttributes, user} = useUserAttributes(); // Get changeUserAttributes from context
     const navigate = useNavigate();
+    const user = useSelector((state: RootState) => state.auth.user);
 
     function handleNameChange(role: string) {
         const testName = role  + ' (test mode)';
-        changeUserAttributes({
-            profile: role as Profile,
-            name: testName,
-            permissions: PermissionService.getPermissions(role as Profile),
-            emailAddress: 'test@test.test',
-            creator: user ? user.emailAddress : 'Something odd has happened!'
-        });
+        const dispatch = useDispatch<AppDispatch>();
+        dispatch(updateAuthUser({
+                profile: role as Profile,
+                name: testName,
+                permissions: PermissionService.getPermissions(role as Profile),
+                emailAddress: 'test@test.test',
+                creator: user ? user.emailAddress : 'Something odd has happened!'
+            })
+        );
         navigate("/");
     }
 

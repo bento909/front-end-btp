@@ -1,4 +1,3 @@
-import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
 import { ViewUsers } from "../Constants/constants.ts";
 import { useEffect, useState } from "react";
 import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
@@ -34,7 +33,7 @@ const UserList: React.FC<GetUserListProps> = () => {
 };
 
 const ViewAllUsers: React.FC = () => {
-    const { user } = useUserAttributes();
+    const user =  useSelector((state: RootState) => state.auth.user);
     const [isFormVisible, setIsFormVisible] = useState(false);
 
     const toggleForm = () => setIsFormVisible(!isFormVisible);

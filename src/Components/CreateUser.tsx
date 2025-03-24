@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { Config, Profile, User } from "../Constants/constants.ts";
 import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -85,9 +87,8 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
 };
 
 const Signup: React.FC = () => {
-    const { user } = useUserAttributes();
+    const user = useSelector((state: RootState) => state.auth.user);
     const [isFormVisible, setIsFormVisible] = useState(false);
-
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
     return user && user.permissions.createUsers.length > 0 && (
