@@ -17,7 +17,7 @@ const PostLoginScreen = () => {
             }
         };
         handleUserLogin();
-    }, [navigate]);
+    }, [navigate, user]);
 
     return <div>Loading...</div>;
 };
