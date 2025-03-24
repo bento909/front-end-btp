@@ -24,7 +24,7 @@ export const fetchUsers = async () => {
     try {
         const token = await getCognitoToken();
         if (!token) throw new Error("No Cognito token found");
-
+        console.log('About to send GET')
         const response = await fetch(getUsersUrl, {
             method: "GET",
             headers: {
@@ -32,7 +32,9 @@ export const fetchUsers = async () => {
                 "Content-Type": "application/json"
             }
         });
-
+        console.log('GET sent, response received;')
+        console.log(response)
+        console.log('Response is good, no?')
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }

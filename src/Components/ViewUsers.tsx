@@ -30,7 +30,7 @@ const UserList: React.FC<GetUserListProps> = ({ user }) => {
     return (users ?
         <ul>
             {users.map((u) => (
-                <li key={u.emailAddress}>{u.name}</li>
+                <li>{u.name}</li>
             ))}
         </ul> :
             <div>You don't have any clients. Loser :p</div>
