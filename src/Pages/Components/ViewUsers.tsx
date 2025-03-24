@@ -1,9 +1,9 @@
-import { ViewUsers } from "../Constants/constants.tsx";
+import { ViewUsers } from "../../Constants/constants.tsx";
 import { useEffect, useState } from "react";
-import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
+import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUsersThunk } from "../redux/usersSlice";
-import { RootState, AppDispatch } from "../redux/store";
+import { fetchUsersThunk } from "../../redux/usersSlice.tsx";
+import { RootState, AppDispatch } from "../../redux/store.tsx";
 
 // User Form Component
 interface GetUserListProps {

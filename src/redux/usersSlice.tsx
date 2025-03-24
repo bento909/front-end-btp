@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchUsers } from "../Api/FetchUsers";
 import { ApiUser, Profile, User } from "../Constants/constants.tsx";
-import { PermissionService } from "../PermissionsProvider/PermissionsMap.tsx";
+import { PermissionService } from "../Helpers/PermissionService.tsx";
 
 interface UsersState {
     users: User[];

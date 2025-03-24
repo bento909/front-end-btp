@@ -1,9 +1,9 @@
-import { Profile } from "../../Constants/constants.tsx";
+import { Profile } from "../../../Constants/constants.tsx";
 import { useNavigate } from "react-router-dom";
-import { PermissionService } from "../../PermissionsProvider/PermissionsMap.tsx";
+import { PermissionService } from "../../../Helpers/PermissionService.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../redux/store";
-import {updateAuthUser} from "../../redux/authSlice.tsx";
+import { RootState, AppDispatch } from "../../../redux/store.tsx";
+import {updateAuthUser} from "../../../redux/authSlice.tsx";
 
 const TesterMenu = () => {
     const navigate = useNavigate();

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
-import { Config, Profile, User } from "../Constants/constants.tsx";
-import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
+import { Config, Profile, User } from "../../Constants/constants.tsx";
+import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+import { RootState } from "../../redux/store.tsx";
 
 
 const client = new CognitoIdentityProviderClient({

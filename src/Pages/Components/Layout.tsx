@@ -1,9 +1,9 @@
 import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./Styles/CollapsiblePanel.tsx"
+import { Button } from "../../Styles/CollapsiblePanel.tsx"
 import { useSelector } from "react-redux";
-import { RootState } from "./redux/store";
+import { RootState } from "../../redux/store.tsx";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
