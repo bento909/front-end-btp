@@ -10,6 +10,7 @@ const PostLoginScreen = () => {
     useEffect(() => {
         const handleUserLogin = async () => {
             const role = user ? user.profile : Profile.BASIC_USER
+            console.log('my role is ' + role)
             if (role === Profile.TESTER) {
                 navigate('/testerMenu');
             } else  {
