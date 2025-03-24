@@ -3,7 +3,7 @@ import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { Config, Profile, User } from "../Constants/constants.ts";
-import Styles from "../Styles/Styles.tsx";
+import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -38,13 +38,13 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
 };
 
 // User Form Component
-interface UserFormProps {
+interface CreateUserFormProps {
     user: User;
     toggleForm: () => void;
     isFormVisible: boolean;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user }) => {
+const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [profile, setProfile] = useState<Profile | "">("");
@@ -91,9 +91,9 @@ const Signup: React.FC = () => {
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
     return user && user.permissions.createUsers.length > 0 && (
-        <Styles title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
+        <CollapsiblePanel title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
             <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
-        </Styles>
+        </CollapsiblePanel>
     );
 };
 

@@ -2,7 +2,7 @@ import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 import { useUserAttributes } from "./PermissionsProvider/UserAttributesContext.tsx"
-import { Button } from "./Styles/Styles.tsx"
+import { Button } from "./Styles/CollapsiblePanel.tsx"
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 

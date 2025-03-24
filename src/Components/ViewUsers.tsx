@@ -1,44 +1,53 @@
-import { Config } from "../Constants/constants.ts";
+import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
+import { User, ViewUsers } from "../Constants/constants.ts";
+import { useEffect, useState } from "react";
+import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
+import { fetchUsers } from "../Api/FetchUsers.tsx"; // Import fetchUsers function
 
-// Cognito Config
-const clientId = Config.COGNITO_CLIENT;
-const getUsersUrl = Config.GET_USERS_URL;
-// Initialize Cognito Identity Provider client
-
-async function getCognitoToken(): Promise<string | null> {
-    try {
-        const lastUser = localStorage.getItem(`CognitoIdentityServiceProvider.${clientId}.LastAuthUser`);
-        if (!lastUser) throw new Error("User not found in local storage");
-
-        const tokenString = localStorage.getItem(`CognitoIdentityServiceProvider.${clientId}.${lastUser}.idToken`);
-        if (!tokenString) throw new Error("No token found for user");
-        return tokenString;
-    } catch (error) {
-        console.error("Error getting Cognito token:", error);
-        return null;
-    }
+// User Form Component
+interface GetUserListProps {
+    user: User;
+    toggleForm: () => void;
+    isFormVisible: boolean;
 }
 
-// Fetch Users from API Gateway
-const fetchUsers = async () => {
-    try {
-        const token = await getCognitoToken(); // Get Cognito token
+const UserList: React.FC<GetUserListProps> = ({ user }) => {
+    const [users, setUsers] = useState<User[]>([]);
 
-        if (!token) throw new Error("No Cognito token found");
+    useEffect(() => {
+        console.log("Current User:", user);
 
-        const response = await fetch(getUsersUrl, {
-            method: "GET",
-            headers: {
-                "Authorization": token,  // Send Cognito JWT Token
-                "Content-Type": "application/json"
+        const getUsers = async () => {
+            const data = await fetchUsers();
+            if (data) {
+                setUsers(data);
             }
-        });
+        };
 
-        const data = await response.json();
-        console.log("Users:", data);
-    } catch (error) {
-        console.error("Error fetching users:", error);
-    }
+        getUsers();
+    }, [user]);
+
+    return (users ?
+        <ul>
+            {users.map((u) => (
+                <li key={u.emailAddress}>{u.name}</li>
+            ))}
+        </ul> :
+            <div>You don't have any clients. Loser :p</div>
+    );
 };
 
-fetchUsers();
+const ViewAllUsers: React.FC = () => {
+    const { user } = useUserAttributes();
+    const [isFormVisible, setIsFormVisible] = useState(false);
+
+    const toggleForm = () => setIsFormVisible(!isFormVisible);
+
+    return user && user.permissions?.viewUsers !== ViewUsers.NONE ? (
+        <CollapsiblePanel title="Users" isOpen={isFormVisible} toggle={toggleForm}>
+            <UserList user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
+        </CollapsiblePanel>
+    ) : null;
+};
+
+export default ViewAllUsers;
