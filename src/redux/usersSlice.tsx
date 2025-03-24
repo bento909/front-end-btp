@@ -21,7 +21,8 @@ const transformUserData = (rawUsers: ApiUser[]): User[] => {
             acc[attr.Name] = attr.Value;
             return acc;
         }, {});
-
+        console.log("here are the attributes:")
+        console.log(user.Attributes);
         return {
             id: user.Username,
             name: attributes.name || "Unknown",
