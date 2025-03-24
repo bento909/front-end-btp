@@ -28,7 +28,7 @@ export const fetchAuthUser = createAsyncThunk<User>(
                 name: attributes.name || "wonderful human",
                 emailAddress: attributes.email || "",
                 profile: userType,
-                creator: attributes.creatorEmail || "",
+                creator: attributes['custom:creatorEmail'] || "who created you?",
                 permissions: PermissionService.getPermissions(userType),
             };
         } catch (error) {
@@ -41,7 +41,7 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        // resetAuthState: () => initialState,
+        resetAuthState: () => initialState,
         updateAuthUser: (state, action: PayloadAction<Partial<User>>) => {
             if (state.user) {
                 state.user = { ...state.user, ...action.payload };
@@ -64,5 +64,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { updateAuthUser } = authSlice.actions;
+export const { updateAuthUser, resetAuthState } = authSlice.actions;
 export default authSlice.reducer;

@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { PermissionService } from "../../../Helpers/PermissionService.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux/store.tsx";
-import {updateAuthUser} from "../../../redux/authSlice.tsx";
+import { updateAuthUser, resetAuthState } from "../../../redux/authSlice.tsx";
+
 
 
 const TesterMenu = () => {
@@ -13,7 +14,7 @@ const TesterMenu = () => {
 
     function handleNameChange(role: string) {
         const testName = role  + ' (test mode)';
-        dispatch({ type: 'USER_LOGOUT' });
+        dispatch(resetAuthState())
         dispatch(updateAuthUser({
                 profile: role as Profile,
                 name: testName,
