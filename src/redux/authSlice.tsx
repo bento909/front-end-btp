@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { fetchUserAttributes } from "aws-amplify/auth";
-import {Profile, User} from "../Constants/constants";
+import {Profile, User} from "../Constants/constants.tsx";
 import { PermissionService } from "../PermissionsProvider/PermissionsMap";
 
 interface AuthState {

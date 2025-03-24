@@ -1,4 +1,4 @@
-import { Profile } from "../../Constants/constants.ts";
+import { Profile } from "../../Constants/constants.tsx";
 import { useNavigate } from "react-router-dom";
 import { PermissionService } from "../../PermissionsProvider/PermissionsMap.tsx";
 import { useDispatch, useSelector } from "react-redux";

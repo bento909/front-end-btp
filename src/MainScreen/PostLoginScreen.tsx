@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Profile } from '../Constants/constants.ts';
+import { Profile } from '../Constants/constants.tsx';
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 

@@ -1,4 +1,4 @@
-import { ViewUsers } from "../Constants/constants.ts";
+import { ViewUsers } from "../Constants/constants.tsx";
 import { useEffect, useState } from "react";
 import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
 import { useDispatch, useSelector } from "react-redux";
