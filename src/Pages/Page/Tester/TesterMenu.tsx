@@ -5,13 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux/store.tsx";
 import {updateAuthUser} from "../../../redux/authSlice.tsx";
 
+
 const TesterMenu = () => {
     const navigate = useNavigate();
     const user = useSelector((state: RootState) => state.auth.user);
+    const dispatch = useDispatch<AppDispatch>();
 
     function handleNameChange(role: string) {
         const testName = role  + ' (test mode)';
-        const dispatch = useDispatch<AppDispatch>();
         dispatch(updateAuthUser({
                 profile: role as Profile,
                 name: testName,
