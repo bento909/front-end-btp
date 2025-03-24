@@ -3,7 +3,7 @@ export enum Config {
     COGNITO_CLIENT = "2smsm5p4lopf156dbja707il5n",
     USER_POOL_ID = "eu-north-1_EEqLiHOgL",
     IDENTITY_POOL_ID = "eu-north-1:228730fa-d6d4-4866-a22c-ff213c8fea30",
-    GET_USERS_URL = "https://6dv7pag4m3.execute-api.eu-north-1.amazonaws.com/Default/getUsers"
+    GET_USERS_URL = "https://6dv7pag4m3.execute-api.eu-north-1.amazonaws.com/Default"
 }
 
 export interface User {
