@@ -3,9 +3,9 @@ import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { Config, Profile, User } from "../../Constants/constants.tsx";
 import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store.tsx";
-
+import { useSelector, useDispatch } from "react-redux";  // Import useDispatch
+import {AppDispatch, RootState} from "../../redux/store.tsx";
+import { fetchUsersThunk } from "../../redux/usersSlice";  // Import the fetchUsersThunk
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -51,6 +51,7 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
     const [name, setName] = useState("");
     const [profile, setProfile] = useState<Profile | "">("");
     const [message, setMessage] = useState("");
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         if (user.permissions.createUsers.length > 0) {
@@ -65,6 +66,7 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
         }
         try {
             await signUpUser(email, name, profile, user.emailAddress);
+            dispatch(fetchUsersThunk());
             setMessage("Signup successful! User should 1. Sign in with Pa55w0rd! 2. Give a new password, 3. See their email for a security code, and enter it when prompted.");
         } catch {
             setMessage("Error signing up. Please try again.");
