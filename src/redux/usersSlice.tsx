@@ -27,7 +27,7 @@ const transformUserData = (rawUsers: ApiUser[]): User[] => {
             name: attributes.name || "Unknown",
             emailAddress: attributes.email || "No email",
             profile: attributes.profile as Profile || Profile.BASIC_USER,
-            creator: attributes.zoneinfo || "No zone info",
+            creator: attributes.creatorEmail || "No creator Email",
             permissions: PermissionService.getPermissions(attributes.profile as Profile)
         };
     });

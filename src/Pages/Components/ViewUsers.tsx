@@ -20,7 +20,11 @@ const UserList: React.FC<GetUserListProps> = () => {
     return users.length ? (
         <ul>
             {users.map((user) => (
-                <li key={user.id}>{user.name} ({user.emailAddress})</li>
+                <li key={user.id}>
+                    <div>Name: {user.name}</div>
+                    <div>Email: {user.emailAddress}</div>
+                    <div>Trainer: {user.creator}</div>
+                </li>
             ))}
         </ul>
     ) : (
