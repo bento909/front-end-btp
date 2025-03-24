@@ -25,7 +25,7 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
             { Name: "email", Value: email },
             { Name: "name", Value: name },
             { Name: "profile", Value: newUserProfile },
-            { Name: "zoneinfo", Value: creatorEmail }
+            { Name: "creatorEmail", Value: creatorEmail}
         ],
     });
 

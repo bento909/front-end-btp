@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { fetchUserAttributes } from "aws-amplify/auth";
-import {Profile, User} from "../Constants/constants.tsx";
+import { Profile, User } from "../Constants/constants.tsx";
 import { PermissionService } from "../Helpers/PermissionService.tsx";
 
 interface AuthState {
@@ -28,7 +28,7 @@ export const fetchAuthUser = createAsyncThunk<User>(
                 name: attributes.name || "wonderful human",
                 emailAddress: attributes.email || "",
                 profile: userType,
-                creator: attributes.zoneinfo || "",
+                creator: attributes.creatorEmail || "",
                 permissions: PermissionService.getPermissions(userType),
             };
         } catch (error) {
