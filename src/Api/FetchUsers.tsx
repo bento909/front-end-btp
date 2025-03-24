@@ -9,9 +9,12 @@ async function getCognitoToken(): Promise<string | null> {
     try {
         const lastUser = localStorage.getItem(`CognitoIdentityServiceProvider.${clientId}.LastAuthUser`);
         if (!lastUser) throw new Error("User not found in local storage");
+        console.log('last user: ' + lastUser);
 
         const tokenString = localStorage.getItem(`CognitoIdentityServiceProvider.${clientId}.${lastUser}.idToken`);
         if (!tokenString) throw new Error("No token found for user");
+
+        console.log('token String: ' + lastUser);
 
         return tokenString;
     } catch (error) {
@@ -22,6 +25,7 @@ async function getCognitoToken(): Promise<string | null> {
 
 export const fetchUsers = async () => {
     try {
+        console.log("about to call await getCognitoToken")
         const token = await getCognitoToken();
         if (!token) throw new Error("No Cognito token found");
         console.log('About to send GET')

@@ -20,6 +20,7 @@ const UserList: React.FC<GetUserListProps> = ({ user }) => {
         const getUsers = async () => {
             const data = await fetchUsers();
             if (data) {
+                console.log("fetchUser has been invoked")
                 setUsers(data);
             }
         };
