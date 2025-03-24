@@ -1,5 +1,5 @@
 import { ViewUsers } from "../../Constants/constants.tsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersThunk } from "../../redux/usersSlice.tsx";
@@ -12,11 +12,7 @@ interface GetUserListProps {
 }
 
 const UserList: React.FC<GetUserListProps> = () => {
-    const dispatch = useDispatch<AppDispatch>();
     const { users, loading, error } = useSelector((state: RootState) => state.users);
-    useEffect(() => {
-        dispatch(fetchUsersThunk());
-    }, [dispatch]);
 
     if (loading) return <div>Loading users...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -33,10 +29,18 @@ const UserList: React.FC<GetUserListProps> = () => {
 };
 
 const ViewAllUsers: React.FC = () => {
-    const user =  useSelector((state: RootState) => state.auth.user);
+    const user = useSelector((state: RootState) => state.auth.user);
+    const dispatch = useDispatch<AppDispatch>();
+    const { users } = useSelector((state: RootState) => state.users);
     const [isFormVisible, setIsFormVisible] = useState(false);
 
-    const toggleForm = () => setIsFormVisible(!isFormVisible);
+    const toggleForm = () => {
+        setIsFormVisible(!isFormVisible);
+        // Fetch users only if panel is opening and users haven't been loaded yet
+        if (!isFormVisible && users.length === 0) {
+            dispatch(fetchUsersThunk());
+        }
+    };
 
     return user && user.permissions?.viewUsers !== ViewUsers.NONE ? (
         <CollapsiblePanel title="Users" isOpen={isFormVisible} toggle={toggleForm}>
