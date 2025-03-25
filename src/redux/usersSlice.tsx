@@ -50,7 +50,7 @@ const usersSlice = createSlice({
     name: "users",
     initialState,
     reducers: {
-        // reset: () => initialState,
+        reset: () => initialState,
     },
     extraReducers: (builder) => {
         builder
@@ -68,5 +68,5 @@ const usersSlice = createSlice({
     },
 });
 
-// export const { reset } = usersSlice.actions;
+export const { reset } = usersSlice.actions;
 export default usersSlice.reducer;

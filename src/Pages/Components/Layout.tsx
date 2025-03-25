@@ -5,6 +5,8 @@ import { Button } from "../../Styles/CollapsiblePanel.tsx"
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store.tsx";
 import { useDispatch } from 'react-redux';
+import { resetAuthState } from "../../redux/authSlice.tsx";
+import { reset } from "../../redux/usersSlice.tsx";
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
@@ -15,7 +17,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const handleLogout = async () => {
         try {
             await signOut();
-            dispatch({ type: 'USER_LOGOUT' }); // Reset the Redux state
+            dispatch(resetAuthState());
+            dispatch(reset())
             navigate("/");
         } catch (error) {
             console.error("Error logging out:", error);
