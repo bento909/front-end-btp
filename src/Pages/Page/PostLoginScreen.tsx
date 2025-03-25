@@ -6,21 +6,25 @@ import { RootState } from "../../redux/store.tsx";
 
 const PostLoginScreen = () => {
     const user = useSelector((state: RootState) => state.auth.user);
+    const loading = useSelector((state: RootState) => state.auth.loading);
     const navigate = useNavigate();
+
     useEffect(() => {
-        const handleUserLogin = async () => {
-            const role = user ? user.profile : Profile.BASIC_USER
-            console.log('my role is ' + role)
-            if (role === Profile.TESTER) {
+        if (!loading && user) {
+            console.log('User profile:', user.profile);
+            if (user.profile === Profile.TESTER) {
                 navigate('/testerMenu');
-            } else  {
+            } else {
                 navigate('/adminMenu');
             }
-        };
-        handleUserLogin();
-    }, [navigate, user]);
+        }
+    }, [loading, user, navigate]);
 
-    return <div>Loading...</div>;
+    if (loading || !user) {
+        return <div>Loading...</div>;
+    }
+
+    return null;
 };
 
 export default PostLoginScreen;
