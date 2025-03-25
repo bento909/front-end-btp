@@ -1,7 +1,7 @@
-import SignUp from '../../Components/CreateUser';
+import SignUp from '../../Components/CreateUser.tsx';
 import ViewAllUsers from "../../Components/ViewUsers.tsx";
 
-const MainMenu = () => {
+const UserMenu = () => {
     return (
         <main>
             <ul>
@@ -13,4 +13,4 @@ const MainMenu = () => {
     );
 };
 
-export default MainMenu
+export default UserMenu
