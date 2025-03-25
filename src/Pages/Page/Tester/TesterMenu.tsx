@@ -4,6 +4,7 @@ import { PermissionService } from "../../../Helpers/PermissionService.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux/store.tsx";
 import { updateAuthUser } from "../../../redux/authSlice.tsx";
+import {reset} from "../../../redux/usersSlice.tsx";
 
 const TesterMenu = () => {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ const TesterMenu = () => {
 
     function handleNameChange(role: string) {
         const testName = role  + ' (test mode)';
+        dispatch(reset());
         dispatch(updateAuthUser({
                 profile: role as Profile,
                 name: testName,
