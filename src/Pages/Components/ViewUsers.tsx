@@ -39,11 +39,13 @@ const ViewAllUsers: React.FC = () => {
     const [isFormVisible, setIsFormVisible] = useState(false);
 
     const toggleForm = () => {
-        setIsFormVisible(!isFormVisible);
-        // Fetch users only if panel is opening and users haven't been loaded yet
-        if (!isFormVisible && users.length === 0) {
-            dispatch(fetchUsersThunk());
-        }
+        setIsFormVisible((prevIsVisible) => {
+            const newIsVisible = !prevIsVisible;
+            if (newIsVisible && users.length === 0) {
+                dispatch(fetchUsersThunk());
+            }
+            return newIsVisible;
+        });
     };
 
     return user && user.permissions?.viewUsers !== ViewUsers.NONE ? (
