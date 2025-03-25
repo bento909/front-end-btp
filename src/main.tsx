@@ -6,8 +6,8 @@ import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
 import '@aws-amplify/ui-react/styles.css';
 import AppRoutes from "./Routes.tsx";
-import {Provider, useDispatch} from "react-redux";
-import {AppDispatch} from "./redux/store.tsx";
+import {Provider, useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "./redux/store.tsx";
 import { fetchAuthUser } from "./redux/authSlice"
 import store from "./redux/store.tsx"
 
@@ -15,14 +15,18 @@ Amplify.configure(outputs);
 
 const RootComponent: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const { loading } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
-        dispatch(fetchAuthUser()); // Fetch user attributes when the app starts
+        dispatch(fetchAuthUser());
     }, [dispatch]);
+
+    if (loading) {
+        return <div>Loading...</div>; // Show a loading screen while fetching user data
+    }
 
     return <AppRoutes />;
 };
-
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
