@@ -4,6 +4,8 @@ import { Authenticator } from '@aws-amplify/ui-react';
 import "./index.css";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
+// @ts-ignore
+import config from "../aws-exports.js";
 import '@aws-amplify/ui-react/styles.css';
 import AppRoutes from "./Routes.tsx";
 import {Provider, useDispatch, useSelector} from "react-redux";
@@ -11,6 +13,7 @@ import {AppDispatch, RootState} from "./redux/store.tsx";
 import { fetchAuthUser } from "./redux/authSlice"
 import store from "./redux/store.tsx"
 
+Amplify.configure(config);
 Amplify.configure(outputs);
 
 const RootComponent: React.FC = () => {
