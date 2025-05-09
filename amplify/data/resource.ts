@@ -1,17 +1,69 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
-/*== STEP 1 ===============================================================
-The section below creates a Todo database table with a "content" field. Try
-adding a new "isDone" field as a boolean. The authorization rule below
-specifies that any user authenticated via an API key can "create", "read",
-"update", and "delete" any "Todo" records.
-=========================================================================*/
 const schema = a.schema({
-  Todo: a
-    .model({
-      content: a.string(),
-    })
-    .authorization((allow) => [allow.publicApiKey()]),
+  // === PLANS ===
+  Plan: a
+      .model({
+        id: a.id(), // required by default
+        name: a.string().required(),
+        trainerEmail: a.string().required(),
+        clientEmail: a.string().required(),
+        planDays: a.hasMany("PlanDay", "planId"), // Plan has many days
+      })
+      .authorization((allow) => [allow.publicApiKey()]),
+
+  // === EXERCISE POOL ===
+  Exercise: a
+      .model({
+        id: a.id(),
+        name: a.string().required(),
+        type: a.enum(["LIFT", "RUN", "CYCLE", "INTERVAL", "KB_SWING"]),
+        tips: a.string(), // Optional: We can leave this as a string without .optional()
+        notes: a.string(), // Optional: Same here
+        planExercises: a.hasMany("PlanExercise", "exerciseId"),
+      })
+      .authorization((allow) => [allow.publicApiKey()]),
+
+  // === PLAN ↔ EXERCISE JOIN ===
+    PlanExercise: a
+        .model({
+            id: a.id(),
+            planId: a.string().required(),
+            exerciseId: a.string().required(),
+            planDayId: a.string(), // ← add this
+            order: a.integer().required(),
+            suggestedReps: a.integer(),
+            suggestedWeight: a.float(),
+            logs: a.hasMany("ExerciseLog", "planExerciseId"),
+            exercise: a.belongsTo("Exercise", "exerciseId"),
+            planDay: a.belongsTo("PlanDay", "planDayId"), // ← and this
+        })
+        .authorization((allow) => [allow.publicApiKey()]),
+
+
+    // === PLAN ↔ DAY JOIN ===
+  PlanDay: a
+      .model({
+        id: a.id(),
+        planId: a.string().required(),
+        dayOfWeek: a.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]),
+        plan: a.belongsTo("Plan", "planId"),
+        dayNumber: a.integer(),
+        planExercises: a.hasMany("PlanExercise", "planDayId"), // Exercises for this day
+      })
+      .authorization((allow) => [allow.publicApiKey()]),
+
+  // === USER LOGS FOR COMPLETED WORKOUTS ===
+    ExerciseLog: a
+        .model({
+            id: a.id(),
+            planExerciseId: a.string().required(),
+            date: a.datetime().required(),
+            sets: a.json().required(),
+            clientNotes: a.string(),
+            planExercise: a.belongsTo("PlanExercise", "planExerciseId"), // Add this line
+        })
+        .authorization((allow) => [allow.publicApiKey()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -20,38 +72,8 @@ export const data = defineData({
   schema,
   authorizationModes: {
     defaultAuthorizationMode: "apiKey",
-    // API Key is used for a.allow.public() rules
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
   },
 });
-
-/*== STEP 2 ===============================================================
-Go to your frontend source code. From your client-side code, generate a
-Data client to make CRUDL requests to your table. (THIS SNIPPET WILL ONLY
-WORK IN THE FRONTEND CODE FILE.)
-
-Using JavaScript or Next.js React Server Components, Middleware, Server 
-Actions or Pages Router? Review how to generate Data clients for those use
-cases: https://docs.amplify.aws/gen2/build-a-backend/data/connect-to-API/
-=========================================================================*/
-
-/*
-"use client"
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-
-const client = generateClient<Schema>() // use this Data client for CRUDL requests
-*/
-
-/*== STEP 3 ===============================================================
-Fetch records from the database and use them in your frontend component.
-(THIS SNIPPET WILL ONLY WORK IN THE FRONTEND CODE FILE.)
-=========================================================================*/
-
-/* For example, in a React component, you can use this snippet in your
-  function's RETURN statement */
-// const { data: todos } = await client.models.Todo.list()
-
-// return <ul>{todos.map(todo => <li key={todo.id}>{todo.content}</li>)}</ul>
