@@ -35,9 +35,7 @@ const CreateExercise: React.FC = () => {
         }
     };
 
-    if (!user || !user.permissions.createExercise) return null;
-
-    return (
+    return (!user || !user.permissions?.createExercise) ? null : (
         <CollapsiblePanel title="Create Exercise" isOpen={isOpen} toggle={togglePanel}>
             <button onClick={handleCreate}>Create Hardcoded Exercise</button>
             {message && <p>{message}</p>}
