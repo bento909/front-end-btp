@@ -13,7 +13,7 @@ interface GetUserListProps {
 
 const UserList: React.FC<GetUserListProps> = () => {
     //TODO even though you might be in test mode, the Lambda that fetches the users doesn't know that - therefore we need
-    //to ensure that the userlist loads user as expected for all cases.
+    //TODO to ensure that the userlist loads user as expected for all cases.
     const { users, loading, error } = useSelector((state: RootState) => state.users);
 
     if (loading) return <div>Loading users...</div>;
