@@ -1,7 +1,8 @@
-import SignUp from '../../Components/CreateUser';
+import SignUp from '../../Components/CreateUser.tsx';
 import ViewAllUsers from "../../Components/ViewUsers.tsx";
+import CreateExercise from "../../Components/CreateExercise.tsx";
 
-const MainMenu = () => {
+const UserMenu = () => {
     return (
         <main>
             <ul>
@@ -9,8 +10,9 @@ const MainMenu = () => {
             </ul>
             <ViewAllUsers/>
             <SignUp/>
+            <CreateExercise/>
         </main>
     );
 };
 
-export default MainMenu
+export default UserMenu

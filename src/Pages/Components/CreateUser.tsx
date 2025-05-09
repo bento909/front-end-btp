@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { useUserAttributes } from "../PermissionsProvider/UserAttributesContext.tsx";
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
-import { Config, Profile, User } from "../Constants/constants.ts";
-import CollapsiblePanel from "../Styles/CollapsiblePanel.tsx";
+import { Config, Profile, User } from "../../Constants/constants.tsx";
+import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
+import { useSelector, useDispatch } from "react-redux";  // Import useDispatch
+import {AppDispatch, RootState} from "../../redux/store.tsx";
+import { fetchUsersThunk } from "../../redux/usersSlice";  // Import the fetchUsersThunk
 
 const client = new CognitoIdentityProviderClient({
     region: Config.REGION,
@@ -23,7 +25,7 @@ export const signUpUser = async (email: string, name: string, newUserProfile: Pr
             { Name: "email", Value: email },
             { Name: "name", Value: name },
             { Name: "profile", Value: newUserProfile },
-            { Name: "zoneinfo", Value: creatorEmail }
+            { Name: "creatorEmail", Value: creatorEmail}
         ],
     });
 
@@ -49,6 +51,7 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
     const [name, setName] = useState("");
     const [profile, setProfile] = useState<Profile | "">("");
     const [message, setMessage] = useState("");
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         if (user.permissions.createUsers.length > 0) {
@@ -63,6 +66,7 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
         }
         try {
             await signUpUser(email, name, profile, user.emailAddress);
+            dispatch(fetchUsersThunk());
             setMessage("Signup successful! User should 1. Sign in with Pa55w0rd! 2. Give a new password, 3. See their email for a security code, and enter it when prompted.");
         } catch {
             setMessage("Error signing up. Please try again.");
@@ -85,9 +89,8 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
 };
 
 const Signup: React.FC = () => {
-    const { user } = useUserAttributes();
+    const user = useSelector((state: RootState) => state.auth.user);
     const [isFormVisible, setIsFormVisible] = useState(false);
-
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
     return user && user.permissions.createUsers.length > 0 && (
