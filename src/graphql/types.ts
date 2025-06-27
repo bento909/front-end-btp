@@ -7,7 +7,28 @@ export type DayOfWeek =
     | "SATURDAY"
     | "SUNDAY";
 
-export type ExerciseType = "LIFT" | "RUN" | "CYCLE" | "INTERVAL" | "KB_SWING";
+export enum ExerciseTypeEnum {
+    LIFT = "LIFT",
+    RUN = "RUN",
+    CYCLE = "CYCLE",
+    INTERVAL = "INTERVAL",
+    KB_SWING = "KB_SWING",
+}
+
+// Define the type for each item
+export interface ExerciseTypeInfo {
+    type: ExerciseTypeEnum;
+    label: string;
+}
+
+// Now use that type for the array
+export const ExerciseTypeMetadata: ExerciseTypeInfo[] = [
+    { type: ExerciseTypeEnum.LIFT, label: "Lift the weight" },
+    { type: ExerciseTypeEnum.RUN, label: "Run fast" },
+    { type: ExerciseTypeEnum.CYCLE, label: "Cycle with speed" },
+    { type: ExerciseTypeEnum.INTERVAL, label: "Interval training" },
+    { type: ExerciseTypeEnum.KB_SWING, label: "Kettlebell swings" },
+];
 
 export interface ListPlansQuery {
     listPlans: {
@@ -40,7 +61,7 @@ export interface ListExercisesQuery {
         items: Array<{
             id: string;
             name: string;
-            type: ExerciseType;
+            type: ExerciseTypeEnum;
             tips?: string;
             notes?: string;
             planExercises: {
@@ -68,7 +89,7 @@ export interface ListPlanExercisesQuery {
             exercise: {
                 id: string;
                 name: string;
-                type: ExerciseType;
+                type: ExerciseTypeEnum;
             };
             planDay: {
                 id: string;
@@ -148,7 +169,7 @@ export interface GetExerciseByIdQuery {
     getExercise: {
         id: string;
         name: string;
-        type: ExerciseType;
+        type: ExerciseTypeEnum;
         tips?: string;
         notes?: string;
         planExercises: {
@@ -179,7 +200,7 @@ export interface GetPlanExerciseByIdQuery {
         exercise: {
             id: string;
             name: string;
-            type: ExerciseType;
+            type: ExerciseTypeEnum;
         };
     };
 }
@@ -225,7 +246,7 @@ export interface GetExerciseLogByIdQuery {
 // --- the GraphQL input type for createExercise ---
 export interface CreateExerciseInput {
     name: string;
-    type: ExerciseType;
+    type: ExerciseTypeEnum;
     tips?: string;
     notes?: string;
 }
@@ -235,7 +256,7 @@ export interface CreateExerciseMutation {
     createExercise: {
         id: string;
         name: string;
-        type: ExerciseType;
+        type: ExerciseTypeEnum;
         tips?: string;
         notes?: string;
     };

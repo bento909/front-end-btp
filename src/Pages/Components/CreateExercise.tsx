@@ -6,14 +6,15 @@ import { client } from "../../graphql/graphqlClient.ts";
 import { createExercise } from "../../graphql/mutations.ts";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
 import { CreateExerciseMutation } from "../../graphql/types.ts";
+import { ExerciseTypeEnum, ExerciseTypeMetadata } from "../../graphql/types.ts"
 
 const CreateExercise: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const [message, setMessage] = React.useState<string | null>(null);
     const [isOpen, setIsOpen] = React.useState(false);
+    const [type, setType] = React.useState<ExerciseTypeEnum>(ExerciseTypeEnum.LIFT);
 
     const [name, setName] = React.useState("");
-    const [type, setType] = React.useState("LIFT");
     const [tips, setTips] = React.useState("");
     const [notes, setNotes] = React.useState("");
     const [loading, setLoading] = React.useState(false);
@@ -37,7 +38,7 @@ const CreateExercise: React.FC = () => {
                 setMessage(`✅ Created exercise: ${created.name}`);
                 // Optionally clear the form
                 setName("");
-                setType("LIFT");
+                setType(ExerciseTypeEnum.LIFT);
                 setTips("");
                 setNotes("");
             } else {
@@ -62,11 +63,15 @@ const CreateExercise: React.FC = () => {
                     placeholder="Exercise Name"
                     onChange={(e) => setName(e.target.value)}
                 />
-                <select value={type} onChange={(e) => setType(e.target.value)}>
-                    <option value="LIFT">Lift</option>
-                    <option value="CARDIO">Cardio</option>
-                    <option value="MOBILITY">Mobility</option>
-                    {/* Add more types as needed */}
+                <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value as ExerciseTypeEnum)}
+                >
+                    {ExerciseTypeMetadata.map(({ type, label }) => (
+                        <option key={type} value={type}>
+                            {label}
+                        </option>
+                    ))}
                 </select>
                 <input
                     type="text"
