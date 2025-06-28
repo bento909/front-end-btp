@@ -56,7 +56,7 @@ const CreateExercise: React.FC = () => {
 
     return (
         <CollapsiblePanel title="Create Exercise" isOpen={isOpen} toggle={togglePanel}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxWidth: "400px" }}>
+            <div>
                 <input
                     type="text"
                     value={name}

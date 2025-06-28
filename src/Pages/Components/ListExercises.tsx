@@ -48,9 +48,9 @@ const ListExercises: React.FC = () => {
             {error && <p style={{ color: "red" }}>{error}</p>}
             {!loading && exercises.length === 0 && <p>No exercises found.</p>}
             {!loading && exercises.length > 0 && (
-                <ul style={{ paddingLeft: "1rem" }}>
+                <ul>
                     {exercises.map((ex) => (
-                        <li key={ex.id} style={{ marginBottom: "1rem" }}>
+                        <li key={ex.id}>
                             <strong>{ex.name}</strong> ({ex.type})<br />
                             {ex.tips && <em>Tip:</em>} {ex.tips}<br />
                             {ex.notes && <em>Notes:</em>} {ex.notes}
