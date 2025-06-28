@@ -27,7 +27,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     return (
         <div>
-            <header style={{ display: "flex", justifyContent: "space-between", padding: "1rem 2rem", background: "#f5f5f5", gap: "3rem"}}>
+            <header
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "1rem 2rem",
+                    background: "#f5f5f5",
+                    gap: "3rem",
+                    marginBottom: "1rem",
+                }}
+            >
                 <h1>Hello, {user ? user.name : "unexpected guest"}</h1>
                 <Button onClick={handleLogout} isOpen={true}>
                     Logout
