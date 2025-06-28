@@ -13,7 +13,7 @@ const Panel = styled.div<{ isOpen: boolean }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 20px;
+    padding: 6px;
     border: 1px solid #ccc;
     border-radius: 8px;
     position: relative;
@@ -27,6 +27,7 @@ const Header = styled.div`
 `;
 
 export const Button = styled.button<{ isOpen: boolean }>`
+    min-width: 110px;
     padding: 8px 12px;
     background-color: ${({ isOpen }) => (isOpen ? "#fff" : "#000")};
     color: ${({ isOpen }) => (isOpen ? "#000" : "#fff")};
