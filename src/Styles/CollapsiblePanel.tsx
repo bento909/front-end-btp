@@ -27,6 +27,7 @@ const Header = styled.div`
 `;
 
 export const Button = styled.button<{ isOpen: boolean }>`
+    min-width: 110px;
     padding: 8px 12px;
     background-color: ${({ isOpen }) => (isOpen ? "#fff" : "#000")};
     color: ${({ isOpen }) => (isOpen ? "#000" : "#fff")};
