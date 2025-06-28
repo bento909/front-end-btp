@@ -1,13 +1,13 @@
-import { useState } from "react";
-import CollapsiblePanel, { Button } from "../../Styles/CollapsiblePanel";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../redux/store";
-import { fetchExercisesThunk } from "../../redux/exercisesSlice";
-import { ExerciseTypeEnum, ExerciseTypeMetadata } from "../../graphql/types";
+import {useState} from "react";
+import CollapsiblePanel, {Button} from "../../Styles/CollapsiblePanel";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState, AppDispatch} from "../../redux/store";
+import {fetchExercisesThunk} from "../../redux/exercisesSlice";
+import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../graphql/types";
 
 const ListExercises: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
-    const { exercises, loading, error } = useSelector((state: RootState) => state.exercises);
+    const {exercises, loading, error} = useSelector((state: RootState) => state.exercises);
     const dispatch = useDispatch<AppDispatch>();
     const [isVisible, setIsVisible] = useState(false);
 
@@ -44,16 +44,33 @@ const ListExercises: React.FC = () => {
     return (
         <CollapsiblePanel title="Exercises" isOpen={isVisible} toggle={toggleVisibility}>
             {loading && <p>Loading exercises...</p>}
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p style={{color: "red"}}>{error}</p>}
             {!loading && exercises.length === 0 && <p>No exercises found.</p>}
             {!loading && exercises.length > 0 && (
-                <ul style={{ padding: 0 }}>
+                <ul style={{padding: 0}}>
                     {exercises.map((ex) => {
                         const isOpen = expandedIds.has(ex.id);
                         return (
-                            <li key={ex.id} style={{ border: "1px solid #ccc", borderRadius: "8px", marginBottom: "10px", padding: "10px" }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <div>
+                            <li
+                                key={ex.id}
+                                style={{
+                                    border: "1px solid #ccc",
+                                    borderRadius: "6px",
+                                    marginBottom: "6px",        // tighter spacing between list items
+                                    padding: "8px 10px",        // reduced internal padding
+                                    lineHeight: "1.3",          // tighter line spacing
+                                    fontSize: "0.95em",         // optional: slightly smaller text
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        marginBottom: isOpen ? "4px" : "0", // minimal spacing before details
+                                    }}
+                                >
+                                    <div style={{margin: 0}}>
                                         <strong>{ex.name}</strong>
                                         {ex.type && ` (${getExerciseTypeLabel(ex.type)})`}
                                     </div>
@@ -62,9 +79,9 @@ const ListExercises: React.FC = () => {
                                     </Button>
                                 </div>
                                 {isOpen && (
-                                    <div style={{ marginTop: "8px" }}>
+                                    <div style={{marginTop: "4px"}}>
                                         {ex.tips && (
-                                            <div>
+                                            <div style={{marginBottom: ex.notes ? "2px" : 0}}>
                                                 <em>Tip:</em> {ex.tips}
                                             </div>
                                         )}
