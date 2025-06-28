@@ -56,8 +56,7 @@ const ListExercises: React.FC = () => {
                                 style={{
                                     border: "1px solid #ccc",
                                     borderRadius: "6px",
-                                    marginBottom: "6px",        // tighter spacing between list items
-                                    padding: "8px 10px",        // reduced internal padding
+                                    padding: "0px 10px 2px",        // reduced internal padding
                                     lineHeight: "1.3",          // tighter line spacing
                                     fontSize: "0.95em",         // optional: slightly smaller text
                                 }}
