@@ -47,20 +47,11 @@ const ListExercises: React.FC = () => {
             {error && <p style={{color: "red"}}>{error}</p>}
             {!loading && exercises.length === 0 && <p>No exercises found.</p>}
             {!loading && exercises.length > 0 && (
-                <ul style={{padding: 0}}>
+                <ul>
                     {exercises.map((ex) => {
                         const isOpen = expandedIds.has(ex.id);
                         return (
-                            <li
-                                key={ex.id}
-                                style={{
-                                    border: "1px solid #ccc",
-                                    borderRadius: "6px",
-                                    padding: "0px 10px 2px",        // reduced internal padding
-                                    lineHeight: "1.3",          // tighter line spacing
-                                    fontSize: "0.95em",         // optional: slightly smaller text
-                                }}
-                            >
+                            <li key={ex.id}>
                                 <div
                                     style={{
                                         display: "flex",
@@ -69,9 +60,8 @@ const ListExercises: React.FC = () => {
                                         marginBottom: isOpen ? "4px" : "0", // minimal spacing before details
                                     }}
                                 >
-                                    <div style={{margin: 0}}>
-                                        <strong>{ex.name}</strong>
-                                        {ex.type && ` (${getExerciseTypeLabel(ex.type)})`}
+                                    <div>
+                                        <strong>{ex.name}</strong>{ex.type && ` (${getExerciseTypeLabel(ex.type)})`}
                                     </div>
                                     <Button isOpen={isOpen} onClick={() => toggleExercise(ex.id)}>
                                         {isOpen ? "Hide Details" : "Show Details"}
