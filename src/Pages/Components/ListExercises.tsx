@@ -1,42 +1,20 @@
 import { useState } from "react";
-import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store.tsx";
-import { client } from "../../graphql/graphqlClient.ts";
-import { GraphQLQueries } from "../../graphql/queries.ts";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { ListExercisesQuery } from "../../graphql/types.ts";
+import CollapsiblePanel from "../../Styles/CollapsiblePanel";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../../redux/store";
+import { fetchExercisesThunk } from "../../redux/exercisesSlice";
 
 const ListExercises: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
+    const { exercises, loading, error } = useSelector((state: RootState) => state.exercises);
+    const dispatch = useDispatch<AppDispatch>();
     const [isVisible, setIsVisible] = useState(false);
-    const [exercises, setExercises] = useState<ListExercisesQuery["listExercises"]["items"]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const toggleVisibility = () => {
         const show = !isVisible;
         setIsVisible(show);
         if (show && exercises.length === 0) {
-            fetchExercises();
-        }
-    };
-
-    const fetchExercises = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-            const response = (await client.graphql({
-                query: GraphQLQueries.listExercises,
-            })) as GraphQLResult<ListExercisesQuery>;
-
-            const items = response.data?.listExercises?.items ?? [];
-            setExercises(items);
-        } catch (err) {
-            console.error("Failed to fetch exercises:", err);
-            setError("Failed to load exercises.");
-        } finally {
-            setLoading(false);
+            dispatch(fetchExercisesThunk());
         }
     };
 
