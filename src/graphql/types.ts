@@ -23,11 +23,11 @@ export interface ExerciseTypeInfo {
 
 // Now use that type for the array
 export const ExerciseTypeMetadata: ExerciseTypeInfo[] = [
-    { type: ExerciseTypeEnum.LIFT, label: "Lift the weight" },
-    { type: ExerciseTypeEnum.RUN, label: "Run fast" },
-    { type: ExerciseTypeEnum.CYCLE, label: "Cycle with speed" },
-    { type: ExerciseTypeEnum.INTERVAL, label: "Interval training" },
-    { type: ExerciseTypeEnum.KB_SWING, label: "Kettlebell swings" },
+    { type: ExerciseTypeEnum.LIFT, label: "Lift Weight" },
+    { type: ExerciseTypeEnum.RUN, label: "Run" },
+    { type: ExerciseTypeEnum.CYCLE, label: "Cycle" },
+    { type: ExerciseTypeEnum.INTERVAL, label: "Interval Training" },
+    { type: ExerciseTypeEnum.KB_SWING, label: "Kettlebells" },
 ];
 
 export interface ListPlansQuery {
