@@ -261,3 +261,39 @@ export interface CreateExerciseMutation {
         notes?: string;
     };
 }
+
+// --- INPUT TYPES ---
+
+export interface CreatePlanInput {
+    name: string;
+    trainerEmail: string;
+    clientEmail: string;
+}
+
+export interface CreateExerciseInput {
+    name: string;
+    type: ExerciseTypeEnum;
+    tips?: string;
+    notes?: string;
+}
+
+// --- MUTATION RESPONSE TYPES ---
+
+export interface CreatePlanMutation {
+    createPlan: {
+        id: string;
+        name: string;
+        trainerEmail: string;
+        clientEmail: string;
+    };
+}
+
+export interface CreateExerciseMutation {
+    createExercise: {
+        id: string;
+        name: string;
+        type: ExerciseTypeEnum;
+        tips?: string;
+        notes?: string;
+    };
+}

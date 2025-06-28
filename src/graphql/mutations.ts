@@ -12,3 +12,15 @@ export const createExercise = gql`
     }
   }
 `;
+
+// Mutation to create a Plan
+export const createPlan = gql`
+  mutation CreatePlan($input: CreatePlanInput!) {
+    createPlan(input: $input) {
+      id
+      name
+      trainerEmail
+      clientEmail
+    }
+  }
+`;
