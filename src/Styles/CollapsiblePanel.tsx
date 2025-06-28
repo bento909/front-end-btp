@@ -13,7 +13,7 @@ const Panel = styled.div<{ isOpen: boolean }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 8px;
+    padding: 6px;
     border: 1px solid #ccc;
     border-radius: 8px;
     position: relative;

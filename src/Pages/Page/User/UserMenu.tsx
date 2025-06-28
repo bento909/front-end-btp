@@ -6,9 +6,6 @@ import ListExercises from "../../Components/ListExercises.tsx";
 const UserMenu = () => {
     return (
         <main>
-            <ul>
-                <li>Todo More stuff</li>
-            </ul>
             <ViewAllUsers/>
             <SignUp/>
             <CreateExercise/>
