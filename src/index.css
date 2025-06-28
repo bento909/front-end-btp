@@ -5,8 +5,9 @@ body {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   min-height: 100vh;
   width: 100vw;
-  justify-content: center; /* horizontal center */
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* optional: stacks content top to bottom */
 }
 
 main {
