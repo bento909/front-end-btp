@@ -228,7 +228,7 @@ const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
                     ))}
                 </ul>
             ) : (
-                <ol>
+                <ul>
                     {sorted.map(day => (
                         <li key={day.id}>
                             <button onClick={() => onToggle(day.id)}>
@@ -250,7 +250,7 @@ const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
                             )}
                         </li>
                     ))}
-                </ol>
+                </ul>
             )}
         </div>
     );
