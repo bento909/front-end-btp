@@ -56,7 +56,7 @@ const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return plan ? (
-        <PlanEditor plan={plan} userName={userName} />
+        <PlanEditor plan={plan} userName={userName} onRefreshPlan={fetchPlans}/>
     ) : (
         <PlanCreator userName={userName} userEmail={userEmail} onCreated={fetchPlans} />
     );
