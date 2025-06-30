@@ -1,5 +1,5 @@
-import { gql } from "graphql-tag";
-import { DocumentNode } from "graphql";
+import {gql} from "graphql-tag";
+import {DocumentNode} from "graphql";
 
 export class GraphQLQueries {
     // 1. Fetch all Plans
@@ -19,6 +19,7 @@ export class GraphQLQueries {
               planExercises {
                 items {
                   id
+                  exerciseId
                   order
                   suggestedReps
                   suggestedWeight
@@ -29,7 +30,7 @@ export class GraphQLQueries {
         }
       }
     }
-  `;
+`;
 
     // 2. Fetch all Exercises
     static listExercises: DocumentNode = gql`

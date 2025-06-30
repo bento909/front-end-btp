@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ListPlansQuery } from "../../graphql/types";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import {ExerciseTypeMetadata, ListPlansQuery} from "../../graphql/types";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../redux/store";
 import { ExerciseTypeEnum } from "../../graphql/types";
+import {fetchExercisesThunk} from "../../redux/exercisesSlice.tsx";
 
 interface Props {
     day: NonNullable<ListPlansQuery["listPlans"]["items"][0]>["planDays"]["items"][0];
@@ -17,10 +18,12 @@ const formatDayName = (dayOfWeek: string): string =>
 
 const PlanDayItem: React.FC<Props> = ({ day, usesDayOfWeek, expanded, onToggle, onAddExercise }) => {
     const { exercises } = useSelector((state: RootState) => state.exercises);
-
+    const dispatch = useDispatch<AppDispatch>();
     const [selectedType, setSelectedType] = useState<ExerciseTypeEnum | "">("");
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");
-
+    if(exercises.length === 0) {
+        dispatch(fetchExercisesThunk());
+    }
     // Filter exercises by selected type
     const filteredExercises = selectedType
         ? exercises.filter((ex) => ex.type === selectedType)
@@ -67,9 +70,9 @@ const PlanDayItem: React.FC<Props> = ({ day, usesDayOfWeek, expanded, onToggle, 
                                 <option value="" disabled>
                                     Select type
                                 </option>
-                                {Object.values(ExerciseTypeEnum).map((type) => (
+                                {ExerciseTypeMetadata.map(({ type, label }) => (
                                     <option key={type} value={type}>
-                                        {type}
+                                        {label}
                                     </option>
                                 ))}
                             </select>
