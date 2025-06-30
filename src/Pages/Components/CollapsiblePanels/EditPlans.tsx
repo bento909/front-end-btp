@@ -4,8 +4,10 @@ import {useSelector, useDispatch} from "react-redux";
 import {AppDispatch, RootState} from "../../../redux/store.tsx";
 import {fetchUsersThunk} from "../../../redux/usersSlice.tsx"; // Adjust path as needed
 import UserPlanView from "../UserPlanView.tsx"
+import {canCreatePlan} from "../../../Constants/constants.tsx";
 
 const EditPlans: React.FC = () => {
+    const user = useSelector((state: RootState) => state.auth.user);
     const [isVisible, setIsVisible] = useState(false);
     const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
     const dispatch = useDispatch<AppDispatch>();
@@ -26,7 +28,7 @@ const EditPlans: React.FC = () => {
         setExpandedUserId(prev => (prev === userId ? null : userId));
     };
 
-    return (
+    return user && canCreatePlan(user) ? (
         <CollapsiblePanel title="Plans" isOpen={isVisible} toggle={toggleVisibility}>
             <div>
                 {loading && <p>Loading users...</p>}
@@ -48,7 +50,7 @@ const EditPlans: React.FC = () => {
                 )}
             </div>
         </CollapsiblePanel>
-    );
+    ) : null;
 };
 
 export default EditPlans;

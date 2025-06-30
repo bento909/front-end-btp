@@ -51,3 +51,10 @@ export interface ApiUser {
     UserStatus: string;
     Username: string;
 }
+
+export function canCreatePlan(user: User): boolean {
+    return (
+        user.permissions.createPlan === CreatePlan.MY_OWN ||
+        user.permissions.createPlan === CreatePlan.MY_USERS
+    );
+}

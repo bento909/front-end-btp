@@ -4,6 +4,8 @@ import { GraphQLQueries } from "../../graphql/queries";
 import { ListPlansQuery, DayOfWeek, CreatePlanInput, CreatePlanMutation } from "../../graphql/types";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
 import { createPlan } from "../../graphql/mutations";
+import {useSelector} from "react-redux";
+import {RootState} from "../../redux/store.tsx";
 
 interface Props {
     userName: string;
@@ -14,6 +16,7 @@ const formatDay = (day: DayOfWeek): string =>
     day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
 
 const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
+    const user = useSelector((state: RootState) => state.auth.user);
     const [loading, setLoading] = useState(true);
     const [plan, setPlan] = useState<ListPlansQuery["listPlans"]["items"][0] | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -40,13 +43,18 @@ const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
 
     // Create the Plan itself (no days yet)
     const handleCreatePlan = async (type: "WEEK" | "CUSTOM") => {
+        if (!user) {
+            console.error("No logged in user!");
+            return;
+        }
+
         setCreating(true);
         try {
             const input: CreatePlanInput = {
                 name: type === "WEEK"
                     ? `${userName}'s Weekly Plan`
                     : `${userName}'s Custom Plan`,
-                trainerEmail: "trainer@example.com", // replace as needed
+                trainerEmail: user.emailAddress,
                 clientEmail: userEmail,
             };
 
