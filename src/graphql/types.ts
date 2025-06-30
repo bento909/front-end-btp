@@ -40,6 +40,8 @@ export interface ListPlansQuery {
             planDays: {
                 items: Array<{
                     id: string;
+                    name?: string;
+                    notes?: string;
                     dayOfWeek: DayOfWeek;
                     dayNumber: number;
                     planExercises: {
@@ -280,6 +282,8 @@ export interface CreateExerciseInput {
 // Input for creating a PlanDay
 export interface CreatePlanDayInput {
     planId: string;
+    name?: string;            // eg Leg Day or whatever
+    notes?: string;           // describe what you want client to do today
     dayOfWeek?: DayOfWeek;    // optional—only for WEEK plans
     dayNumber?: number;       // optional—only for CUSTOM plans
 }

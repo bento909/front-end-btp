@@ -205,7 +205,7 @@ const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
             {usesDayOfWeek ? (
                 <ul>
                     {sorted.map(day => (
-                        <li key={day.id}>
+                        <ul key={day.id}>
                             <button onClick={() => onToggle(day.id)}>
                                 {formatDay(day.dayOfWeek!)}{" "}
                                 {expandedDays.has(day.id) ? "▲" : "▼"}
@@ -224,7 +224,7 @@ const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
                                     )}
                                 </ul>
                             )}
-                        </li>
+                        </ul>
                     ))}
                 </ul>
             ) : (
