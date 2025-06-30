@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { client } from "../../graphql/graphqlClient";
 import { GraphQLQueries } from "../../graphql/queries";
-import { ListPlansQuery, DayOfWeek } from "../../graphql/types";
+import { ListPlansQuery, DayOfWeek, CreatePlanInput, CreatePlanMutation } from "../../graphql/types";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
+import { createPlan } from "../../graphql/mutations";
 
 interface Props {
     userName: string;
@@ -16,53 +17,105 @@ const UserPlanView: React.FC<Props> = ({ userName, userEmail }) => {
     const [loading, setLoading] = useState(true);
     const [plan, setPlan] = useState<ListPlansQuery["listPlans"]["items"][0] | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [creating, setCreating] = useState(false);
 
+    // Fetch existing plan
     useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const response = (await client.graphql({
+                const resp = (await client.graphql({
                     query: GraphQLQueries.listPlans,
                 })) as GraphQLResult<ListPlansQuery>;
-
-                const allPlans = response.data?.listPlans?.items ?? [];
-                const userPlan = allPlans.find(plan => plan?.clientEmail === userEmail);
-
-                setPlan(userPlan ?? null);
-            } catch (err) {
-                console.error("Error loading plan", err);
+                const all = resp.data?.listPlans.items ?? [];
+                setPlan(all.find(p => p.clientEmail === userEmail) ?? null);
+            } catch (e) {
+                console.error(e);
                 setError("Error loading plan");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchPlans();
     }, [userEmail]);
 
-    if (loading) return <p>Loading plan for {userName}...</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
+    // Create the Plan itself (no days yet)
+    const handleCreatePlan = async (type: "WEEK" | "CUSTOM") => {
+        setCreating(true);
+        try {
+            const input: CreatePlanInput = {
+                name: type === "WEEK"
+                    ? `${userName}'s Weekly Plan`
+                    : `${userName}'s Custom Plan`,
+                trainerEmail: "trainer@example.com", // replace as needed
+                clientEmail: userEmail,
+            };
 
+            const res = (await client.graphql({
+                query: createPlan,
+                variables: { input },
+            })) as GraphQLResult<CreatePlanMutation>;
+
+            if (res.data?.createPlan) {
+                // we now have the plan; next step is to create days
+                setPlan({
+                    ...res.data.createPlan,
+                    planDays: { items: [] },
+                });
+                // TODO: for "WEEK" → create 7 planDays (MON→SUN)
+                //       for "CUSTOM" → prompt for N days, then create
+            }
+        } catch (e) {
+            console.error(e);
+            setError("Could not create plan");
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    if (loading) return <p>Loading plan for {userName}…</p>;
+    if (error)   return <p style={{ color: "red" }}>{error}</p>;
+
+    // No plan yet → show two create buttons
     if (!plan) {
-        return <p>No plan yet for user {userName}</p>;
+        return (
+            <div>
+                <p>No plan yet for {userName}.</p>
+                <button onClick={() => handleCreatePlan("WEEK")} disabled={creating}>
+                    {creating ? "Creating…" : "Create Week Plan"}
+                </button>
+                <button
+                    onClick={() => handleCreatePlan("CUSTOM")}
+                    disabled={creating}
+                    style={{ marginLeft: "1rem" }}
+                >
+                    {creating ? "Creating…" : "Create Custom Days Plan"}
+                </button>
+            </div>
+        );
     }
 
+    // Plan exists → show days & exercises as before...
     return (
         <div>
             <h4>Plan: {plan.name}</h4>
             <ul>
-                {plan.planDays?.items?.map((day) => (
-                    <li key={day.id} style={{ marginBottom: "0.75rem" }}>
-                        <strong>{day.dayOfWeek ? formatDay(day.dayOfWeek) : `Day ${day.dayNumber}`}</strong>
+                {plan.planDays.items.map((day) => (
+                    <li key={day.id} style={{ marginBottom: 8 }}>
+                        <strong>
+                            {day.dayOfWeek
+                                ? formatDay(day.dayOfWeek)
+                                : `Day ${day.dayNumber}`}
+                        </strong>
                         <ul>
-                            {day.planExercises.items.length === 0 ? (
-                                <li>No exercises for this day</li>
-                            ) : (
-                                day.planExercises.items.map((ex) => (
+                            {day.planExercises.items.length === 0
+                                ? <li>No exercises for this day</li>
+                                : day.planExercises.items.map(ex => (
                                     <li key={ex.id}>
-                                        Order: {ex.order}, Reps: {ex.suggestedReps ?? "-"}, Weight: {ex.suggestedWeight ?? "-"}
+                                        Order: {ex.order}, Reps: {ex.suggestedReps ?? "-"},
+                                        Weight: {ex.suggestedWeight ?? "-"}
                                     </li>
                                 ))
-                            )}
+                            }
                         </ul>
                     </li>
                 ))}
