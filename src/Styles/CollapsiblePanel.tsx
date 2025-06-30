@@ -13,7 +13,7 @@ const Panel = styled.div<{ isOpen: boolean }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 2px;
+    padding: 6px;
     border: 1px solid #ccc;
     border-radius: 8px;
     position: relative;
@@ -23,7 +23,7 @@ const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 `;
 
 export const Button = styled.button<{ isOpen: boolean }>`
