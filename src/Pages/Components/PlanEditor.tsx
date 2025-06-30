@@ -53,6 +53,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
         }
     };
 
+
     return (
         <div>
             <h4>{plan.name || `${userName}'s Plan`}</h4>
