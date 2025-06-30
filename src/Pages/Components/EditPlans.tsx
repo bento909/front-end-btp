@@ -1,34 +1,61 @@
-import {useState} from "react";
+import React, {useState, useEffect} from "react";
 import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
-import {useSelector} from "react-redux";
-import {RootState} from "../../redux/store.tsx";
+import {useSelector, useDispatch} from "react-redux";
+import {AppDispatch, RootState} from "../../redux/store.tsx";
+import {fetchUsersThunk} from "../../redux/usersSlice.tsx"; // Adjust path as needed
 
+const UserPlanView: React.FC<{ userId: string }> = ({userId}) => {
+    return (
+        <div>
+            <p>Plans for user ID: {userId}</p>
+        </div>
+    );
+};
 
 const EditPlans: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
-    const { users, loading, error } = useSelector((state: RootState) => state.users);
-    if (loading) return <div>Loading users...</div>;
-    if (error) return <div>Error: {error}</div>;
+    const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+    const {users, loading, error} = useSelector((state: RootState) => state.users);
 
     const toggleVisibility = () => {
         const show = !isVisible;
         setIsVisible(show);
     };
 
-    return <CollapsiblePanel title="Edit Plans" isOpen={isVisible} toggle={toggleVisibility}>
-        <div>
-            {users.length === 0 ? (
-                <p>No users found.</p>
-            ) : (
-                <ul>
-                    {users.map((user) => (
-                        <li key={user.id}>
-                            {user.name} - {user.emailAddress}
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    </CollapsiblePanel>}
+    useEffect(() => {
+        if (isVisible && users.length === 0 && !loading && !error) {
+            dispatch(fetchUsersThunk());
+        }
+    }, [isVisible, users.length, loading, error, dispatch]);
 
-export default EditPlans
+    const toggleUser = (userId: string) => {
+        setExpandedUserId(prev => (prev === userId ? null : userId));
+    };
+
+    return (
+        <CollapsiblePanel title="Plans" isOpen={isVisible} toggle={toggleVisibility}>
+            <div>
+                {loading && <p>Loading users...</p>}
+                {error && <p>Error: {error}</p>}
+                {!loading && users.length === 0 && <p>No users found.</p>}
+                {!loading && users.length > 0 && (
+                    <ul>
+                        {users.map((user) => (
+                            <li key={user.id}>
+                                <button onClick={() => toggleUser(user.id)}>
+                                    {user.name} - {user.emailAddress}
+                                </button>
+                                {expandedUserId === user.id && (
+                                    <UserPlanView userId={user.id}/>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+        </CollapsiblePanel>
+    );
+};
+
+export default EditPlans;
