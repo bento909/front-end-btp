@@ -42,7 +42,7 @@ const ListExercises: React.FC = () => {
     if (!user || !user.permissions?.createExercise) return null;
 
     return (
-        <CollapsiblePanel title="Exercises" isOpen={isVisible} toggle={toggleVisibility}>
+        <CollapsiblePanel title="List Exercises" isOpen={isVisible} toggle={toggleVisibility}>
             {loading && <p>Loading exercises...</p>}
             {error && <p style={{color: "red"}}>{error}</p>}
             {!loading && exercises.length === 0 && <p>No exercises found.</p>}
