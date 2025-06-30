@@ -15,7 +15,7 @@ const EditPlans: React.FC = () => {
         setIsVisible(show);
     };
 
-    return <CollapsiblePanel title="Plans" isOpen={isVisible} toggle={toggleVisibility}>
+    return <CollapsiblePanel title="Edit Plans" isOpen={isVisible} toggle={toggleVisibility}>
         <div>
             {users.length === 0 ? (
                 <p>No users found.</p>
