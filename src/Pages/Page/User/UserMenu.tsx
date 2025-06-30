@@ -1,8 +1,8 @@
-import SignUp from '../../Components/CreateUser.tsx';
-import ViewAllUsers from "../../Components/ViewUsers.tsx";
-import CreateExercise from "../../Components/CreateExercise.tsx";
-import ListExercises from "../../Components/ListExercises.tsx";
-import EditPlans from "../../Components/EditPlans.tsx"
+import SignUp from '../../Components/CollapsiblePanels/CreateUser.tsx';
+import ViewAllUsers from "../../Components/CollapsiblePanels/ViewUsers.tsx";
+import CreateExercise from "../../Components/CollapsiblePanels/CreateExercise.tsx";
+import ListExercises from "../../Components/CollapsiblePanels/ListExercises.tsx";
+import EditPlans from "../../Components/CollapsiblePanels/EditPlans.tsx"
 
 const UserMenu = () => {
     return (

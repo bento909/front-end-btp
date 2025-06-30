@@ -1,16 +1,9 @@
 import React, {useState, useEffect} from "react";
-import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
+import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
 import {useSelector, useDispatch} from "react-redux";
-import {AppDispatch, RootState} from "../../redux/store.tsx";
-import {fetchUsersThunk} from "../../redux/usersSlice.tsx"; // Adjust path as needed
-
-const UserPlanView: React.FC<{ userId: string }> = ({userId}) => {
-    return (
-        <div>
-            <p>Plans for user ID: {userId}</p>
-        </div>
-    );
-};
+import {AppDispatch, RootState} from "../../../redux/store.tsx";
+import {fetchUsersThunk} from "../../../redux/usersSlice.tsx"; // Adjust path as needed
+import UserPlanView from "../UserPlanView.tsx"
 
 const EditPlans: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -47,7 +40,7 @@ const EditPlans: React.FC = () => {
                                     {user.name} - {user.emailAddress}
                                 </button>
                                 {expandedUserId === user.id && (
-                                    <UserPlanView userId={user.id}/>
+                                    <UserPlanView userName={user.name} userEmail={user.emailAddress}/>
                                 )}
                             </li>
                         ))}

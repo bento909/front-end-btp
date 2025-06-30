@@ -1,9 +1,9 @@
 import {useState} from "react";
-import CollapsiblePanel, {Button} from "../../Styles/CollapsiblePanel";
+import CollapsiblePanel, {Button} from "../../../Styles/CollapsiblePanel.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState, AppDispatch} from "../../redux/store";
-import {fetchExercisesThunk} from "../../redux/exercisesSlice";
-import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../graphql/types";
+import {RootState, AppDispatch} from "../../../redux/store.tsx";
+import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
+import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../graphql/types.ts";
 
 const ListExercises: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
