@@ -277,6 +277,13 @@ export interface CreateExerciseInput {
     notes?: string;
 }
 
+// Input for creating a PlanDay
+export interface CreatePlanDayInput {
+    planId: string;
+    dayOfWeek?: DayOfWeek;    // optional—only for WEEK plans
+    dayNumber?: number;       // optional—only for CUSTOM plans
+}
+
 // --- MUTATION RESPONSE TYPES ---
 
 export interface CreatePlanMutation {
@@ -295,5 +302,15 @@ export interface CreateExerciseMutation {
         type: ExerciseTypeEnum;
         tips?: string;
         notes?: string;
+    };
+}
+
+// The response type
+export interface CreatePlanDayMutation {
+    createPlanDay: {
+        id: string;
+        planId: string;
+        dayOfWeek?: DayOfWeek;
+        dayNumber?: number;
     };
 }

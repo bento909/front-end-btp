@@ -24,3 +24,15 @@ export const createPlan = gql`
     }
   }
 `;
+
+// Mutation to create a PlanDay
+export const createPlanDay = gql`
+  mutation CreatePlanDay($input: CreatePlanDayInput!) {
+    createPlanDay(input: $input) {
+      id
+      planId
+      dayOfWeek
+      dayNumber
+    }
+  }
+`;
