@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import {gql} from 'graphql-tag';
 
 // Mutation to create an Exercise
 export const createExercise = gql`
@@ -37,4 +37,20 @@ export const createPlanDay = gql`
       dayNumber
     }
   }
+`;
+
+export const createPlanExercise = gql`
+  mutation CreatePlanExercise($input: CreatePlanExerciseInput!) {
+    createPlanExercise(input: $input) {
+      id
+      planId
+      exerciseId
+      order
+      suggestedReps
+      suggestedWeight
+      planDay {
+        id
+      }
+    }
+ }
 `;

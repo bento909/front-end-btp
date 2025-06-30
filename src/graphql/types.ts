@@ -271,14 +271,6 @@ export interface CreatePlanInput {
     trainerEmail: string;
     clientEmail: string;
 }
-
-export interface CreateExerciseInput {
-    name: string;
-    type: ExerciseTypeEnum;
-    tips?: string;
-    notes?: string;
-}
-
 // Input for creating a PlanDay
 export interface CreatePlanDayInput {
     planId: string;
@@ -288,6 +280,13 @@ export interface CreatePlanDayInput {
     dayNumber?: number;       // optional—only for CUSTOM plans
 }
 
+export interface CreatePlanExerciseInput {
+    planDayId: string;
+    exerciseId: string;
+    order?: number;
+    suggestedReps?: number;
+    suggestedWeight?: number;
+}
 // --- MUTATION RESPONSE TYPES ---
 
 export interface CreatePlanMutation {
