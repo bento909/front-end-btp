@@ -1,7 +1,7 @@
 // components/UserPlan/PlanEditor.tsx
 
 import { useState } from "react";
-import { DayOfWeek, ListPlansQuery } from "../../graphql/types";
+import { CreatePlanExerciseInput, DayOfWeek, ListPlansQuery} from "../../graphql/types";
 import PlanDayItem from "./PlanDayItem";
 import { client } from "../../graphql/graphqlClient.ts";
 import { createPlanExercise } from "../../graphql/mutations";  // <-- Import your mutation
@@ -42,25 +42,19 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
         suggestedReps: number,
         suggestedWeight: number
     ) => {
-
-        console.log("Creating exercise with input:", {
+        const input: CreatePlanExerciseInput = {
             planDayId: dayId,
             exerciseId,
             order,
             suggestedReps,
             suggestedWeight
-        });  
+        };
+        console.log('Creating exercise with input ' + input)
         try {
             await client.graphql({
                 query: createPlanExercise, // Your mutation document imported
                 variables: {
-                    input: {
-                        planDayId: dayId,
-                        exerciseId,
-                        order,
-                        suggestedReps,
-                        suggestedWeight
-                    },
+                    input
                 },
             });
             await onRefreshPlan(); // Refresh plan data after mutation (pass from parent)
