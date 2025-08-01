@@ -35,7 +35,13 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
     );
 
     // The handler to add an exercise to a plan day
-    const handleAddExercise = async (dayId: string, exerciseId: string) => {
+    const handleAddExercise =  async (
+        dayId: string,
+        exerciseId: string,
+        order: number,
+        suggestedReps: number,
+        suggestedWeight: number
+    ) => {
         try {
             await client.graphql({
                 query: createPlanExercise, // Your mutation document imported
@@ -43,7 +49,9 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
                     input: {
                         planDayId: dayId,
                         exerciseId,
-                        // Add other fields like order, suggestedReps, suggestedWeight as needed
+                        order,
+                        suggestedReps,
+                        suggestedWeight
                     },
                 },
             });
