@@ -64,74 +64,80 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                     </ul>
 
                 {/* Add exercise UI */}
-                    <div style={{marginTop: 12, marginLeft: 16}}>
-                        <label>
-                            Exercise Type:{" "}
-                            <select
-                                value={selectedType}
-                                onChange={(e) => setSelectedType(e.target.value as ExerciseTypeEnum)}
-                            >
-                                <option value="" disabled>
-                                    Select type
-                                </option>
-                                {ExerciseTypeMetadata.map(({type, label}) => (
-                                    <option key={type} value={type}>
-                                        {label}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
+                    <div style={{ marginTop: 12, marginLeft: 16, maxWidth: 300 }}>
+                        <div style={{ marginBottom: 8 }}>
+                            <label>
+                                Exercise Type:<br />
+                                <select
+                                    value={selectedType}
+                                    onChange={(e) => setSelectedType(e.target.value as ExerciseTypeEnum)}
+                                    style={{ width: "100%" }}
+                                >
+                                    <option value="" disabled>Select type</option>
+                                    {ExerciseTypeMetadata.map(({ type, label }) => (
+                                        <option key={type} value={type}>{label}</option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
 
                         {selectedType && (
                             <>
-                                <label style={{marginLeft: 8}}>
-                                    Exercise:{" "}
-                                    <select
-                                        value={selectedExerciseId}
-                                        onChange={(e) => setSelectedExerciseId(e.target.value)}
-                                    >
-                                        <option value="" disabled>
-                                            Select exercise
-                                        </option>
-                                        {filteredExercises.map((ex) => (
-                                            <option key={ex.id} value={ex.id}>
-                                                {ex.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-                                <label style={{ marginLeft: 8 }}>
-                                    Order:{" "}
-                                    <input
-                                        type="number"
-                                        value={order}
-                                        onChange={(e) => setOrder(Number(e.target.value))}
-                                        style={{ width: 60 }}
-                                    />
-                                </label>
-                                <label style={{ marginLeft: 8 }}>
-                                    Reps:{" "}
-                                    <input
-                                        type="number"
-                                        value={suggestedReps}
-                                        onChange={(e) => setSuggestedReps(Number(e.target.value))}
-                                        style={{ width: 60 }}
-                                    />
-                                </label>
-                                <label style={{ marginLeft: 8 }}>
-                                    Weight:{" "}
-                                    <input
-                                        type="number"
-                                        value={suggestedWeight}
-                                        onChange={(e) => setSuggestedWeight(Number(e.target.value))}
-                                        style={{ width: 80 }}
-                                    />
-                                </label>
+                                <div style={{ marginBottom: 8 }}>
+                                    <label>
+                                        Exercise:<br />
+                                        <select
+                                            value={selectedExerciseId}
+                                            onChange={(e) => setSelectedExerciseId(e.target.value)}
+                                            style={{ width: "100%" }}
+                                        >
+                                            <option value="" disabled>Select exercise</option>
+                                            {filteredExercises.map((ex) => (
+                                                <option key={ex.id} value={ex.id}>{ex.name}</option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+
+                                <div style={{ marginBottom: 8 }}>
+                                    <label>
+                                        Order:<br />
+                                        <input
+                                            type="number"
+                                            value={order}
+                                            onChange={(e) => setOrder(Number(e.target.value))}
+                                            style={{ width: "100%" }}
+                                        />
+                                    </label>
+                                </div>
+
+                                <div style={{ marginBottom: 8 }}>
+                                    <label>
+                                        Reps:<br />
+                                        <input
+                                            type="number"
+                                            value={suggestedReps}
+                                            onChange={(e) => setSuggestedReps(Number(e.target.value))}
+                                            style={{ width: "100%" }}
+                                        />
+                                    </label>
+                                </div>
+
+                                <div style={{ marginBottom: 8 }}>
+                                    <label>
+                                        Weight:<br />
+                                        <input
+                                            type="number"
+                                            value={suggestedWeight}
+                                            onChange={(e) => setSuggestedWeight(Number(e.target.value))}
+                                            style={{ width: "100%" }}
+                                        />
+                                    </label>
+                                </div>
                             </>
                         )}
 
                         <button
-                            style={{marginLeft: 8}}
                             disabled={!selectedExerciseId}
                             onClick={handleAddExercise}
                         >
