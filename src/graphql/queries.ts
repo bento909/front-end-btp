@@ -62,6 +62,7 @@ export class GraphQLQueries {
       listPlanExercises {
         items {
           id
+          planId
           exerciseId
           order
           suggestedReps
@@ -182,6 +183,7 @@ export class GraphQLQueries {
     query GetPlanExerciseById($id: ID!) {
       getPlanExercise(id: $id) {
         id
+        planId
         exerciseId
         order
         suggestedReps
