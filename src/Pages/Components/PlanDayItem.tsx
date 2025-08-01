@@ -55,11 +55,15 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                         {day.planExercises.items.length === 0 ? (
                             <li>No exercises</li>
                         ) : (
-                            day.planExercises.items.map((ex) => (
-                                <li key={ex.id}>
-                                    Order {ex.order}, Reps {ex.suggestedReps}, Weight {ex.suggestedWeight}
-                                </li>
-                            ))
+                            day.planExercises.items.map((ex) => {
+                                const exercise = exercises.find(e => e.id === ex.exerciseId);
+                                return (
+                                    <li key={ex.id}>
+                                        <strong>{exercise ? exercise.name : "Unknown Exercise"}</strong><br />
+                                        Reps {ex.suggestedReps}, Weight {ex.suggestedWeight} Kg
+                                    </li>
+                                );
+                            })
                         )}
                     </ul>
 

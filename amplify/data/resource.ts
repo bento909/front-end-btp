@@ -28,7 +28,7 @@ const schema = a.schema({
     PlanExercise: a
         .model({
             id: a.id(),
-            planId: a.string().required(),
+            planId: a.string().required(), //TODO Get Rid
             exerciseId: a.string().required(),
             planDayId: a.string(), // ← add this
             order: a.integer().required(),
