@@ -29,6 +29,7 @@ const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [plan, setPlan] = useState<ListPlansQuery["listPlans"]["items"][0] | null>(null);
+    const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
     const fetchPlans = async () => {
         setLoading(true);
@@ -56,7 +57,13 @@ const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return plan ? (
-        <PlanEditor plan={plan} userName={userName} onRefreshPlan={fetchPlans}/>
+        <PlanEditor
+            plan={plan}
+            userName={userName}
+            onRefreshPlan={fetchPlans}
+            expandedDays={expandedDays}
+            setExpandedDays={setExpandedDays}
+        />
     ) : (
         <PlanCreator userName={userName} userEmail={userEmail} onCreated={fetchPlans} />
     );

@@ -1,6 +1,5 @@
 // components/UserPlan/PlanEditor.tsx
 
-import { useState } from "react";
 import {CreatePlanExerciseInput, CreatePlanExerciseMutation, DayOfWeek, ListPlansQuery} from "../../graphql/types";
 import PlanDayItem from "./PlanDayItem";
 import { client } from "../../graphql/graphqlClient.ts";
@@ -14,12 +13,12 @@ const WEEK_DAYS: DayOfWeek[] = [
 interface Props {
     plan: ListPlansQuery["listPlans"]["items"][0];
     userName: string;
-    // Add a prop to refresh the plan data from parent or use other state management
     onRefreshPlan: () => Promise<void>;
+    expandedDays: Set<string>;
+    setExpandedDays: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
-    const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDays, setExpandedDays }) => {
 
     const onToggle = (id: string) =>
         setExpandedDays((prev) => {
