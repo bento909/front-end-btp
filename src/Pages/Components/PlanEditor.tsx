@@ -1,10 +1,11 @@
 // components/UserPlan/PlanEditor.tsx
 
 import { useState } from "react";
-import { CreatePlanExerciseInput, DayOfWeek, ListPlansQuery} from "../../graphql/types";
+import {CreatePlanExerciseInput, CreatePlanExerciseMutation, DayOfWeek, ListPlansQuery} from "../../graphql/types";
 import PlanDayItem from "./PlanDayItem";
 import { client } from "../../graphql/graphqlClient.ts";
-import { createPlanExercise } from "../../graphql/mutations";  // <-- Import your mutation
+import { createPlanExercise } from "../../graphql/mutations";
+import {GraphQLResult} from "@aws-amplify/api-graphql";  // <-- Import your mutation
 
 const WEEK_DAYS: DayOfWeek[] = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY",
@@ -49,14 +50,14 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
             suggestedReps,
             suggestedWeight
         };
-        console.log('Creating exercise with input ' + input)
+        console.log('Creating exercise with input', input);
         try {
             await client.graphql({
                 query: createPlanExercise, // Your mutation document imported
                 variables: {
                     input
                 },
-            });
+            }) as GraphQLResult<CreatePlanExerciseMutation>;
             await onRefreshPlan(); // Refresh plan data after mutation (pass from parent)
         } catch (error) {
             console.error("Failed to add exercise:", error);
