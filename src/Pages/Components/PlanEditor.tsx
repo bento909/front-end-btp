@@ -54,12 +54,19 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
         console.log('Creating exercise with input', input);
         try {
             await client.graphql({
-                query: createPlanExercise, // Your mutation document imported
-                variables: {
-                    input
-                },
+                query: createPlanExercise,
+                variables: { input },
             }) as GraphQLResult<CreatePlanExerciseMutation>;
-            await onRefreshPlan(); // Refresh plan data after mutation (pass from parent)
+
+            // Re-expand the modified day
+            setExpandedDays((prev) => {
+                const next = new Set(prev);
+                next.add(dayId);  // <- Ensure it stays open
+                return next;
+            });
+
+            await onRefreshPlan(); // Now reload data, but expandedDays still includes dayId
+
         } catch (error) {
             console.error("Failed to add exercise:", error);
         }
