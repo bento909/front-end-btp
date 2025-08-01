@@ -42,7 +42,7 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
     };
 
     return (
-        <li style={{marginBottom: 12}}>
+        <li>
             <button onClick={onToggle}>
                 {usesDayOfWeek ? formatDayName(day.dayOfWeek!) : `Day ${day.dayNumber}`}{" "}
                 {expanded ? "▲" : "▼"}
