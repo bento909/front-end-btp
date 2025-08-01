@@ -282,6 +282,7 @@ export interface CreatePlanDayInput {
 
 export interface CreatePlanExerciseInput {
     planDayId: string;
+    planId: string;
     exerciseId: string;
     order?: number;
     suggestedReps?: number;

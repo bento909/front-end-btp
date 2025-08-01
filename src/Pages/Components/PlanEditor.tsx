@@ -45,6 +45,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
     ) => {
         const input: CreatePlanExerciseInput = {
             planDayId: dayId,
+            planId: plan.id,
             exerciseId,
             order,
             suggestedReps,
