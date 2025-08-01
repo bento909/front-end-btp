@@ -42,6 +42,14 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan }) => {
         suggestedReps: number,
         suggestedWeight: number
     ) => {
+
+        console.log("Creating exercise with input:", {
+            planDayId: dayId,
+            exerciseId,
+            order,
+            suggestedReps,
+            suggestedWeight
+        });  
         try {
             await client.graphql({
                 query: createPlanExercise, // Your mutation document imported
