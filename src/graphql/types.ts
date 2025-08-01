@@ -321,6 +321,7 @@ export interface CreatePlanDayMutation {
 export interface CreatePlanExerciseMutation {
     createPlanExercise: {
         id: string;
+        planId: string;
         exerciseId: string;
         order: number;
         suggestedReps?: number;

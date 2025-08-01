@@ -43,6 +43,7 @@ export const createPlanExercise = gql`
   mutation CreatePlanExercise($input: CreatePlanExerciseInput!) {
     createPlanExercise(input: $input) {
       id
+      planId
       exerciseId
       order
       suggestedReps
