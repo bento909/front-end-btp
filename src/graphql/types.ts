@@ -47,6 +47,7 @@ export interface ListPlansQuery {
                     planExercises: {
                         items: Array<{
                             id: string;
+                            exerciseId: string;
                             order: number;
                             suggestedReps?: number;
                             suggestedWeight?: number;

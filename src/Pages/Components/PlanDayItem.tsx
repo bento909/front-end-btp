@@ -58,26 +58,30 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                             day.planExercises.items
                                 .slice()
                                 .sort((a, b) => a.order - b.order)
-                                .map((ex) => (
-                                <li key={ex.id}>
-                                    Order {ex.order}, {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
-                                </li>
-                            ))
+                                .map((ex) => {
+                                    const exercise = exercises.find((e) => e.id === ex.exerciseId);
+                                    return (
+                                        <li key={ex.id}>
+                                            <strong>{exercise ? exercise.name : "Unknown Exercise"}</strong><br/>
+                                            {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
+                                        </li>
+                                    );
+                                })
                         )}
                     </ul>
 
-                {/* Add exercise UI */}
-                    <div style={{ marginTop: 12, marginLeft: 16, maxWidth: 300 }}>
-                        <div style={{ marginBottom: 8 }}>
+                    {/* Add exercise UI */}
+                    <div style={{marginTop: 12, marginLeft: 16, maxWidth: 300}}>
+                        <div style={{marginBottom: 8}}>
                             <label>
-                                Exercise Type:<br />
+                                Exercise Type:<br/>
                                 <select
                                     value={selectedType}
                                     onChange={(e) => setSelectedType(e.target.value as ExerciseTypeEnum)}
-                                    style={{ width: "100%" }}
+                                    style={{width: "100%"}}
                                 >
                                     <option value="" disabled>Select type</option>
-                                    {ExerciseTypeMetadata.map(({ type, label }) => (
+                                    {ExerciseTypeMetadata.map(({type, label}) => (
                                         <option key={type} value={type}>{label}</option>
                                     ))}
                                 </select>
@@ -86,13 +90,13 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
 
                         {selectedType && (
                             <>
-                                <div style={{ marginBottom: 8 }}>
+                                <div style={{marginBottom: 8}}>
                                     <label>
-                                        Exercise:<br />
+                                        Exercise:<br/>
                                         <select
                                             value={selectedExerciseId}
                                             onChange={(e) => setSelectedExerciseId(e.target.value)}
-                                            style={{ width: "100%" }}
+                                            style={{width: "100%"}}
                                         >
                                             <option value="" disabled>Select exercise</option>
                                             {filteredExercises.map((ex) => (
@@ -102,26 +106,26 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                                     </label>
                                 </div>
 
-                                <div style={{ marginBottom: 8 }}>
+                                <div style={{marginBottom: 8}}>
                                     <label>
-                                        Reps:<br />
+                                        Reps:<br/>
                                         <input
                                             type="number"
                                             value={suggestedReps}
                                             onChange={(e) => setSuggestedReps(Number(e.target.value))}
-                                            style={{ width: "100%" }}
+                                            style={{width: "100%"}}
                                         />
                                     </label>
                                 </div>
 
-                                <div style={{ marginBottom: 8 }}>
+                                <div style={{marginBottom: 8}}>
                                     <label>
-                                        Weight:<br />
+                                        Weight:<br/>
                                         <input
                                             type="number"
                                             value={suggestedWeight}
                                             onChange={(e) => setSuggestedWeight(Number(e.target.value))}
-                                            style={{ width: "100%" }}
+                                            style={{width: "100%"}}
                                         />
                                     </label>
                                 </div>
