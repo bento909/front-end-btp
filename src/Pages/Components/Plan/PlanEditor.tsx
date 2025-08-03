@@ -9,7 +9,8 @@ import {
     CreatePlanExerciseMutation,
     UpdatePlanExerciseOrderMutation
 } from "../../../graphql/PlanExercise/planExerciseTypes.ts";
-import {createPlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";  // <-- Import your mutation
+import {createPlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";
+import {useState} from "react";  // <-- Import your mutation
 
 const WEEK_DAYS: DayOfWeek[] = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY",
@@ -24,7 +25,14 @@ interface Props {
 }
 
 const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDays, setExpandedDays }) => {
-
+    const [planDays, setPlanDays] = useState(() =>
+        plan.planDays.items.map(day => ({
+            ...day,
+            planExercises: {
+                items: [...day.planExercises.items].sort((a, b) => a.order - b.order),
+            },
+        }))
+    );    
     const onToggle = (id: string) =>
         setExpandedDays((prev) => {
             const next = new Set(prev);
@@ -33,7 +41,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         });
 
     const usesDayOfWeek = plan.planDays.items.every((d) => Boolean(d.dayOfWeek));
-    const sortedDays = [...plan.planDays.items].sort((a, b) =>
+    const sortedDays = [...planDays].sort((a, b) =>
         usesDayOfWeek
             ? WEEK_DAYS.indexOf(a.dayOfWeek!) - WEEK_DAYS.indexOf(b.dayOfWeek!)
             : a.dayNumber - b.dayNumber
@@ -85,6 +93,22 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
             suggestedWeight?: number;
         }[]
     ) => {
+        setPlanDays(currentDays =>
+            currentDays.map(day => {
+                if (day.id !== dayId) return day;
+                return {
+                    ...day,
+                    planExercises: {
+                        items: day.planExercises.items
+                            .map(exercise => {
+                                const updated = reorderedItems.find(i => i.id === exercise.id);
+                                return updated ? { ...exercise, order: updated.order } : exercise;
+                            })
+                            .sort((a, b) => a.order - b.order),
+                    },
+                };
+            })
+        );
         try {
             await Promise.all(
                 reorderedItems.map((item) =>
@@ -97,6 +121,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
             console.log(`✅ Exercise order updated for day ${dayId}`);
         } catch (error) {
             console.error("❌ Error updating exercise order", error);
+            await onRefreshPlan()
         }
     };
 
