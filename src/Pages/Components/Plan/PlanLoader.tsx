@@ -10,12 +10,12 @@
 // Delegating to PlanEditor if a plan exists
 
 import { useEffect, useState } from "react";
-import { client } from "../../graphql/graphqlClient";
-import { GraphQLQueries } from "../../graphql/queries";
+import { client } from "../../../graphql/graphqlClient.ts";
+import { GraphQLQueries } from "../../../graphql/queries.ts";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { ListPlansQuery } from "../../graphql/types";
-import PlanCreator from "./PlanCreator";
-import PlanEditor from "./PlanEditor";
+import { ListPlansQuery } from "../../../graphql/types.ts";
+import PlanCreator from "./PlanCreator.tsx";
+import PlanEditor from "./PlanEditor.tsx";
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../redux/store";
 

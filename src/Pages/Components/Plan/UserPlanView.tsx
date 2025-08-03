@@ -1,4 +1,4 @@
-import PlanLoader from "./PlanLoader";
+import PlanLoader from "./PlanLoader.tsx";
 
 interface Props {
     userName: string;

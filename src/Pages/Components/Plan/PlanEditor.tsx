@@ -1,9 +1,9 @@
 // components/UserPlan/PlanEditor.tsx
 
-import {CreatePlanExerciseInput, CreatePlanExerciseMutation, DayOfWeek, ListPlansQuery} from "../../graphql/types";
-import PlanDayItem from "./PlanDayItem";
-import { client } from "../../graphql/graphqlClient.ts";
-import { createPlanExercise } from "../../graphql/mutations";
+import {CreatePlanExerciseInput, CreatePlanExerciseMutation, DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
+import PlanDayItem from "../PlanDayItem.tsx";
+import { client } from "../../../graphql/graphqlClient.ts";
+import { createPlanExercise } from "../../../graphql/mutations.ts";
 import {GraphQLResult} from "@aws-amplify/api-graphql";  // <-- Import your mutation
 
 const WEEK_DAYS: DayOfWeek[] = [

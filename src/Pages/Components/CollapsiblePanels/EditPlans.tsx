@@ -3,7 +3,7 @@ import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
 import {useSelector, useDispatch} from "react-redux";
 import {AppDispatch, RootState} from "../../../redux/store.tsx";
 import {fetchUsersThunk} from "../../../redux/usersSlice.tsx"; // Adjust path as needed
-import UserPlanView from "../UserPlanView.tsx"
+import UserPlanView from "../Plan/UserPlanView.tsx"
 import {canCreatePlan} from "../../../Constants/constants.tsx";
 
 const EditPlans: React.FC = () => {
