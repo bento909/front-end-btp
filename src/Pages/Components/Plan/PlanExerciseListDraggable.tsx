@@ -79,7 +79,6 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                                                         justifyContent: "space-between",
                                                         alignItems: "center",
                                                         padding: "8px",
-                                                        marginBottom: "4px",
                                                         background: "#f9f9f9",
                                                         border: "1px solid #ddd",
                                                         borderRadius: "4px",

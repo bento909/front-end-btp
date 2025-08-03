@@ -57,6 +57,7 @@ const ListExercises: React.FC = () => {
                                         display: "flex",
                                         justifyContent: "space-between",
                                         alignItems: "center",
+                                        marginBottom: isOpen ? "4px" : "0", // minimal spacing before details
                                     }}
                                 >
                                     <div>
