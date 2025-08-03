@@ -66,7 +66,8 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                                             {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
                                         </li>
                                     );
-                                })
+                                }
+                            )
                         )}
                     </ul>
 
@@ -120,7 +121,7 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
 
                                 <div style={{marginBottom: 8}}>
                                     <label>
-                                        Weight:<br/>
+                                        Weight (Kg):<br/>
                                         <input
                                             type="number"
                                             value={suggestedWeight}
