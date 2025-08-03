@@ -22,7 +22,6 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
     const dispatch = useDispatch<AppDispatch>();
     const [selectedType, setSelectedType] = useState<ExerciseTypeEnum | "">("");
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");
-    const [order, setOrder] = useState<number>(1);
     const [suggestedReps, setSuggestedReps] = useState<number>(10);
     const [suggestedWeight, setSuggestedWeight] = useState<number>(50);
     if (exercises.length === 0) {
@@ -35,7 +34,8 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
 
     const handleAddExercise = () => {
         if (selectedExerciseId) {
-            onAddExercise(day.id, selectedExerciseId, order, suggestedReps, suggestedWeight);
+            const nextOrder = day.planExercises.items.length + 1;
+            onAddExercise(day.id, selectedExerciseId, nextOrder, suggestedReps, suggestedWeight);
             setSelectedExerciseId("");
             setSelectedType("");
         }
@@ -55,9 +55,12 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                         {day.planExercises.items.length === 0 ? (
                             <li>No exercises</li>
                         ) : (
-                            day.planExercises.items.map((ex) => (
+                            day.planExercises.items
+                                .slice()
+                                .sort((a, b) => a.order - b.order)
+                                .map((ex) => (
                                 <li key={ex.id}>
-                                    Order {ex.order}, Reps {ex.suggestedReps}, Weight {ex.suggestedWeight}
+                                    Order {ex.order}, {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
                                 </li>
                             ))
                         )}
@@ -96,18 +99,6 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                                                 <option key={ex.id} value={ex.id}>{ex.name}</option>
                                             ))}
                                         </select>
-                                    </label>
-                                </div>
-
-                                <div style={{ marginBottom: 8 }}>
-                                    <label>
-                                        Order:<br />
-                                        <input
-                                            type="number"
-                                            value={order}
-                                            onChange={(e) => setOrder(Number(e.target.value))}
-                                            style={{ width: "100%" }}
-                                        />
                                     </label>
                                 </div>
 
