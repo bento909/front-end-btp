@@ -1,33 +1,70 @@
 import React, {useState} from "react";
-import {ExerciseTypeEnum, ExerciseTypeMetadata, ListPlansQuery} from "../../graphql/types";
+import {ExerciseTypeEnum, ExerciseTypeMetadata, ListPlansQuery,} from "../../graphql/types";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {fetchExercisesThunk} from "../../redux/exercisesSlice.tsx";
+import {DragDropContext, Draggable, Droppable, DropResult,} from "react-beautiful-dnd";
 
 interface Props {
     day: NonNullable<ListPlansQuery["listPlans"]["items"][0]>["planDays"]["items"][0];
     usesDayOfWeek: boolean;
     expanded: boolean;
     onToggle: () => void;
-    onAddExercise: (dayId: string, exerciseId: string, order: number, suggestedReps: number, suggestedWeight: number) => void;
+    onAddExercise: (
+        dayId: string,
+        exerciseId: string,
+        order: number,
+        suggestedReps: number,
+        suggestedWeight: number
+    ) => void;
+    onReorderExercises: (
+        dayId: string,
+        updatedItems: Array<{ id: string; order: number }>
+    ) => void;
 }
 
 const formatDayName = (dayOfWeek: string): string =>
     dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1).toLowerCase();
 
-
-//called by PlanEditor
-const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, onAddExercise}) => {
+const PlanDayItem: React.FC<Props> = ({
+                                          day,
+                                          usesDayOfWeek,
+                                          expanded,
+                                          onToggle,
+                                          onAddExercise,
+                                          onReorderExercises,
+                                      }) => {
     const {exercises} = useSelector((state: RootState) => state.exercises);
     const dispatch = useDispatch<AppDispatch>();
+
     const [selectedType, setSelectedType] = useState<ExerciseTypeEnum | "">("");
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");
     const [suggestedReps, setSuggestedReps] = useState<number>(10);
     const [suggestedWeight, setSuggestedWeight] = useState<number>(50);
+
     if (exercises.length === 0) {
         dispatch(fetchExercisesThunk());
     }
-    // Filter exercises by selected type
+
+    const handleDragEnd = (result: DropResult) => {
+        const {source, destination} = result;
+        if (!destination || source.index === destination.index) return;
+
+        const reordered = [...day.planExercises.items]
+            .slice()
+            .sort((a, b) => a.order - b.order);
+
+        const [movedItem] = reordered.splice(source.index, 1);
+        reordered.splice(destination.index, 0, movedItem);
+
+        const updated = reordered.map((item, index) => ({
+            id: item.id,
+            order: index + 1,
+        }));
+
+        onReorderExercises(day.id, updated);
+    };
+
     const filteredExercises = selectedType
         ? exercises.filter((ex) => ex.type === selectedType)
         : [];
@@ -35,7 +72,13 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
     const handleAddExercise = () => {
         if (selectedExerciseId) {
             const nextOrder = day.planExercises.items.length + 1;
-            onAddExercise(day.id, selectedExerciseId, nextOrder, suggestedReps, suggestedWeight);
+            onAddExercise(
+                day.id,
+                selectedExerciseId,
+                nextOrder,
+                suggestedReps,
+                suggestedWeight
+            );
             setSelectedExerciseId("");
             setSelectedType("");
         }
@@ -44,46 +87,114 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
     return (
         <li>
             <button onClick={onToggle}>
-                {usesDayOfWeek ? formatDayName(day.dayOfWeek!) : `Day ${day.dayNumber}`}{" "}
+                {usesDayOfWeek
+                    ? formatDayName(day.dayOfWeek!)
+                    : `Day ${day.dayNumber}`}{" "}
                 {expanded ? "▲" : "▼"}
             </button>
 
             {expanded && (
                 <>
-                    {/* List current exercises */}
-                    <ul style={{marginLeft: 16}}>
-                        {day.planExercises.items.length === 0 ? (
-                            <li>No exercises</li>
-                        ) : (
-                            day.planExercises.items
-                                .slice()
-                                .sort((a, b) => a.order - b.order)
-                                .map((ex) => {
-                                    const exercise = exercises.find((e) => e.id === ex.exerciseId);
-                                    return (
-                                        <li key={ex.id}>
-                                            <strong>{exercise ? exercise.name : "Unknown Exercise"}</strong><br/>
-                                            {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
-                                        </li>
-                                    );
-                                }
-                            )
-                        )}
-                    </ul>
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId={`droppable-${day.id}`}>
+                            {(provided) => (
+                                <ul
+                                    style={{marginLeft: 16}}
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                >
+                                    {day.planExercises.items.length === 0 ? (
+                                        <li>No exercises</li>
+                                    ) : (
+                                        day.planExercises.items
+                                            .slice()
+                                            .sort((a, b) => a.order - b.order)
+                                            .map((ex, index) => {
+                                                const exercise = exercises.find(
+                                                    (e) => e.id === ex.exerciseId
+                                                );
+                                                return (
+                                                    <Draggable
+                                                        key={ex.id}
+                                                        draggableId={ex.id}
+                                                        index={index}
+                                                    >
+                                                        {(provided) => (
+                                                            <li
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={{
+                                                                    ...provided.draggableProps.style,
+                                                                    display: "flex",
+                                                                    justifyContent: "space-between",
+                                                                    alignItems: "center",
+                                                                    padding: "8px",
+                                                                    marginBottom: "4px",
+                                                                    background: "#f9f9f9",
+                                                                    border: "1px solid #ddd",
+                                                                    borderRadius: "4px",
+                                                                }}
+                                                            >
+                                <span>
+                                  <strong>
+                                    {exercise
+                                        ? exercise.name
+                                        : "Unknown Exercise"}
+                                  </strong>
+                                  <br/>
+                                    {ex.suggestedReps} Reps, {ex.suggestedWeight}{" "}
+                                    Kg
+                                </span>
+                                                                <span>
+                                  {/* Placeholder Edit/Delete buttons */}
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            console.log("Edit clicked", ex)
+                                                                        }
+                                                                        style={{marginLeft: 8}}
+                                                                    >
+                                    Edit
+                                  </button>
+                                  <button
+                                      onClick={() =>
+                                          console.log("Delete clicked", ex.id)
+                                      }
+                                      style={{marginLeft: 4}}
+                                  >
+                                    Delete
+                                  </button>
+                                </span>
+                                                            </li>
+                                                        )}
+                                                    </Draggable>
+                                                );
+                                            })
+                                    )}
+                                    {provided.placeholder}
+                                </ul>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
 
-                    {/* Add exercise UI */}
                     <div style={{marginTop: 12, marginLeft: 16, maxWidth: 300}}>
                         <div style={{marginBottom: 8}}>
                             <label>
                                 Exercise Type:<br/>
                                 <select
                                     value={selectedType}
-                                    onChange={(e) => setSelectedType(e.target.value as ExerciseTypeEnum)}
+                                    onChange={(e) =>
+                                        setSelectedType(e.target.value as ExerciseTypeEnum)
+                                    }
                                     style={{width: "100%"}}
                                 >
-                                    <option value="" disabled>Select type</option>
+                                    <option value="" disabled>
+                                        Select type
+                                    </option>
                                     {ExerciseTypeMetadata.map(({type, label}) => (
-                                        <option key={type} value={type}>{label}</option>
+                                        <option key={type} value={type}>
+                                            {label}
+                                        </option>
                                     ))}
                                 </select>
                             </label>
@@ -99,9 +210,13 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                                             onChange={(e) => setSelectedExerciseId(e.target.value)}
                                             style={{width: "100%"}}
                                         >
-                                            <option value="" disabled>Select exercise</option>
+                                            <option value="" disabled>
+                                                Select exercise
+                                            </option>
                                             {filteredExercises.map((ex) => (
-                                                <option key={ex.id} value={ex.id}>{ex.name}</option>
+                                                <option key={ex.id} value={ex.id}>
+                                                    {ex.name}
+                                                </option>
                                             ))}
                                         </select>
                                     </label>
@@ -113,7 +228,9 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                                         <input
                                             type="number"
                                             value={suggestedReps}
-                                            onChange={(e) => setSuggestedReps(Number(e.target.value))}
+                                            onChange={(e) =>
+                                                setSuggestedReps(Number(e.target.value))
+                                            }
                                             style={{width: "100%"}}
                                         />
                                     </label>
@@ -125,7 +242,9 @@ const PlanDayItem: React.FC<Props> = ({day, usesDayOfWeek, expanded, onToggle, o
                                         <input
                                             type="number"
                                             value={suggestedWeight}
-                                            onChange={(e) => setSuggestedWeight(Number(e.target.value))}
+                                            onChange={(e) =>
+                                                setSuggestedWeight(Number(e.target.value))
+                                            }
                                             style={{width: "100%"}}
                                         />
                                     </label>
