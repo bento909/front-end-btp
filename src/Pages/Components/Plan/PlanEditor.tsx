@@ -1,10 +1,15 @@
 // components/UserPlan/PlanEditor.tsx
 
-import {CreatePlanExerciseInput, CreatePlanExerciseMutation, DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
-import PlanDayItem from "../PlanDayItem.tsx";
+import {CreatePlanExerciseInput, DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
+import PlanDayItem from "./PlanDayItem.tsx";
 import { client } from "../../../graphql/graphqlClient.ts";
-import { createPlanExercise } from "../../../graphql/mutations.ts";
-import {GraphQLResult} from "@aws-amplify/api-graphql";  // <-- Import your mutation
+import {GraphQLResult} from "@aws-amplify/api-graphql";
+import {updatePlanExercise} from "../../../graphql/PlanDay/planDayMutations.ts";
+import {
+    CreatePlanExerciseMutation,
+    UpdatePlanExerciseOrderMutation
+} from "../../../graphql/PlanExercise/planExerciseTypes.ts";
+import {createPlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";  // <-- Import your mutation
 
 const WEEK_DAYS: DayOfWeek[] = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY",
@@ -71,6 +76,29 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         }
     };
 
+    const handleReorderExercises = async (
+        dayId: string,
+        reorderedItems: {
+            id: string;
+            order: number;
+            suggestedReps?: number;
+            suggestedWeight?: number;
+        }[]
+    ) => {
+        try {
+            await Promise.all(
+                reorderedItems.map((item) =>
+                    client.graphql({
+                        query: updatePlanExercise,
+                        variables: { input: { id: item.id, order: item.order } },
+                    }) as Promise<GraphQLResult<UpdatePlanExerciseOrderMutation>>
+                )
+            );
+            console.log(`✅ Exercise order updated for day ${dayId}`);
+        } catch (error) {
+            console.error("❌ Error updating exercise order", error);
+        }
+    };
 
     return (
         <div>
@@ -84,6 +112,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                         expanded={expandedDays.has(day.id)}
                         onToggle={() => onToggle(day.id)}
                         onAddExercise={handleAddExercise} // Pass handler here
+                        onReorderExercises={handleReorderExercises}
                     />
                 ))}
             </ul>

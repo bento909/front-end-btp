@@ -9,11 +9,13 @@
 // Notifying the parent to reload plans via onCreated
 import { useState } from "react";
 import { client } from "../../../graphql/graphqlClient.ts";
-import { CreatePlanInput, CreatePlanDayInput, CreatePlanMutation, CreatePlanDayMutation, DayOfWeek } from "../../../graphql/types.ts";
+import { CreatePlanInput, CreatePlanMutation, CreatePlanDayMutation, DayOfWeek } from "../../../graphql/types.ts";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { createPlan, createPlanDay } from "../../../graphql/mutations.ts";
+import { createPlan } from "../../../graphql/mutations.ts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store.tsx";
+import {CreatePlanDayInput} from "../../../graphql/PlanDay/planDayTypes.ts";
+import {createPlanDay} from "../../../graphql/PlanDay/planDayMutations.ts";
 
 const WEEK_DAYS: DayOfWeek[] = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"

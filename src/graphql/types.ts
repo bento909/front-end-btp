@@ -249,14 +249,6 @@ export interface CreatePlanInput {
     trainerEmail: string;
     clientEmail: string;
 }
-// Input for creating a PlanDay
-export interface CreatePlanDayInput {
-    planId: string;
-    name?: string;            // eg Leg Day or whatever
-    notes?: string;           // describe what you want client to do today
-    dayOfWeek?: DayOfWeek;    // optional—only for WEEK plans
-    dayNumber?: number;       // optional—only for CUSTOM plans
-}
 
 export interface CreatePlanExerciseInput {
     planDayId: string;
@@ -294,19 +286,5 @@ export interface CreatePlanDayMutation {
         planId: string;
         dayOfWeek?: DayOfWeek;
         dayNumber?: number;
-    };
-}
-
-export interface CreatePlanExerciseMutation {
-    createPlanExercise: {
-        id: string;
-        planId: string;
-        exerciseId: string;
-        order: number;
-        suggestedReps?: number;
-        suggestedWeight?: number;
-        planDay: {
-            id: string;
-        };
     };
 }

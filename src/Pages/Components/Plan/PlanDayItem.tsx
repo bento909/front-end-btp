@@ -1,27 +1,33 @@
 import React, {useState} from "react";
-import {ExerciseTypeEnum, ExerciseTypeMetadata, ListPlansQuery,} from "../../graphql/types";
+import {ExerciseTypeEnum, ExerciseTypeMetadata, ListPlansQuery,} from "../../../graphql/types.ts";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../redux/store";
-import {fetchExercisesThunk} from "../../redux/exercisesSlice.tsx";
+import {AppDispatch, RootState} from "../../../redux/store.tsx";
+import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
 import {DragDropContext, Draggable, Droppable, DropResult,} from "react-beautiful-dnd";
 
 interface Props {
-    day: NonNullable<ListPlansQuery["listPlans"]["items"][0]>["planDays"]["items"][0];
-    usesDayOfWeek: boolean;
-    expanded: boolean;
-    onToggle: () => void;
+    day: NonNullable<ListPlansQuery["listPlans"]["items"][0]>["planDays"]["items"][0],
+    usesDayOfWeek: boolean,
+    expanded: boolean,
+    onToggle: () => void,
     onAddExercise: (
         dayId: string,
         exerciseId: string,
         order: number,
         suggestedReps: number,
         suggestedWeight: number
-    ) => void;
+    ) => void,
     onReorderExercises: (
         dayId: string,
-        updatedItems: Array<{ id: string; order: number }>
-    ) => void;
+        reorderedItems: {
+            id: string;
+            order: number;
+            suggestedReps?: number;
+            suggestedWeight?: number;
+        }[]
+    ) => void
 }
+
 
 const formatDayName = (dayOfWeek: string): string =>
     dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1).toLowerCase();
@@ -32,7 +38,7 @@ const PlanDayItem: React.FC<Props> = ({
                                           expanded,
                                           onToggle,
                                           onAddExercise,
-                                          onReorderExercises,
+                                          onReorderExercises
                                       }) => {
     const {exercises} = useSelector((state: RootState) => state.exercises);
     const dispatch = useDispatch<AppDispatch>();

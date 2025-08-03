@@ -25,32 +25,4 @@ export const createPlan = gql`
   }
 `;
 
-// Mutation to create a PlanDay
-export const createPlanDay = gql`
-  mutation CreatePlanDay($input: CreatePlanDayInput!) {
-    createPlanDay(input: $input) {
-      id
-      planId
-      name
-      notes
-      dayOfWeek
-      dayNumber
-    }
-  }
-`;
 
-export const createPlanExercise = gql`
-  mutation CreatePlanExercise($input: CreatePlanExerciseInput!) {
-    createPlanExercise(input: $input) {
-      id
-      planId
-      exerciseId
-      order
-      suggestedReps
-      suggestedWeight
-      planDay {
-        id
-      }
-    }
- }
-`;
