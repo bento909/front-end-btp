@@ -93,6 +93,31 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         suggestedReps: number,
         suggestedWeight: number
     ) => {
+        const newExercise = {
+            id: `temp-${Math.random()}`, // temporary ID until backend returns real ID
+            exerciseId,
+            order,
+            suggestedReps,
+            suggestedWeight,
+        };
+
+        setPlanDays(currentDays =>
+            currentDays.map(day =>
+                day.id === dayId
+                    ? {
+                        ...day,
+                        planExercises: { items: [...day.planExercises.items, newExercise] }
+                    }
+                    : day
+            )
+        );
+        // Re-expand the modified day
+        setExpandedDays((prev) => {
+            const next = new Set(prev);
+            next.add(dayId);  // <- Ensure it stays open
+            return next;
+        });
+        
         const input: CreatePlanExerciseInput = {
             planDayId: dayId,
             planId: plan.id,
@@ -103,22 +128,44 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         };
         console.log('Creating exercise with input ', input);
         try {
-            await client.graphql({
+            const result = await client.graphql({
                 query: createPlanExercise,
                 variables: { input },
             }) as GraphQLResult<CreatePlanExerciseMutation>;
 
-            // Re-expand the modified day
-            setExpandedDays((prev) => {
-                const next = new Set(prev);
-                next.add(dayId);  // <- Ensure it stays open
-                return next;
-            });
-
-            await onRefreshPlan(); // Now reload data, but expandedDays still includes dayId
-
+            const realId = result.data?.createPlanExercise?.id;
+            if (realId) {
+                // 3. Replace temporary ID with real ID from backend
+                setPlanDays(currentDays =>
+                    currentDays.map(day =>
+                        day.id === dayId
+                            ? {
+                                ...day,
+                                planExercises: {
+                                    items: day.planExercises.items.map(ex =>
+                                        ex.id.startsWith("temp-") ? {...ex, id: realId} : ex
+                                    ),
+                                },
+                            }
+                            : day
+                    )
+                );
+            }
         } catch (error) {
             console.error("Failed to add exercise:", error);
+            setPlanDays(currentDays =>
+                currentDays.map(day =>
+                    day.id === dayId
+                        ? {
+                            ...day,
+                            planExercises: {
+                                items: day.planExercises.items.filter(ex => !ex.id.startsWith("temp-")),
+                            },
+                        }
+                        : day
+                )
+            );
+            await onRefreshPlan();
         }
     };
 
