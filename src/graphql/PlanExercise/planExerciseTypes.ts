@@ -24,3 +24,16 @@ export interface UpdatePlanExerciseOrderMutation {
     };
 }
 
+export interface CreatePlanExerciseInput {
+    planDayId: string;
+    planId: string;
+    exerciseId: string;
+    order?: number;
+    suggestedReps?: number;
+    suggestedWeight?: number;
+}
+
+export interface PlanExerciseDeletionInput {
+    id: string;
+}
+

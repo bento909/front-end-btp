@@ -26,3 +26,11 @@ export const updatePlanExercise = gql`
     }
   }
 `;
+
+export const deletePlanExercise = gql`
+  mutation DeletePlanExercise($input: DeletePlanExerciseInput!) {
+    deletePlanExercise(input: $input) {
+      id
+    }
+  }
+`;

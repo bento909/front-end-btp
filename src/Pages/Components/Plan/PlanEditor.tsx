@@ -1,15 +1,17 @@
 // components/UserPlan/PlanEditor.tsx
 
-import {CreatePlanExerciseInput, DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
+import { DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
 import PlanDayItem from "./PlanDayItem.tsx";
 import { client } from "../../../graphql/graphqlClient.ts";
 import {GraphQLResult} from "@aws-amplify/api-graphql";
 import {updatePlanExercise} from "../../../graphql/PlanDay/planDayMutations.ts";
 import {
+    CreatePlanExerciseInput,
     CreatePlanExerciseMutation,
-    UpdatePlanExerciseOrderMutation
+    UpdatePlanExerciseOrderMutation,
+    PlanExerciseDeletionInput
 } from "../../../graphql/PlanExercise/planExerciseTypes.ts";
-import {createPlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";
+import {createPlanExercise, deletePlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";
 import {useState} from "react";  // <-- Import your mutation
 
 const WEEK_DAYS: DayOfWeek[] = [
@@ -46,6 +48,23 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
             ? WEEK_DAYS.indexOf(a.dayOfWeek!) - WEEK_DAYS.indexOf(b.dayOfWeek!)
             : a.dayNumber - b.dayNumber
     );
+    
+    const handleDeleteExercise = async (
+        id: string
+    ) => {
+        const input: PlanExerciseDeletionInput = {
+            id: id
+        };
+        console.log('deleting planExercise with id ', input)
+        try {
+            await client.graphql({
+                query: deletePlanExercise,
+                variables: {input}
+            }) as GraphQLResult<PlanExerciseDeletionInput>
+        } catch (error) {
+            console.error("Failed to delete exercise:", error);
+        }
+    };
 
     // The handler to add an exercise to a plan day
     const handleAddExercise =  async (
@@ -63,7 +82,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
             suggestedReps,
             suggestedWeight
         };
-        console.log('Creating exercise with input', input);
+        console.log('Creating exercise with input ', input);
         try {
             await client.graphql({
                 query: createPlanExercise,
@@ -136,7 +155,8 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                         usesDayOfWeek={usesDayOfWeek}
                         expanded={expandedDays.has(day.id)}
                         onToggle={() => onToggle(day.id)}
-                        onAddExercise={handleAddExercise} // Pass handler here
+                        onAddExercise={handleAddExercise}
+                        onDeleteExercise={handleDeleteExercise}
                         onReorderExercises={handleReorderExercises}
                     />
                 ))}

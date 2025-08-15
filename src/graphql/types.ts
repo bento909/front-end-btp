@@ -250,14 +250,6 @@ export interface CreatePlanInput {
     clientEmail: string;
 }
 
-export interface CreatePlanExerciseInput {
-    planDayId: string;
-    planId: string;
-    exerciseId: string;
-    order?: number;
-    suggestedReps?: number;
-    suggestedWeight?: number;
-}
 // --- MUTATION RESPONSE TYPES ---
 
 export interface CreatePlanMutation {

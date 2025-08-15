@@ -1,8 +1,8 @@
 import React from "react";
-import { ListPlansQuery } from "../../../graphql/types.ts";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../redux/store.tsx";
-import { fetchExercisesThunk } from "../../../redux/exercisesSlice.tsx";
+import {ListPlansQuery} from "../../../graphql/types.ts";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../../redux/store.tsx";
+import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
 
 import ExerciseListDraggable from "./PlanExerciseListDraggable.tsx";
 import AddExerciseForm from "./AddExerciseForm";
@@ -19,6 +19,7 @@ interface Props {
         suggestedReps: number,
         suggestedWeight: number
     ) => void;
+    onDeleteExercise: (exerciseId: string) => void;
     onReorderExercises: (
         dayId: string,
         reorderedItems: {
@@ -39,9 +40,10 @@ const PlanDayItem: React.FC<Props> = ({
                                           expanded,
                                           onToggle,
                                           onAddExercise,
+                                          onDeleteExercise,
                                           onReorderExercises,
                                       }) => {
-    const { exercises } = useSelector((state: RootState) => state.exercises);
+    const {exercises} = useSelector((state: RootState) => state.exercises);
     const dispatch = useDispatch<AppDispatch>();
 
     if (exercises.length === 0) {
@@ -70,9 +72,10 @@ const PlanDayItem: React.FC<Props> = ({
                         dayId={day.id}
                         exercises={day.planExercises.items}
                         allExercises={exercises}
+                        onDeleteExercise={onDeleteExercise}
                         onReorderExercises={onReorderExercises}
                     />
-                    <AddExerciseForm onAddExercise={handleAddExercise} exercises={exercises} />
+                    <AddExerciseForm onAddExercise={handleAddExercise} exercises={exercises}/>
                 </>
             )}
         </li>
