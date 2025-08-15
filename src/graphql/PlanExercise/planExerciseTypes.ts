@@ -35,5 +35,6 @@ export interface CreatePlanExerciseInput {
 
 export interface PlanExerciseDeletionInput {
     id: string;
+    dayId: string;
 }
 
