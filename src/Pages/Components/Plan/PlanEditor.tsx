@@ -50,10 +50,12 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
     );
     
     const handleDeleteExercise = async (
-        id: string
+        id: string,
+        dayId: string
     ) => {
         const input: PlanExerciseDeletionInput = {
-            id: id
+            id: id,
+            dayId: dayId,
         };
         console.log('deleting planExercise with id ', input)
         try {
@@ -61,6 +63,15 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                 query: deletePlanExercise,
                 variables: {input}
             }) as GraphQLResult<PlanExerciseDeletionInput>
+            
+            setExpandedDays((prev) => {
+                const next = new Set(prev);
+                next.add(dayId);
+                return next;
+            });
+
+            await onRefreshPlan();
+            
         } catch (error) {
             console.error("Failed to delete exercise:", error);
         }

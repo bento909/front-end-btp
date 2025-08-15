@@ -11,7 +11,10 @@ interface ExerciseListDraggableProps {
         exerciseId: string;
     }>;
     allExercises: Array<{ id: string; name: string }>;
-    onDeleteExercise: (exerciseId: string) => void;
+    onDeleteExercise: (
+        exerciseId: string,
+        onDeleteExercise: string
+    ) => void;
     onReorderExercises: (
         dayId: string,
         reorderedItems: {
@@ -99,7 +102,7 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                               Edit
                             </button>
                             <button
-                                onClick={() => onDeleteExercise(ex.id)}
+                                onClick={() => onDeleteExercise(ex.id, dayId)}
                                 style={{marginLeft: 4}}
                             >
                               Delete

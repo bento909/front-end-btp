@@ -19,7 +19,10 @@ interface Props {
         suggestedReps: number,
         suggestedWeight: number
     ) => void;
-    onDeleteExercise: (exerciseId: string) => void;
+    onDeleteExercise: (
+        exerciseId: string,
+        dayId: string,
+    ) => void;
     onReorderExercises: (
         dayId: string,
         reorderedItems: {
