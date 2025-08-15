@@ -53,6 +53,23 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         id: string,
         dayId: string
     ) => {
+        setPlanDays((currentDays) =>
+            currentDays.map((day) => {
+                if (day.id !== dayId) return day;
+
+                return {
+                    ...day,
+                    planExercises: {
+                        items: day.planExercises.items.filter((ex) => ex.id !== id),
+                    },
+                };
+            })
+        );
+        setExpandedDays((prev) => {
+            const next = new Set(prev);
+            next.add(dayId);
+            return next;
+        });
         const input: PlanExerciseDeletionInput = {
             id: id
         };
@@ -62,17 +79,9 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                 query: deletePlanExercise,
                 variables: {input}
             }) as GraphQLResult<PlanExerciseDeletionInput>
-            
-            setExpandedDays((prev) => {
-                const next = new Set(prev);
-                next.add(dayId);
-                return next;
-            });
-
-            await onRefreshPlan();
-            
         } catch (error) {
             console.error("Failed to delete exercise:", error);
+            await onRefreshPlan();
         }
     };
 
