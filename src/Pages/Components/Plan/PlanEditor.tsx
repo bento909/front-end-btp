@@ -54,8 +54,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         dayId: string
     ) => {
         const input: PlanExerciseDeletionInput = {
-            id: id,
-            dayId: dayId,
+            id: id
         };
         console.log('deleting planExercise with id ', input)
         try {
