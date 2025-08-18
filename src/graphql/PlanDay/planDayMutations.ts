@@ -13,14 +13,3 @@ export const createPlanDay = gql`
     }
   }
 `;
-
-export const updatePlanExercise = gql`
-  mutation UpdatePlanExercise($input: UpdatePlanExerciseInput!) {
-    updatePlanExercise(input: $input) {
-      id
-      order
-    }
-  }
-`;
-
-

@@ -24,6 +24,15 @@ interface ExerciseListDraggableProps {
             suggestedWeight?: number;
         }[]
     ) => void;
+    onEditExercises: (
+        dayId: string,
+        exerciseId: string,
+        updates: {
+            suggestedReps?: number;
+            suggestedWeight?: number;
+            order?: number;
+        }
+    ) => void;
 }
 
 const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
@@ -32,7 +41,12 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                                                                          allExercises,
                                                                          onDeleteExercise,
                                                                          onReorderExercises,
+                                                                         onEditExercises
                                                                      }) => {
+    const [editingId, setEditingId] = React.useState<string | null>(null);
+    const [tempReps, setTempReps] = React.useState<number | undefined>();
+    const [tempWeight, setTempWeight] = React.useState<number | undefined>();
+
     const handleDragEnd = (result: DropResult) => {
         const {source, destination} = result;
         if (!destination || source.index === destination.index) return;
@@ -71,6 +85,7 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                                 .sort((a, b) => a.order - b.order)
                                 .map((ex, index) => {
                                     const exercise = allExercises.find((e) => e.id === ex.exerciseId);
+                                    const isEditing = editingId === ex.id;
                                     return (
                                         <Draggable key={ex.id} draggableId={ex.id} index={index}>
                                             {(provided) => (
@@ -89,25 +104,81 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                                                         borderRadius: "4px",
                                                     }}
                                                 >
-                          <span>
-                            <strong>{exercise ? exercise.name : "Unknown Exercise"}</strong>
-                            <br/>
-                              {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
-                          </span>
+            <span>
+              <strong>{exercise ? exercise.name : "Unknown Exercise"}</strong>
+              <br/>
+                {isEditing ? (
+                    <>
+                        <input
+                            type="number"
+                            value={tempReps ?? ex.suggestedReps ?? ""}
+                            placeholder="Reps"
+                            onChange={(e) => setTempReps(Number(e.target.value))}
+                            style={{width: 60, marginRight: 8}}
+                        />
+                        <input
+                            type="number"
+                            value={tempWeight ?? ex.suggestedWeight ?? ""}
+                            placeholder="Kg"
+                            onChange={(e) => setTempWeight(Number(e.target.value))}
+                            style={{width: 60}}
+                        />
+                    </>
+                ) : (
+                    <>
+                        {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
+                    </>
+                )}
+            </span>
+
                                                     <span>
-                            <button
-                                onClick={() => console.log("Edit clicked", ex)}
-                                style={{marginLeft: 8}}
-                            >
-                              Edit
-                            </button>
-                            <button
-                                onClick={() => onDeleteExercise(ex.id, dayId)}
-                                style={{marginLeft: 4}}
-                            >
-                              Delete
-                            </button>
-                          </span>
+              {isEditing ? (
+                  <>
+                      <button
+                          onClick={() => {
+                              onEditExercises(dayId, ex.id, {
+                                  suggestedReps: tempReps,
+                                  suggestedWeight: tempWeight,
+                              });
+                              setEditingId(null);
+                              setTempReps(undefined);
+                              setTempWeight(undefined);
+                          }}
+                          style={{marginLeft: 8}}
+                      >
+                          Save
+                      </button>
+                      <button
+                          onClick={() => {
+                              setEditingId(null);
+                              setTempReps(undefined);
+                              setTempWeight(undefined);
+                          }}
+                          style={{marginLeft: 4}}
+                      >
+                          Cancel
+                      </button>
+                  </>
+              ) : (
+                  <button
+                      onClick={() => {
+                          setEditingId(ex.id);
+                          setTempReps(ex.suggestedReps);
+                          setTempWeight(ex.suggestedWeight);
+                      }}
+                      style={{marginLeft: 8}}
+                  >
+                      Edit
+                  </button>
+              )}
+
+                                                        <button
+                                                            onClick={() => onDeleteExercise(ex.id, dayId)}
+                                                            style={{marginLeft: 4}}
+                                                        >
+                Delete
+              </button>
+            </span>
                                                 </li>
                                             )}
                                         </Draggable>

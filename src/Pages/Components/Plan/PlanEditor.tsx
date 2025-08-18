@@ -1,18 +1,18 @@
 // components/UserPlan/PlanEditor.tsx
 
-import { DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
+import {DayOfWeek, ListPlansQuery} from "../../../graphql/types.ts";
 import PlanDayItem from "./PlanDayItem.tsx";
-import { client } from "../../../graphql/graphqlClient.ts";
+import {client} from "../../../graphql/graphqlClient.ts";
 import {GraphQLResult} from "@aws-amplify/api-graphql";
-import {updatePlanExercise} from "../../../graphql/PlanDay/planDayMutations.ts";
+
 import {
     CreatePlanExerciseInput,
     CreatePlanExerciseMutation,
-    UpdatePlanExerciseOrderMutation,
-    PlanExerciseDeletionInput
+    PlanExerciseDeletionInput,
+    UpdatePlanExerciseOrderMutation
 } from "../../../graphql/PlanExercise/planExerciseTypes.ts";
-import {createPlanExercise, deletePlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";
-import {useState} from "react";  // <-- Import your mutation
+import {createPlanExercise, deletePlanExercise, updatePlanExercise} from "../../../graphql/PlanExercise/planExerciseMutations.ts";
+import {useState} from "react"; // <-- Import your mutation
 
 const WEEK_DAYS: DayOfWeek[] = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY",
@@ -26,7 +26,7 @@ interface Props {
     setExpandedDays: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDays, setExpandedDays }) => {
+const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDays, setExpandedDays}) => {
     const [planDays, setPlanDays] = useState(() =>
         plan.planDays.items.map(day => ({
             ...day,
@@ -34,7 +34,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                 items: [...day.planExercises.items].sort((a, b) => a.order - b.order),
             },
         }))
-    );    
+    );
     const onToggle = (id: string) =>
         setExpandedDays((prev) => {
             const next = new Set(prev);
@@ -48,7 +48,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
             ? WEEK_DAYS.indexOf(a.dayOfWeek!) - WEEK_DAYS.indexOf(b.dayOfWeek!)
             : a.dayNumber - b.dayNumber
     );
-    
+
     const handleDeleteExercise = async (
         id: string,
         dayId: string
@@ -85,8 +85,46 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         }
     };
 
+    const handleEditExercises = async (
+        dayId: string,
+        exerciseId: string,
+        updates: {
+            suggestedReps?: number;
+            suggestedWeight?: number;
+            order?: number;
+        }) => {
+        // 1. Optimistically update local state
+        setPlanDays(currentDays =>
+            currentDays.map(day =>
+                day.id === dayId
+                    ? {
+                        ...day,
+                        planExercises: {
+                            items: day.planExercises.items.map(ex =>
+                                ex.id === exerciseId ? { ...ex, ...updates } : ex
+                            ),
+                        },
+                    }
+                    : day
+            )
+        );
+
+        // 2. Send update to backend
+        try {
+            await client.graphql({
+                query: updatePlanExercise,
+                variables: { input: { id: exerciseId, ...updates } },
+            }) as GraphQLResult<UpdatePlanExerciseOrderMutation>;
+
+            console.log(`✅ Updated exercise ${exerciseId}`);
+        } catch (error) {
+            console.error("❌ Failed to update exercise:", error);
+            await onRefreshPlan(); // rollback with fresh data
+        }
+    };
+
     // The handler to add an exercise to a plan day
-    const handleAddExercise =  async (
+    const handleAddExercise = async (
         dayId: string,
         exerciseId: string,
         order: number,
@@ -106,7 +144,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                 day.id === dayId
                     ? {
                         ...day,
-                        planExercises: { items: [...day.planExercises.items, newExercise] }
+                        planExercises: {items: [...day.planExercises.items, newExercise]}
                     }
                     : day
             )
@@ -117,7 +155,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
             next.add(dayId);  // <- Ensure it stays open
             return next;
         });
-        
+
         const input: CreatePlanExerciseInput = {
             planDayId: dayId,
             planId: plan.id,
@@ -130,7 +168,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
         try {
             const result = await client.graphql({
                 query: createPlanExercise,
-                variables: { input },
+                variables: {input},
             }) as GraphQLResult<CreatePlanExerciseMutation>;
 
             const realId = result.data?.createPlanExercise?.id;
@@ -187,7 +225,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                         items: day.planExercises.items
                             .map(exercise => {
                                 const updated = reorderedItems.find(i => i.id === exercise.id);
-                                return updated ? { ...exercise, order: updated.order } : exercise;
+                                return updated ? {...exercise, order: updated.order} : exercise;
                             })
                             .sort((a, b) => a.order - b.order),
                     },
@@ -199,7 +237,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                 reorderedItems.map((item) =>
                     client.graphql({
                         query: updatePlanExercise,
-                        variables: { input: { id: item.id, order: item.order } },
+                        variables: {input: {id: item.id, order: item.order}},
                     }) as Promise<GraphQLResult<UpdatePlanExerciseOrderMutation>>
                 )
             );
@@ -224,6 +262,7 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, onRefreshPlan, expandedDa
                         onAddExercise={handleAddExercise}
                         onDeleteExercise={handleDeleteExercise}
                         onReorderExercises={handleReorderExercises}
+                        onEditExercises={handleEditExercises}
                     />
                 ))}
             </ul>

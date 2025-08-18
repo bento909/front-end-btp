@@ -32,6 +32,15 @@ interface Props {
             suggestedWeight?: number;
         }[]
     ) => void;
+    onEditExercises: (
+        dayId: string,
+        exerciseId: string,
+        updates: {
+            suggestedReps?: number;
+            suggestedWeight?: number;
+            order?: number;
+        }
+    ) => void;
 }
 
 const formatDayName = (dayOfWeek: string): string =>
@@ -45,6 +54,7 @@ const PlanDayItem: React.FC<Props> = ({
                                           onAddExercise,
                                           onDeleteExercise,
                                           onReorderExercises,
+                                          onEditExercises
                                       }) => {
     const {exercises} = useSelector((state: RootState) => state.exercises);
     const dispatch = useDispatch<AppDispatch>();
@@ -77,6 +87,7 @@ const PlanDayItem: React.FC<Props> = ({
                         allExercises={exercises}
                         onDeleteExercise={onDeleteExercise}
                         onReorderExercises={onReorderExercises}
+                        onEditExercises={onEditExercises}
                     />
                     <AddExerciseForm onAddExercise={handleAddExercise} exercises={exercises}/>
                 </>
