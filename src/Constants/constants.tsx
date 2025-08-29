@@ -11,7 +11,8 @@ export interface User {
     emailAddress: string;
     profile: Profile;
     creator: string;
-    permissions: Permissions
+    permissions: Permissions;
+    id : string;
 }
 
 export enum Profile {
@@ -40,4 +41,24 @@ export interface Permissions {
     createPlan: CreatePlan,
     createExercise: boolean,
     viewMyPlan: boolean;
+}
+
+export interface ApiUser {
+    Attributes: { Name: string; Value: string }[];
+    Enabled: boolean;
+    UserCreateDate: string;
+    UserLastModifiedDate: string;
+    UserStatus: string;
+    Username: string;
+}
+
+export function canReadMessages(user: User): boolean {
+    return user.profile === Profile.ADMIN;
+}
+
+export function canCreatePlan(user: User): boolean {
+    return (
+        user.permissions.createPlan === CreatePlan.MY_OWN ||
+        user.permissions.createPlan === CreatePlan.MY_USERS
+    );
 }

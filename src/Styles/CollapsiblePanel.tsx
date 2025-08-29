@@ -13,20 +13,23 @@ const Panel = styled.div<{ isOpen: boolean }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 20px;
+    padding: 6px;
     border: 1px solid #ccc;
     border-radius: 8px;
     position: relative;
+    width: 600px; /* fixed width */
+    margin: 0 auto; /* center horizontally */
 `;
 
 const Header = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
 `;
 
 export const Button = styled.button<{ isOpen: boolean }>`
+    min-width: 110px;
     padding: 8px 12px;
     background-color: ${({ isOpen }) => (isOpen ? "#fff" : "#000")};
     color: ${({ isOpen }) => (isOpen ? "#000" : "#fff")};
@@ -42,7 +45,7 @@ const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({ title, isOpen, togg
             <Header>
                 <h2 style={{ margin: 0 }}>{title}</h2>
                 <Button isOpen={isOpen} onClick={toggle}>
-                    {isOpen ? "Close Form" : "View Form"}
+                    {isOpen ? "Close" : "View"}
                 </Button>
             </Header>
             {isOpen && children}

@@ -1,4 +1,4 @@
-import { CreatePlan, Profile, ViewUsers, Permissions } from "../Constants/constants.ts";
+import { CreatePlan, Profile, ViewUsers, Permissions } from "../Constants/constants.tsx";
 
 export class PermissionService {
     public static getPermissions(userType: Profile): Permissions {
