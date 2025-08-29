@@ -62,12 +62,12 @@ const ContactForm: React.FC = () => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'flex-end', // aligns everything to the right
                     gap: '1rem',
+                    width: '100%', // ensures inputs can expand
                 }}
             >
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <label htmlFor="name">Name:</label>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+                    <label htmlFor="name" style={{ width: '100px' }}>Name:</label>
                     <input
                         id="name"
                         name="name"
@@ -75,12 +75,12 @@ const ContactForm: React.FC = () => {
                         value={formData.name}
                         onChange={handleChange}
                         required
-                        style={{ marginTop: '0.25rem' }}
+                        style={{ flex: 1, padding: '6px' }}
                     />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <label htmlFor="email">Email:</label>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem' }}>
+                    <label htmlFor="email" style={{ width: '100px' }}>Email:</label>
                     <input
                         id="email"
                         name="email"
@@ -88,23 +88,23 @@ const ContactForm: React.FC = () => {
                         value={formData.email}
                         onChange={handleChange}
                         required
-                        style={{ marginTop: '0.25rem' }}
+                        style={{ flex: 1, padding: '6px' }}
                     />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <label htmlFor="message">Message:</label>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '1rem' }}>
+                    <label htmlFor="message" style={{ width: '100px', marginTop: '6px' }}>Message:</label>
                     <textarea
                         id="message"
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
                         required
-                        style={{ marginTop: '0.25rem', verticalAlign: 'top' }}
+                        style={{ flex: 1, padding: '6px' }}
                     />
                 </div>
 
-                <button type="submit" style={{ alignSelf: 'flex-end' }}>Submit</button>
+                <button type="submit" style={{ alignSelf: 'flex-end', padding: '6px 12px' }}>Submit</button>
             </form>
         </CollapsiblePanel>
     );
