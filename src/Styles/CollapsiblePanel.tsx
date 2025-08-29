@@ -45,7 +45,7 @@ const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({ title, isOpen, togg
             <Header>
                 <h2 style={{ margin: 0 }}>{title}</h2>
                 <Button isOpen={isOpen} onClick={toggle}>
-                    {isOpen ? "Close Form" : "View Form"}
+                    {isOpen ? "Close" : "View"}
                 </Button>
             </Header>
             {isOpen && children}
