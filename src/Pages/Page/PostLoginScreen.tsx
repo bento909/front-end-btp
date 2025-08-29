@@ -13,9 +13,9 @@ const PostLoginScreen = () => {
         if (!loading && user) {
             console.log('User profile:', user.profile);
             if (user.profile === Profile.TESTER) {
-                navigate('/testerMenu'); //this is a bit wank
+                navigate('/app/testerMenu'); //this is a bit wank
             } else {
-                navigate('/trainingMenu');
+                navigate('/app/trainingMenu');
             }
         }
     }, [loading, user, navigate]);
