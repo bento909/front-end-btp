@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, ChangeEvent, FormEvent } from "react";
-import { Button } from "../../Styles/Resources.tsx";
+import CollapsiblePanel, { Button } from "../../Styles/CollapsiblePanel.tsx";
 
 interface FormData {
     name: string;
@@ -32,9 +32,8 @@ export default function LandingPage() {
     
     return (
         <div>
-            {/* Bio Section */}
-            <section>
-                <h1>Welcome to My App</h1>
+            <CollapsiblePanel>
+                <h1>Welcome to Ben Thomas Programming </h1>
                 <p>
                     This is the public landing page. Learn more about the app below or
                     sign in to access your dashboard.
@@ -42,7 +41,7 @@ export default function LandingPage() {
                 <Button isOpen={true} onClick={() => navigate("/app/home")}>
                     Enter App
                 </Button>
-            </section>
+            </CollapsiblePanel>
 
             {/* Bio / About */}
             <section>

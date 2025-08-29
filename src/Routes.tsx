@@ -1,6 +1,6 @@
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import PostLoginScreen from './Pages/Page/PostLoginScreen.tsx';
-import UserMenu from './Pages/Page/User/UserMenu.tsx';
+import UserMenu from './Pages/Page/UserMenu.tsx';
 import TesterMenu from './Pages/Page/Tester/TesterMenu.tsx';
 import Layout from "./Pages/Components/Layout.tsx";
 import LandingPage from "./Pages/Page/LandingPage.tsx"

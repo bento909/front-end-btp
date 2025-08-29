@@ -1,6 +1,6 @@
 import { ViewUsers } from "../../../Constants/constants.tsx";
 import { useState } from "react";
-import Resources from "../../../Styles/Resources.tsx";
+import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersThunk } from "../../../redux/usersSlice.tsx";
 import { RootState, AppDispatch } from "../../../redux/store.tsx";
@@ -51,9 +51,9 @@ const ViewAllUsers: React.FC = () => {
     };
 
     return user && user.permissions?.viewUsers !== ViewUsers.NONE ? (
-        <Resources title="Users" isOpen={isFormVisible} toggle={toggleForm}>
+        <CollapsiblePanel title="Users" isOpen={isFormVisible} toggle={toggleForm}>
             <UserList toggleForm={toggleForm} isFormVisible={isFormVisible} />
-        </Resources>
+        </CollapsiblePanel>
     ) : null;
 };
 
