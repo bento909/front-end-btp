@@ -9,6 +9,7 @@ const schema = a.schema({
             email: a.string().required(),
             message: a.string().required(),
             createdAt: a.datetime().required(),
+            read: a.boolean().default(false), // ← add this
         })
         .authorization((allow) => [allow.publicApiKey()]),
 
