@@ -55,10 +55,8 @@ const CreateExercise: React.FC = () => {
             setLoading(false);
         }
     };
-
-    if (!user || !user.permissions?.createExercise) return null;
-
-    return (
+    
+    return  user && user.permissions?.createExercise ? (
         <CollapsiblePanel title="Create Exercise" isOpen={isOpen} toggle={togglePanel}>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <input
@@ -94,7 +92,7 @@ const CreateExercise: React.FC = () => {
                 {message && <p>{message}</p>}
             </div>
         </CollapsiblePanel>
-    );
+    ): null;
 };
 
 export default CreateExercise;

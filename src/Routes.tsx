@@ -14,6 +14,7 @@ import {reset} from "./redux/usersSlice.tsx";
 import {updateAuthUser} from "./redux/authSlice.tsx";
 import {Profile} from "./Constants/constants.tsx";
 import {PermissionService} from "./Helpers/PermissionService.tsx";
+import ViewMessages from "./Pages/Components/CollapsiblePanels/ViewMessages.tsx";
 
 function AppRoutes() {
     return (
@@ -45,6 +46,7 @@ function AppRoutes() {
 const Menu = () => {
     return (
         <main>
+            <ViewMessages/>
             <ViewAllUsers />
             <SignUp />
             <CreateExercise />

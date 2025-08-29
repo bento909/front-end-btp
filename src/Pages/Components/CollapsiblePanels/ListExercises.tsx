@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState, AppDispatch} from "../../../redux/store.tsx";
 import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
 import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../graphql/types.ts";
+import {canCreatePlan} from "../../../Constants/constants.tsx";
 
 const ListExercises: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -41,7 +42,7 @@ const ListExercises: React.FC = () => {
 
     if (!user || !user.permissions?.createExercise) return null;
 
-    return (
+    return user && canCreatePlan(user) ? (
         <CollapsiblePanel title="List Exercises" isOpen={isVisible} toggle={toggleVisibility}>
             {loading && <p>Loading exercises...</p>}
             {error && <p style={{color: "red"}}>{error}</p>}
@@ -87,7 +88,7 @@ const ListExercises: React.FC = () => {
                 </ul>
             )}
         </CollapsiblePanel>
-    );
+    ) : null;
 };
 
 export default ListExercises;

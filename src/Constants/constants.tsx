@@ -52,6 +52,10 @@ export interface ApiUser {
     Username: string;
 }
 
+export function canReadMessages(user: User): boolean {
+    return user.profile === Profile.ADMIN;
+}
+
 export function canCreatePlan(user: User): boolean {
     return (
         user.permissions.createPlan === CreatePlan.MY_OWN ||
