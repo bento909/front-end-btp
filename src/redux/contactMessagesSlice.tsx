@@ -63,11 +63,12 @@ export const addMessageThunk = createAsyncThunk(
     "contactMessages/add",
     async (input: CreateContactMessageInput, thunkAPI) => {
         try {
+            console.log('Inside AddMessageThunk - input is: ' + input)
             const res = (await client.graphql({
                 query: createContactMessage,
                 variables: { input },
             })) as GraphQLResult<{ createContactMessage: any }>;
-
+            console.log('Result is: ' + res);
             return res.data?.createContactMessage;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to create message");

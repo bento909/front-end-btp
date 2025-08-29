@@ -38,7 +38,7 @@ const ContactForm: React.FC = () => {
             createdAt: new Date().toISOString(),
             read: false,
         };
-
+        console.log('Input to be sent: ' + input)
         dispatch(addMessageThunk(input));
 
         setFormData({ name: "", email: "", message: "" });
