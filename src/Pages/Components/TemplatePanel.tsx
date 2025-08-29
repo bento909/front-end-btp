@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import CollapsiblePanel from "../../Styles/CollapsiblePanel.tsx";
+import Resources from "../../Styles/Resources.tsx";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store.tsx";
 
@@ -17,9 +17,9 @@ const TemplatePanel: React.FC<TemplatePanelProps> = ({ title = "Template", child
     };
 
     return user && user.permissions ? (
-        <CollapsiblePanel title={title} isOpen={isOpen} toggle={togglePanel}>
+        <Resources title={title} isOpen={isOpen} toggle={togglePanel}>
             {children}
-        </CollapsiblePanel>
+        </Resources>
     ) : null;
 };
 

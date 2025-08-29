@@ -37,7 +37,7 @@ export const Button = styled.button<{ isOpen: boolean }>`
     border-radius: 5px;
 `;
 
-const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({ title, isOpen, toggle, children }) => {
+const Resources: React.FC<CollapsiblePanelProps> = ({ title, isOpen, toggle, children }) => {
     return (
         <Panel isOpen={isOpen}>
             <Header>
@@ -51,4 +51,4 @@ const CollapsiblePanel: React.FC<CollapsiblePanelProps> = ({ title, isOpen, togg
     );
 };
 
-export default CollapsiblePanel;
+export default Resources;

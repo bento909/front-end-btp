@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
 import { Config, Profile, User } from "../../../Constants/constants.tsx";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
+import Resources from "../../../Styles/Resources.tsx";
 import { useSelector, useDispatch } from "react-redux";  // Import useDispatch
 import {AppDispatch, RootState} from "../../../redux/store.tsx";
 import { fetchUsersThunk } from "../../../redux/usersSlice.tsx";  // Import the fetchUsersThunk
@@ -94,9 +94,9 @@ const Signup: React.FC = () => {
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
     return user && user.permissions.createUsers.length > 0 && (
-        <CollapsiblePanel title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
+        <Resources title="Create a user" isOpen={isFormVisible} toggle={toggleForm}>
             <UserForm user={user} toggleForm={toggleForm} isFormVisible={isFormVisible} />
-        </CollapsiblePanel>
+        </Resources>
     );
 };
 

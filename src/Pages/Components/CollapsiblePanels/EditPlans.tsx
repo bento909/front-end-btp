@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
+import Resources from "../../../Styles/Resources.tsx";
 import {useSelector, useDispatch} from "react-redux";
 import {AppDispatch, RootState} from "../../../redux/store.tsx";
 import {fetchUsersThunk} from "../../../redux/usersSlice.tsx"; // Adjust path as needed
@@ -29,7 +29,7 @@ const EditPlans: React.FC = () => {
     };
 
     return user && canCreatePlan(user) ? (
-        <CollapsiblePanel title="Plans" isOpen={isVisible} toggle={toggleVisibility}>
+        <Resources title="Plans" isOpen={isVisible} toggle={toggleVisibility}>
             <div>
                 {loading && <p>Loading users...</p>}
                 {error && <p>Error: {error}</p>}
@@ -49,7 +49,7 @@ const EditPlans: React.FC = () => {
                     </ul>
                 )}
             </div>
-        </CollapsiblePanel>
+        </Resources>
     ) : null;
 };
 

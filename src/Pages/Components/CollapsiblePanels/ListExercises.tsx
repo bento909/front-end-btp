@@ -1,5 +1,5 @@
 import {useState} from "react";
-import CollapsiblePanel, {Button} from "../../../Styles/CollapsiblePanel.tsx";
+import Resources, {Button} from "../../../Styles/Resources.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState, AppDispatch} from "../../../redux/store.tsx";
 import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
@@ -42,7 +42,7 @@ const ListExercises: React.FC = () => {
     if (!user || !user.permissions?.createExercise) return null;
 
     return (
-        <CollapsiblePanel title="List Exercises" isOpen={isVisible} toggle={toggleVisibility}>
+        <Resources title="List Exercises" isOpen={isVisible} toggle={toggleVisibility}>
             {loading && <p>Loading exercises...</p>}
             {error && <p style={{color: "red"}}>{error}</p>}
             {!loading && exercises.length === 0 && <p>No exercises found.</p>}
@@ -86,7 +86,7 @@ const ListExercises: React.FC = () => {
                     })}
                 </ul>
             )}
-        </CollapsiblePanel>
+        </Resources>
     );
 };
 

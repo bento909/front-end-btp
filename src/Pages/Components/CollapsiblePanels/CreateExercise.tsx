@@ -1,5 +1,5 @@
 import React from "react";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
+import Resources from "../../../Styles/Resources.tsx";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store.tsx";
 import { client } from "../../../graphql/graphqlClient.ts";
@@ -59,7 +59,7 @@ const CreateExercise: React.FC = () => {
     if (!user || !user.permissions?.createExercise) return null;
 
     return (
-        <CollapsiblePanel title="Create Exercise" isOpen={isOpen} toggle={togglePanel}>
+        <Resources title="Create Exercise" isOpen={isOpen} toggle={togglePanel}>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <input
                     type="text"
@@ -93,7 +93,7 @@ const CreateExercise: React.FC = () => {
                 </button>
                 {message && <p>{message}</p>}
             </div>
-        </CollapsiblePanel>
+        </Resources>
     );
 };
 

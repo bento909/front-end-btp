@@ -1,7 +1,7 @@
 import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../../Styles/CollapsiblePanel.tsx"
+import { Button } from "../../Styles/Resources.tsx"
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store.tsx";
 import { useDispatch } from 'react-redux';
