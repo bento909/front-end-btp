@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import usersReducer from "./usersSlice";
 import authReducer from "./authSlice";
-import exercisesReducer from "./exercisesSlice"; // <- add this
+import exercisesReducer from "./exercisesSlice";
+import contactMessagesReducer from "./contactMessagesSlice"
 
 const store = configureStore({
     reducer: {
-        users: usersReducer, // Add users to Redux store
-        auth: authReducer, // Add authentication state
-        exercises: exercisesReducer, // <- include it
+        users: usersReducer,
+        auth: authReducer,
+        exercises: exercisesReducer,
+        contactMessages: contactMessagesReducer, // <-- add this
     },
 });
 
