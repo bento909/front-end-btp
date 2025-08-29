@@ -17,6 +17,8 @@ const Panel = styled.div<{ isOpen: boolean }>`
     border: 1px solid #ccc;
     border-radius: 8px;
     position: relative;
+    width: 600px; /* fixed width */
+    margin: 0 auto; /* center horizontally */
 `;
 
 const Header = styled.div`

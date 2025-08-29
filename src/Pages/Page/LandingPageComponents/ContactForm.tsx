@@ -28,7 +28,7 @@ const ContactForm: React.FC = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         const input: CreateContactMessageInput = {
@@ -38,11 +38,21 @@ const ContactForm: React.FC = () => {
             createdAt: new Date().toISOString(),
             read: false,
         };
-        console.log('Input to be sent: ' + input)
-        dispatch(addMessageThunk(input));
 
-        setFormData({ name: "", email: "", message: "" });
-        alert("Message submitted successfully!");
+        try {
+            const resultAction = await dispatch(addMessageThunk(input));
+
+            if (addMessageThunk.fulfilled.match(resultAction)) {
+                setFormData({ name: "", email: "", message: "" });
+                alert("Message submitted successfully!");
+            } else {
+                console.error(resultAction.payload);
+                alert("❌ Failed to submit message");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("❌ Error submitting message");
+        }
     };
 
     return (
