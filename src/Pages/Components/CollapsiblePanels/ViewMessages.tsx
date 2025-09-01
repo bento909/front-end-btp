@@ -44,7 +44,7 @@ const ViewMessages: React.FC = () => {
             {sortedMessages.length === 0 && <p>No messages</p>}
             <ul>
                 {sortedMessages.map((msg) => (
-                    <li key={msg.id} style={{ marginBottom: "12px", paddingBottom: "8px" }}>
+                    <li key={msg.id} style={{ marginBottom: "12px" }}>
                         <strong>{msg.name} ({msg.email})</strong>
                         <p>{msg.message}</p>
                         <p>
