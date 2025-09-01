@@ -39,16 +39,8 @@ const ViewMessages: React.FC = () => {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
-    const toggleVisibility = () => {
-        const show = !isVisible;
-        setIsVisible(show);
-        if (show) {
-            dispatch(fetchMessagesThunk());
-        }
-    };
-
     return  user && canReadMessages(user) ? (
-        <CollapsiblePanel title="Admin Messages" isOpen={isVisible} toggle={toggleVisibility}>
+        <CollapsiblePanel title="Admin Messages" isOpen={isVisible} toggle={() => {setIsVisible(!isVisible);}}>
             {sortedMessages.length === 0 && <p>No messages</p>}
             <ul>
                 {sortedMessages.map((msg) => (
