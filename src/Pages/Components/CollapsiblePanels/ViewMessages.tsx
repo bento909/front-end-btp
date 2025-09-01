@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux/store.tsx";
 import {
@@ -12,6 +12,7 @@ import { canReadMessages } from "../../../Constants/constants.tsx";
 const ViewMessages: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useDispatch<AppDispatch>();
+    const [isVisible, setIsVisible] = useState(false);
     const { messages, loading, error } = useSelector(
         (state: RootState) => state.contactMessages
     );
@@ -38,12 +39,20 @@ const ViewMessages: React.FC = () => {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    const toggleVisibility = () => {
+        const show = !isVisible;
+        setIsVisible(show);
+        if (show) {
+            dispatch(fetchMessagesThunk());
+        }
+    };
+
     return  user && canReadMessages(user) ? (
-        <CollapsiblePanel title="Admin Messages" isOpen={true} toggle={() => {}}>
+        <CollapsiblePanel title="Admin Messages" isOpen={isVisible} toggle={toggleVisibility}>
             {sortedMessages.length === 0 && <p>No messages</p>}
             <ul>
                 {sortedMessages.map((msg) => (
-                    <li key={msg.id} style={{ marginBottom: "12px", borderBottom: "1px solid #ccc", paddingBottom: "8px" }}>
+                    <li key={msg.id} style={{ marginBottom: "12px", paddingBottom: "8px" }}>
                         <strong>{msg.name} ({msg.email})</strong>
                         <p>{msg.message}</p>
                         <p>
