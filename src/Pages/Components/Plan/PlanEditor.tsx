@@ -21,7 +21,7 @@ const WEEK_DAYS: DayOfWeek[] = [
 interface Props {
     plan: ListPlansQuery["listPlans"]["items"][0];
     userName: string;
-    onRefreshPlan: () => Promise<void>;
+    onRefreshPlan: () => void;
     expandedDays: Set<string>;
     setExpandedDays: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
@@ -81,7 +81,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             }) as GraphQLResult<PlanExerciseDeletionInput>
         } catch (error) {
             console.error("Failed to delete exercise:", error);
-            await onRefreshPlan();
+            onRefreshPlan();
         }
     };
 

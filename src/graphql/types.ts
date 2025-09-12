@@ -30,6 +30,31 @@ export const ExerciseTypeMetadata: ExerciseTypeInfo[] = [
     { type: ExerciseTypeEnum.KB_SWING, label: "Kettlebells" },
 ];
 
+export interface Plan {
+    id: string;
+    name: string;
+    trainerEmail: string;
+    clientEmail: string;
+    planDays: {
+        items: Array<{
+            id: string;
+            name?: string;
+            notes?: string;
+            dayOfWeek: DayOfWeek;
+            dayNumber: number;
+            planExercises: {
+                items: Array<{
+                    id: string;
+                    exerciseId: string;
+                    order: number;
+                    suggestedReps?: number;
+                    suggestedWeight?: number;
+                }>;
+            };
+        }>;
+    };
+}
+
 export interface ListPlansQuery {
     listPlans: {
         items: Array<{

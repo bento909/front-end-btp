@@ -10,12 +10,12 @@
 // Delegating to PlanEditor if a plan exists
 
 import { useEffect, useState } from "react";
-import { client } from "../../../graphql/graphqlClient.ts";
-import { GraphQLQueries } from "../../../graphql/queries.ts";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { ListPlansQuery } from "../../../graphql/types.ts";
+import { useDispatch, useSelector } from "react-redux";
 import PlanCreator from "./PlanCreator.tsx";
 import PlanEditor from "./PlanEditor.tsx";
+import { fetchPlanByClientEmailThunk } from "../../../redux/plansSlice";
+import { AppDispatch, RootState } from "../../../redux/store.tsx";
+
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../redux/store";
 
@@ -25,33 +25,15 @@ interface Props {
 }
 
 const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
-    // const user = useSelector((state: RootState) => state.auth.user);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [plan, setPlan] = useState<ListPlansQuery["listPlans"]["items"][0] | null>(null);
+    const dispatch = useDispatch<AppDispatch>();
+    const { plan, loading, error } = useSelector((state: RootState) => state.plans);
     const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
-    const fetchPlans = async () => {
-        setLoading(true);
-        try {
-            const resp = (await client.graphql({
-                query: GraphQLQueries.listPlans,
-            })) as GraphQLResult<ListPlansQuery>;
-
-            const all = resp.data?.listPlans.items ?? [];
-            setPlan(all.find(p => p.clientEmail === userEmail) ?? null);
-            setError(null);
-        } catch (e) {
-            console.error(e);
-            setError("Error loading plan");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        fetchPlans();
-    }, [userEmail]);
+        if (userEmail) {
+            dispatch(fetchPlanByClientEmailThunk(userEmail));
+        }
+    }, [userEmail, dispatch]);
 
     if (loading) return <p>Loading plan…</p>;
     if (error) return <p style={{ color: "red" }}>{error}</p>;
@@ -60,12 +42,12 @@ const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
         <PlanEditor
             plan={plan}
             userName={userName}
-            onRefreshPlan={fetchPlans}
+            onRefreshPlan={() => dispatch(fetchPlanByClientEmailThunk(userEmail)).unwrap()}
             expandedDays={expandedDays}
             setExpandedDays={setExpandedDays}
         />
     ) : (
-        <PlanCreator userName={userName} userEmail={userEmail} onCreated={fetchPlans} />
+        <PlanCreator userName={userName} userEmail={userEmail} onCreated={() => dispatch(fetchPlanByClientEmailThunk(userEmail))} />
     );
 };
 

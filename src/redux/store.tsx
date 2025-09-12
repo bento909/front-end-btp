@@ -3,13 +3,15 @@ import usersReducer from "./usersSlice";
 import authReducer from "./authSlice";
 import exercisesReducer from "./exercisesSlice";
 import contactMessagesReducer from "./contactMessagesSlice"
+import plansReducer from "./plansSlice.tsx"
 
 const store = configureStore({
     reducer: {
         users: usersReducer,
         auth: authReducer,
         exercises: exercisesReducer,
-        contactMessages: contactMessagesReducer, // <-- add this
+        contactMessages: contactMessagesReducer,
+        plans: plansReducer// <-- add this
     },
 });
 

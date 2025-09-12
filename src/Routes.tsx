@@ -8,6 +8,7 @@ import ViewAllUsers from "./Pages/Components/CollapsiblePanels/ViewUsers.tsx";
 import CreateExercise from "./Pages/Components/CollapsiblePanels/CreateExercise.tsx";
 import ListExercises from "./Pages/Components/CollapsiblePanels/ListExercises.tsx";
 import EditPlans from "./Pages/Components/CollapsiblePanels/EditPlans.tsx"
+import ViewPlan from "./Pages/Components/CollapsiblePanels/ViewPlan.tsx"
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "./redux/store.tsx";
 import {reset} from "./redux/usersSlice.tsx";
@@ -52,6 +53,7 @@ const Menu = () => {
             <CreateExercise />
             <ListExercises />
             <EditPlans />
+            <ViewPlan />
         </main>
     );
 };
