@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux/store";
 import { fetchPlanByClientEmailThunk } from "../../../redux/plansSlice";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel"; // adjust path
-
-// ✅ canonical ordered tuple for days of week
+import { fetchExercisesThunk } from "../../../redux/exercisesSlice";
+import CollapsiblePanel from "../../../Styles/CollapsiblePanel";
+// canonical ordered tuple for days of week
 export const DaysOfWeek = [
     "SUNDAY",
     "MONDAY",
@@ -18,36 +18,55 @@ export const DaysOfWeek = [
 export type DayOfWeek = typeof DaysOfWeek[number];
 
 const ViewPlan: React.FC = () => {
-    const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useDispatch<AppDispatch>();
-    const { plan, loading, error } = useSelector((state: RootState) => state.plans);
 
-    // figure out today's day string in uppercase
+    const user = useSelector((state: RootState) => state.auth.user);
+    const { plan, loading: planLoading, error: planError } = useSelector(
+        (state: RootState) => state.plans
+    );
+    const {
+        exercises,
+        loading: exercisesLoading,
+        error: exercisesError,
+    } = useSelector((state: RootState) => state.exercises);
+
+    // figure out today's day string
     const today = new Date()
         .toLocaleDateString("en-US", { weekday: "long" })
         .toUpperCase() as DayOfWeek;
 
-    // track which day is expanded
     const [expandedDay, setExpandedDay] = useState<DayOfWeek | null>(today);
 
+    // fetch plan for user
     useEffect(() => {
         const userEmail = user?.emailAddress;
         if (userEmail) {
             dispatch(fetchPlanByClientEmailThunk(userEmail));
         }
-    }, [dispatch]);
+    }, [dispatch, user?.emailAddress]);
 
-    if (loading) return <p>Loading plan…</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
+    // fetch exercises if not loaded
+    useEffect(() => {
+        if (exercises.length === 0) {
+            dispatch(fetchExercisesThunk());
+        }
+    }, [dispatch, exercises.length]);
+
+    if (planLoading || exercisesLoading) return <p>Loading plan…</p>;
+    if (planError) return <p style={{ color: "red" }}>{planError}</p>;
+    if (exercisesError) return <p style={{ color: "red" }}>{exercisesError}</p>;
     if (!plan) return <p>No plan found.</p>;
+
+    // map exerciseId → exerciseName
+    const exerciseNameMap = Object.fromEntries(
+        exercises.map((ex) => [ex.id, ex.name])
+    );
 
     return (
         <div>
             <h3>{plan.name}</h3>
             {DaysOfWeek.map((dayName) => {
-                const planDay = plan.planDays.items.find(
-                    (d) => d.dayOfWeek === dayName
-                );
+                const planDay = plan.planDays.items.find((d) => d.dayOfWeek === dayName);
 
                 return (
                     <CollapsiblePanel
@@ -62,9 +81,8 @@ const ViewPlan: React.FC = () => {
                             <ul>
                                 {planDay.planExercises.items.map((ex) => (
                                     <li key={ex.id}>
-                                        <strong>{`Exercise ${ex.exerciseId}`}</strong>{" "}
-                                        — Reps: {ex.suggestedReps ?? "-"} | Weight:{" "}
-                                        {ex.suggestedWeight ?? "-"}
+                                        <strong>{exerciseNameMap[ex.exerciseId] ?? `Exercise ${ex.exerciseId}`}</strong>{" "}
+                                        — Reps: {ex.suggestedReps ?? "-"} | Weight: {ex.suggestedWeight ?? "-"}
                                     </li>
                                 ))}
                             </ul>
