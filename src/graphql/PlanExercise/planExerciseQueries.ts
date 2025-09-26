@@ -13,6 +13,7 @@ export class PlanExerciseQueries {
           order
           suggestedReps
           suggestedWeight
+          suggestedSets
           exercise {
             id
             name

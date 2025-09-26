@@ -9,6 +9,7 @@ export const createPlanExercise = gql`
       order
       suggestedReps
       suggestedWeight
+      suggestedSets
       planDay {
         id
       }
@@ -23,6 +24,7 @@ export const updatePlanExercise = gql`
       order
       suggestedReps
       suggestedWeight
+      suggestedSets
     }
   }
 `;

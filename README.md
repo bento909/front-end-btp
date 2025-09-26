@@ -185,7 +185,8 @@ await createExerciseLog({
         {
           "exercise": { "name": "Bench Press" },
           "suggestedReps": 8,
-          "suggestedWeight": 80
+          "suggestedWeight": 80,
+          "suggestedSets": 3
         }
       ]
     },

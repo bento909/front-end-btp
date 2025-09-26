@@ -4,6 +4,7 @@ import { RootState, AppDispatch } from "../../../redux/store";
 import { fetchPlanByClientEmailThunk } from "../../../redux/plansSlice";
 import { fetchExercisesThunk } from "../../../redux/exercisesSlice";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel";
+import ExerciseInput from "../Plan/ExerciseInput.tsx";
 // canonical ordered tuple for days of week
 export const DaysOfWeek = [
     "SUNDAY",
@@ -78,14 +79,18 @@ const ViewPlan: React.FC = () => {
                         }
                     >
                         {planDay ? (
-                            <ul>
+                            <div>
                                 {planDay.planExercises.items.map((ex) => (
-                                    <li key={ex.id}>
-                                        <strong>{exerciseNameMap[ex.exerciseId] ?? `Exercise ${ex.exerciseId}`}</strong>{" "}
-                                        — Reps: {ex.suggestedReps ?? "-"} | Weight: {ex.suggestedWeight ?? "-"}
-                                    </li>
+                                    <ExerciseInput
+                                        key={ex.id}
+                                        planExercise={{
+                                            id: ex.id,
+                                            exerciseName: exerciseNameMap[ex.exerciseId] ?? `Exercise ${ex.exerciseId}`,
+                                            sets: ex.suggestedSets?? 1, // make sure this matches your data
+                                        }}
+                                    />
                                 ))}
-                            </ul>
+                            </div>
                         ) : (
                             <p>No exercises for this day.</p>
                         )}

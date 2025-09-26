@@ -6,6 +6,7 @@ export interface CreatePlanExerciseMutation {
         order: number;
         suggestedReps?: number;
         suggestedWeight?: number;
+        suggestedSets?: number;
         planDay: {
             id: string;
         };
@@ -18,6 +19,7 @@ export interface UpdatePlanExerciseOrderMutation {
         order: number;
         suggestedReps?: number;
         suggestedWeight?: number;
+        suggestedSets?: number;
         planDay: {
             id: string;
         };
@@ -31,6 +33,7 @@ export interface CreatePlanExerciseInput {
     order?: number;
     suggestedReps?: number;
     suggestedWeight?: number;
+    suggestedSets?: number;
 }
 
 export interface CreateExerciseLogInput {

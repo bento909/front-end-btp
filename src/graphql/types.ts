@@ -49,6 +49,7 @@ export interface Plan {
                     order: number;
                     suggestedReps?: number;
                     suggestedWeight?: number;
+                    suggestedSets?: number;
                 }>;
             };
         }>;
@@ -76,6 +77,7 @@ export interface ListPlansQuery {
                             order: number;
                             suggestedReps?: number;
                             suggestedWeight?: number;
+                            suggestedSets?: number;
                         }>;
                     };
                 }>;
@@ -99,6 +101,7 @@ export interface ListExercisesQuery {
                     order: number;
                     suggestedReps?: number;
                     suggestedWeight?: number;
+                    suggestedSets?: number;
                 }>;
             };
         }>;
@@ -114,6 +117,7 @@ export interface ListPlanExercisesQuery {
             order: number;
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number;
             exercise: {
                 id: string;
                 name: string;
@@ -163,6 +167,7 @@ export interface GetPlanByIdQuery {
                         order: number;
                         suggestedReps?: number;
                         suggestedWeight?: number;
+                        suggestedSets?: number;
                     }>;
                 };
             }>;
@@ -184,6 +189,7 @@ export interface GetExerciseByIdQuery {
                 order: number;
                 suggestedReps?: number;
                 suggestedWeight?: number;
+                suggestedSets?: number;
             }>;
         };
     };
@@ -197,6 +203,7 @@ export interface GetPlanExerciseByIdQuery {
         order: number;
         suggestedReps?: number;
         suggestedWeight?: number;
+        suggestedSets?: number;
         planDay: {
             id: string;
             dayOfWeek: DayOfWeek;
@@ -226,6 +233,7 @@ export interface GetPlanDayByIdQuery {
                 order: number;
                 suggestedReps?: number;
                 suggestedWeight?: number;
+                suggestedSets?: number;
             }>;
         };
     };

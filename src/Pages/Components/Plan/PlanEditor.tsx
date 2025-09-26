@@ -91,6 +91,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
         updates: {
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number;
             order?: number;
         }) => {
         // 1. Optimistically update local state
@@ -129,7 +130,8 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
         exerciseId: string,
         order: number,
         suggestedReps: number,
-        suggestedWeight: number
+        suggestedWeight: number,
+        suggestedSets: number
     ) => {
         const newExercise = {
             id: `temp-${Math.random()}`, // temporary ID until backend returns real ID
@@ -137,6 +139,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             order,
             suggestedReps,
             suggestedWeight,
+            suggestedSets
         };
 
         setPlanDays(currentDays =>
@@ -162,7 +165,8 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             exerciseId,
             order,
             suggestedReps,
-            suggestedWeight
+            suggestedWeight,
+            suggestedSets
         };
         console.log('Creating exercise with input ', input);
         try {
@@ -214,6 +218,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             order: number;
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number
         }[]
     ) => {
         setPlanDays(currentDays =>

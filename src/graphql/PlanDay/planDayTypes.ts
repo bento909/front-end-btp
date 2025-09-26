@@ -26,6 +26,7 @@ export interface ListPlanDaysQuery {
                     order: number;
                     suggestedReps?: number;
                     suggestedWeight?: number;
+                    suggestedSets?: number;
                 }>;
             };
         }>;

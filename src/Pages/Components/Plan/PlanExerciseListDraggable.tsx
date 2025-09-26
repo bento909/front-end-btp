@@ -8,6 +8,7 @@ interface ExerciseListDraggableProps {
         order: number;
         suggestedReps?: number;
         suggestedWeight?: number;
+        suggestedSets?: number;
         exerciseId: string;
     }>;
     allExercises: Array<{ id: string; name: string }>;
@@ -22,6 +23,7 @@ interface ExerciseListDraggableProps {
             order: number;
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number;
         }[]
     ) => void;
     onEditExercises: (
@@ -30,6 +32,7 @@ interface ExerciseListDraggableProps {
         updates: {
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number;
             order?: number;
         }
     ) => void;
@@ -46,6 +49,7 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
     const [editingId, setEditingId] = React.useState<string | null>(null);
     const [tempReps, setTempReps] = React.useState<number | undefined>();
     const [tempWeight, setTempWeight] = React.useState<number | undefined>();
+    const [tempSets, setTempSets] = React.useState<number | undefined>();
 
     const handleDragEnd = (result: DropResult) => {
         const {source, destination} = result;
@@ -63,6 +67,7 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
             order: index + 1,
             suggestedReps: item.suggestedReps,
             suggestedWeight: item.suggestedWeight,
+            suggestedSets: item.suggestedSets
         }));
 
         onReorderExercises(dayId, updated);
@@ -123,10 +128,17 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                             onChange={(e) => setTempWeight(Number(e.target.value))}
                             style={{width: 60}}
                         />
+                        <input
+                            type="number"
+                            value={tempSets ?? ex.suggestedSets ?? ""}
+                            placeholder="Sets"
+                            onChange={(e) => setTempSets(Number(e.target.value))}
+                            style={{width: 60}}
+                        />
                     </>
                 ) : (
                     <>
-                        {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg
+                        {ex.suggestedReps} Reps, {ex.suggestedWeight} Kg, {ex.suggestedSets}
                     </>
                 )}
             </span>
@@ -139,10 +151,12 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                               onEditExercises(dayId, ex.id, {
                                   suggestedReps: tempReps,
                                   suggestedWeight: tempWeight,
+                                  suggestedSets: tempSets
                               });
                               setEditingId(null);
                               setTempReps(undefined);
                               setTempWeight(undefined);
+                              setTempSets(undefined);
                           }}
                           style={{marginLeft: 8}}
                       >
@@ -165,6 +179,7 @@ const ExerciseListDraggable: React.FC<ExerciseListDraggableProps> = ({
                           setEditingId(ex.id);
                           setTempReps(ex.suggestedReps);
                           setTempWeight(ex.suggestedWeight);
+                          setTempSets(ex.suggestedSets)
                       }}
                       style={{marginLeft: 8}}
                   >

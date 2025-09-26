@@ -47,6 +47,7 @@ const schema = a.schema({
             order: a.integer().required(),
             suggestedReps: a.integer(),
             suggestedWeight: a.float(),
+            suggestedSets: a.integer(),
             logs: a.hasMany("ExerciseLog", "planExerciseId"),
             exercise: a.belongsTo("Exercise", "exerciseId"),
             planDay: a.belongsTo("PlanDay", "planDayId"), // ← and this

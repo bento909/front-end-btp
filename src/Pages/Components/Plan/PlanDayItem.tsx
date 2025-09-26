@@ -17,7 +17,8 @@ interface Props {
         exerciseId: string,
         order: number,
         suggestedReps: number,
-        suggestedWeight: number
+        suggestedWeight: number,
+        suggestedSets: number
     ) => void;
     onDeleteExercise: (
         exerciseId: string,
@@ -30,6 +31,7 @@ interface Props {
             order: number;
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number
         }[]
     ) => void;
     onEditExercises: (
@@ -38,6 +40,7 @@ interface Props {
         updates: {
             suggestedReps?: number;
             suggestedWeight?: number;
+            suggestedSets?: number
             order?: number;
         }
     ) => void;
@@ -66,10 +69,11 @@ const PlanDayItem: React.FC<Props> = ({
     const handleAddExercise = (
         exerciseId: string,
         suggestedReps: number,
-        suggestedWeight: number
+        suggestedWeight: number,
+        suggestedSets: number
     ) => {
         const nextOrder = day.planExercises.items.length + 1;
-        onAddExercise(day.id, exerciseId, nextOrder, suggestedReps, suggestedWeight);
+        onAddExercise(day.id, exerciseId, nextOrder, suggestedReps, suggestedWeight, suggestedSets);
     };
 
     return (

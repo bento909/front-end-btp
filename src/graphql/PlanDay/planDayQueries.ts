@@ -21,6 +21,7 @@ export class planDayQueries {
               order
               suggestedReps
               suggestedWeight
+              suggestedSets
             }
           }
         }
@@ -45,6 +46,7 @@ export class planDayQueries {
             order
             suggestedReps
             suggestedWeight
+            suggestedSets
           }
         }
       }

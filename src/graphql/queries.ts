@@ -23,6 +23,7 @@ export class GraphQLQueries {
                   order
                   suggestedReps
                   suggestedWeight
+                  suggestedSets
                 }
               }
             }
@@ -49,6 +50,7 @@ export class GraphQLQueries {
               order
               suggestedReps
               suggestedWeight
+              suggestedSets
             }
           }
         }
@@ -67,6 +69,7 @@ export class GraphQLQueries {
           order
           suggestedReps
           suggestedWeight
+          suggestedSets
           exercise {
             id
             name
@@ -101,6 +104,7 @@ export class GraphQLQueries {
               order
               suggestedReps
               suggestedWeight
+              suggestedSets
             }
           }
         }
@@ -148,6 +152,7 @@ export class GraphQLQueries {
                 order
                 suggestedReps
                 suggestedWeight
+                suggestedSets
               }
             }
           }
@@ -172,6 +177,7 @@ export class GraphQLQueries {
             order
             suggestedReps
             suggestedWeight
+            suggestedSets
           }
         }
       }
@@ -188,6 +194,7 @@ export class GraphQLQueries {
         order
         suggestedReps
         suggestedWeight
+        suggestedSets
         planDay {
           id
           dayOfWeek
@@ -220,6 +227,7 @@ export class GraphQLQueries {
             order
             suggestedReps
             suggestedWeight
+            suggestedSets
           }
         }
       }

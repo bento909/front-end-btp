@@ -5,7 +5,8 @@ interface AddExerciseFormProps {
     onAddExercise: (
         exerciseId: string,
         suggestedReps: number,
-        suggestedWeight: number
+        suggestedWeight: number,
+        suggestedSets: number
     ) => void;
     exercises: Array<{ id: string; name: string; type: ExerciseTypeEnum }>;
 }
@@ -15,6 +16,7 @@ const AddExerciseForm: React.FC<AddExerciseFormProps> = ({onAddExercise, exercis
     const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");
     const [suggestedReps, setSuggestedReps] = useState<number>(10);
     const [suggestedWeight, setSuggestedWeight] = useState<number>(50);
+    const [suggestedSets, setSuggestedSets] = useState<number>(3);
 
     const filteredExercises = selectedType
         ? exercises.filter((ex) => ex.type === selectedType)
@@ -22,7 +24,7 @@ const AddExerciseForm: React.FC<AddExerciseFormProps> = ({onAddExercise, exercis
 
     const handleAdd = () => {
         if (selectedExerciseId) {
-            onAddExercise(selectedExerciseId, suggestedReps, suggestedWeight);
+            onAddExercise(selectedExerciseId, suggestedReps, suggestedWeight, suggestedSets);
             setSelectedExerciseId("");
             setSelectedType("");
         }
@@ -91,6 +93,18 @@ const AddExerciseForm: React.FC<AddExerciseFormProps> = ({onAddExercise, exercis
                                 type="number"
                                 value={suggestedWeight}
                                 onChange={(e) => setSuggestedWeight(Number(e.target.value))}
+                                style={{width: "100%"}}
+                            />
+                        </label>
+                    </div>
+
+                    <div style={{marginBottom: 8}}>
+                        <label>
+                            Sets:<br/>
+                            <input
+                                type="number"
+                                value={suggestedSets}
+                                onChange={(e) => setSuggestedSets(Number(e.target.value))}
                                 style={{width: "100%"}}
                             />
                         </label>
