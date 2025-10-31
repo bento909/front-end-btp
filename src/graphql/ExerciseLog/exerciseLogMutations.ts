@@ -6,10 +6,7 @@ export const createExerciseLogMutation = gql`
       id
       planExerciseId
       date
-      sets {
-        reps
-        weight
-      }
+      sets
       clientNotes
     }
   }
