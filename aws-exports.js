@@ -6,9 +6,15 @@ const config =  {
           endpoint: 'https://2y4lpwdqebbpfadqp2fs5likum.appsync-api.eu-north-1.amazonaws.com/graphql',
           region: 'eu-north-1',
           defaultAuthMode: 'apiKey',
-          apiKey: 'da2-toncrli6jjdalhwggo4hpvfpqm'
+          apiKey: 'da2-dpvnyw3dlnhmfoklgomw6ve4ku'
         }
     }
 };
 
 export default config;
+
+/**
+ * If you need to change out the API key, which you will when it expires, go to 
+ * https://eu-north-1.console.aws.amazon.com/appsync/home?region=eu-north-1#/2aya4vv425b73nv4x772orefry/v1/home
+ * Download Config and replace the apikey above and replace API key with what you downloaded
+ */
