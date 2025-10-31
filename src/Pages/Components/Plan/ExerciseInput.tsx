@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import {submitExerciseLogThunk} from "../../../redux/exerciseLogSlice.tsx";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "../../../redux/store.tsx";
 
 interface PlanExercise {
     id: string;
@@ -14,7 +17,8 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
     const [setsData, setSetsData] = useState(
         Array(planExercise.sets).fill({ reps: "", weight: "" })
     );
-
+    const dispatch: AppDispatch = useDispatch();
+    
     const handleChange = (index: number, field: "reps" | "weight", value: string) => {
         const updated = [...setsData];
         updated[index] = { ...updated[index], [field]: value };
@@ -23,7 +27,15 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
 
     const handleSubmit = () => {
         console.log("Submit ExerciseLog for", planExercise.id, setsData);
-        // TODO: call your save ExerciseLog API / thunk here
+        const logData = {
+            planExerciseId : planExercise.id,
+            date: new Date().toISOString().split("T")[0],
+            sets: setsData,
+        }
+        
+        dispatch(submitExerciseLogThunk(logData)).unwrap()
+            .then((result: any) => {console.log("Exercise Log Submitted!: ", result)})
+            .catch((err: any) => {console.error("Submission failed:", err)})
     };
 
     return (

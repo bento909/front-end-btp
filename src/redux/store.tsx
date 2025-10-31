@@ -4,6 +4,7 @@ import authReducer from "./authSlice";
 import exercisesReducer from "./exercisesSlice";
 import contactMessagesReducer from "./contactMessagesSlice"
 import plansReducer from "./plansSlice.tsx"
+import exerciseLogsReducer from "./exerciseLogSlice.tsx"
 
 const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
         auth: authReducer,
         exercises: exercisesReducer,
         contactMessages: contactMessagesReducer,
-        plans: plansReducer// <-- add this
+        plans: plansReducer,
+        exerciseLogs: exerciseLogsReducer
     },
 });
 
