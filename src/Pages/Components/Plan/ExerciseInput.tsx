@@ -29,7 +29,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
         console.log("Submit ExerciseLog for", planExercise.id, setsData);
         const logData = {
             planExerciseId : planExercise.id,
-            date: new Date().toISOString().split("T")[0],
+            date: new Date().toISOString(),
             sets: setsData,
         }
         
