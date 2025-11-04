@@ -32,7 +32,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
             date: new Date().toISOString(),
             sets: setsData,
         }
-        
+        console.log("about to submit exercise " + logData)
         dispatch(submitExerciseLogThunk(logData)).unwrap()
             .then((result: any) => {console.log("Exercise Log Submitted!: ", result)})
             .catch((err: any) => {console.error("Submission failed:", err)})

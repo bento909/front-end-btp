@@ -1,5 +1,14 @@
 import {a, type ClientSchema, defineData} from "@aws-amplify/backend";
 
+export type CompletedSet = {
+  weight?: number;
+  reps?: number;
+  time?: number;
+  distance?: number;
+  [key: string]: any;
+};
+
+
 const schema = a.schema({
     // ===CONTACT MESSAGES+++ 
     ContactMessage: a
@@ -75,7 +84,7 @@ const schema = a.schema({
             date: a.datetime().required(),
             sets: a.json().required(),
             clientNotes: a.string(),
-            planExercise: a.belongsTo("PlanExercise", "planExerciseId"), // Add this line
+            planExercise: a.belongsTo("PlanExercise", "planExerciseId"),
         })
         .authorization((allow) => [allow.publicApiKey()]),
 });
@@ -91,3 +100,106 @@ export const data = defineData({
         },
     },
 });
+
+//Reusable stuff for Refactoring??
+//import { a, type ClientSchema, defineData } from "@aws-amplify/backend";
+// 
+// // === Reusable TypeScript type ===
+// export type CompletedSet = {
+//   weight?: number;
+//   reps?: number;
+//   time?: number;
+//   distance?: number;
+//   [key: string]: any;
+// };
+// 
+// // === Reusable schema field objects ===
+// const idField = a.id();
+// const stringRequired = a.string().required();
+// const stringOptional = a.string();
+// const datetimeRequired = a.datetime().required();
+// const booleanDefault = (def: boolean) => a.boolean().default(def);
+// const integerOptional = a.integer();
+// const floatOptional = a.float();
+// 
+// // === Prebuilt objects for models ===
+// const contactMessageFields = {
+//   id: idField,
+//   name: stringRequired,
+//   email: stringRequired,
+//   message: stringRequired,
+//   createdAt: datetimeRequired,
+//   read: booleanDefault(false),
+// };
+// 
+// const planFields = {
+//   id: idField,
+//   name: stringRequired,
+//   trainerEmail: stringRequired,
+//   clientEmail: stringRequired,
+//   planDays: a.hasMany("PlanDay", "planId"),
+// };
+// 
+// const exerciseFields = {
+//   id: idField,
+//   name: stringRequired,
+//   type: a.enum(["LIFT", "RUN", "CYCLE", "INTERVAL", "KB_SWING"]),
+//   tips: stringOptional,
+//   notes: stringOptional,
+//   planExercises: a.hasMany("PlanExercise", "exerciseId"),
+// };
+// 
+// const planExerciseFields = {
+//   id: idField,
+//   planId: stringRequired,
+//   exerciseId: stringRequired,
+//   planDayId: stringOptional,
+//   order: a.integer().required(),
+//   suggestedReps: integerOptional,
+//   suggestedWeight: floatOptional,
+//   suggestedSets: integerOptional,
+//   logs: a.hasMany("ExerciseLog", "planExerciseId"),
+//   exercise: a.belongsTo("Exercise", "exerciseId"),
+//   planDay: a.belongsTo("PlanDay", "planDayId"),
+// };
+// 
+// const planDayFields = {
+//   id: idField,
+//   planId: stringRequired,
+//   dayOfWeek: a.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]),
+//   plan: a.belongsTo("Plan", "planId"),
+//   dayNumber: integerOptional,
+//   planExercises: a.hasMany("PlanExercise", "planDayId"),
+// };
+// 
+// const exerciseLogFields = {
+//   id: idField,
+//   planExerciseId: stringRequired,
+//   date: datetimeRequired,
+//   sets: a.json<CompletedSet[]>().required(),
+//   clientNotes: stringOptional,
+//   planExercise: a.belongsTo("PlanExercise", "planExerciseId"),
+// };
+// 
+// // === Schema ===
+// const schema = a.schema({
+//   ContactMessage: a.model(contactMessageFields).authorization((allow) => [allow.publicApiKey()]),
+//   Plan: a.model(planFields).authorization((allow) => [allow.publicApiKey()]),
+//   Exercise: a.model(exerciseFields).authorization((allow) => [allow.publicApiKey()]),
+//   PlanExercise: a.model(planExerciseFields).authorization((allow) => [allow.publicApiKey()]),
+//   PlanDay: a.model(planDayFields).authorization((allow) => [allow.publicApiKey()]),
+//   ExerciseLog: a.model(exerciseLogFields).authorization((allow) => [allow.publicApiKey()]),
+// });
+// 
+// // === Export ===
+// export type Schema = ClientSchema<typeof schema>;
+// 
+// export const data = defineData({
+//   schema,
+//   authorizationModes: {
+//     defaultAuthorizationMode: "apiKey",
+//     apiKeyAuthorizationMode: {
+//       expiresInDays: 30,
+//     },
+//   },
+// });

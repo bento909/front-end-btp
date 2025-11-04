@@ -1,18 +1,36 @@
-import React from "react";
-import { signOut } from "aws-amplify/auth";
-import { useNavigate } from "react-router-dom";
-import { Button } from "../../Styles/CollapsiblePanel.tsx"
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store.tsx";
-import { useDispatch } from 'react-redux';
-import { resetAuthState } from "../../redux/authSlice.tsx";
-import { reset } from "../../redux/usersSlice.tsx";
+import React, {useEffect, useState} from "react";
+import {signOut} from "aws-amplify/auth";
+import {useNavigate} from "react-router-dom";
+import {Button} from "../../Styles/CollapsiblePanel.tsx"
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../redux/store.tsx";
+import {resetAuthState} from "../../redux/authSlice.tsx";
+import {reset} from "../../redux/usersSlice.tsx";
 
-const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+function reloadPage() {
+    window.location.reload();
+}
+
+const Layout: React.FC<{ children: React.ReactNode }> = ({children}) => {
 
     const user = useSelector((state: RootState) => state.auth.user); // Extract 'user' instead of using the whole object
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [reloadCount, setReloadCount] = useState(0);
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+        if (!user && reloadCount < 3) {
+            const timeout = setTimeout(() => {
+                setReloadCount(prev => prev + 1);
+                reloadPage();
+            }, 500);
+            return () => clearTimeout(timeout);
+        }
+        if (user || reloadCount >= 3) {
+            setReady(true);
+        }
+    }, [user, reloadCount]);
 
     const handleLogout = async () => {
         try {
@@ -24,6 +42,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             console.error("Error logging out:", error);
         }
     };
+    if (!ready) {
+        return null;
+    }
+
+    const userName = user ? user.name : "unexpected guest";
 
     return (
         <div>
@@ -37,7 +60,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     marginBottom: "1rem",
                 }}
             >
-                <h1>Hello, {user ? user.name : "unexpected guest"}</h1>
+                <h1>Hello, {userName}</h1>
                 <Button onClick={handleLogout} isOpen={true}>
                     Logout
                 </Button>
