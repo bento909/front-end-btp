@@ -12,7 +12,7 @@ export const createExerciseLogMutation = gql`
   }
 `;
 
-export const updateExerciseLogMutation = gql`
+export const updateExerciseLogMutation = /* GraphQL */ `
   mutation UpdateExerciseLog($input: UpdateExerciseLogInput!) {
     updateExerciseLog(input: $input) {
       id

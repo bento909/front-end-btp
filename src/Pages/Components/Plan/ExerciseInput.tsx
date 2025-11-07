@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../redux/store";
-import {
-    submitExerciseLogThunk
-} from "../../../redux/exerciseLogSlice";
+import React, {useEffect, useState} from "react";
+import {useDispatch} from "react-redux";
+import {AppDispatch} from "../../../redux/store";
+import {submitExerciseLogThunk, updateExerciseLogThunk} from "../../../redux/exerciseLogSlice";
 
 interface PlanExercise {
     id: string;
@@ -19,17 +17,17 @@ interface ExerciseInputProps {
     onChange?: (data: { reps: string; weight: string }[]) => void;
 }
 
-const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, onChange }) => {
+const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, onChange}) => {
     const dispatch: AppDispatch = useDispatch();
 
     const [setsData, setSetsData] = useState(
         savedData ??
-        Array.from({ length: planExercise.suggestedSets }, () => ({
+        Array.from({length: planExercise.suggestedSets}, () => ({
             reps: planExercise.suggestedReps?.toString() ?? "",
             weight: planExercise.suggestedWeight?.toString() ?? "",
         }))
     );
-    const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = useState<null | { id: string }>(null);
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -40,7 +38,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
     const handleChange = (index: number, field: "reps" | "weight", value: string) => {
         setSetsData((prev) => {
             const updated = [...prev];
-            updated[index] = { ...updated[index], [field]: value };
+            updated[index] = {...updated[index], [field]: value};
             return updated;
         });
     };
@@ -55,8 +53,8 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
         };
 
         try {
-            await dispatch(submitExerciseLogThunk(logData)).unwrap();
-            setSubmitted(true);
+            const result = await dispatch(submitExerciseLogThunk(logData)).unwrap();
+            setSubmitted({id: result.id});
         } catch (err) {
             console.error("Submission failed:", err);
         } finally {
@@ -65,10 +63,25 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
     };
 
     const handleEdit = () => setEditing(true);
-    const handleSaveEdit = () => {
-        setEditing(false);
-        // optionally re-submit updated data
-        // dispatch(submitExerciseLogThunk({ ...same logData, updated fields }));
+
+    const handleSaveEdit = async () => {
+        if (!submitted) return;
+        setLoading(true);
+        try {
+            const filteredSets = setsData.filter((s) => s.reps !== "" || s.weight !== "");
+            const updatedData = {
+                id: submitted.id,
+                sets: JSON.stringify(filteredSets),
+            };
+            const updatedLog = await dispatch(updateExerciseLogThunk(updatedData)).unwrap();
+            console.log("Updated Exercise Log:", updatedLog);
+            setSubmitted(updatedLog); // refresh local state with backend result
+            setEditing(false);
+        } catch (err) {
+            console.error("Update failed:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -91,7 +104,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                                 type="number"
                                 min={0}
                                 value={set.reps}
-                                disabled={submitted && !editing}
+                                disabled={!!submitted && !editing}
                                 onChange={(e) => handleChange(index, "reps", e.target.value)}
                             />
                         </td>
@@ -100,7 +113,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                                 type="number"
                                 min={0}
                                 value={set.weight}
-                                disabled={submitted && !editing}
+                                disabled={!!submitted && !editing}
                                 onChange={(e) => handleChange(index, "weight", e.target.value)}
                             />
                         </td>
@@ -109,7 +122,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                 </tbody>
             </table>
 
-            <div style={{ textAlign: "right" }}>
+            <div style={{textAlign: "right"}}>
                 {!submitted && (
                     <button onClick={handleSubmit} disabled={loading}>
                         {loading ? "Saving..." : "Finish Exercise"}
