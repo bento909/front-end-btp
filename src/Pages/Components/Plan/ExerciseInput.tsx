@@ -95,7 +95,9 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                 ))}
                 </tbody>
             </table>
-            <button onClick={handleSubmit}>Submit ExerciseLog</button>
+            <button 
+                style={{float: "right"}}
+                onClick={handleSubmit}>Finish Exercise</button>
         </div>
     );
 };
