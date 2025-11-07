@@ -1,13 +1,5 @@
 import {a, type ClientSchema, defineData} from "@aws-amplify/backend";
 
-export type CompletedSet = {
-  weight?: number;
-  reps?: number;
-  time?: number;
-  distance?: number;
-  [key: string]: any;
-};
-
 
 const schema = a.schema({
     // ===CONTACT MESSAGES+++ 

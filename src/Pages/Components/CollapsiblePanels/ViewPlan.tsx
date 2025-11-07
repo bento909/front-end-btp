@@ -86,7 +86,9 @@ const ViewPlan: React.FC = () => {
                                         planExercise={{
                                             id: ex.id,
                                             exerciseName: exerciseNameMap[ex.exerciseId] ?? `Exercise ${ex.exerciseId}`,
-                                            sets: ex.suggestedSets?? 1, // make sure this matches your data
+                                            suggestedSets: ex.suggestedSets?? 1,
+                                            suggestedReps: ex.suggestedReps?? 1,
+                                            suggestedWeight: ex.suggestedWeight?? 1
                                         }}
                                     />
                                 ))}

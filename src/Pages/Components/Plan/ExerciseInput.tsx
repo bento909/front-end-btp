@@ -6,7 +6,9 @@ import {AppDispatch} from "../../../redux/store.tsx";
 interface PlanExercise {
     id: string;
     exerciseName: string;
-    sets: number;
+    suggestedSets: number;
+    suggestedReps: number;
+    suggestedWeight: number,
 }
 
 interface ExerciseInputProps {
@@ -15,7 +17,10 @@ interface ExerciseInputProps {
 
 const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
     const [setsData, setSetsData] = useState(
-        Array(planExercise.sets).fill({ reps: "", weight: "" })
+        Array.from({ length: planExercise.suggestedSets }, () => ({
+            reps: planExercise.suggestedReps?.toString() ?? "",
+            weight: planExercise.suggestedWeight?.toString() ?? "",
+        }))
     );
     const dispatch: AppDispatch = useDispatch();
     
@@ -27,10 +32,13 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
 
     const handleSubmit = () => {
         console.log("Submit ExerciseLog for", planExercise.id, setsData);
+        
+        const filteredSets = setsData.filter((s) => s.reps !== "" || s.weight !== "");
+        
         const logData = {
             planExerciseId : planExercise.id,
             date: new Date().toISOString(),
-            sets: JSON.stringify(setsData),
+            sets: JSON.stringify(filteredSets),
         }
         console.log("about to submit exercise: ", logData)
         dispatch(submitExerciseLogThunk(logData)).unwrap()
