@@ -11,3 +11,15 @@ export const createExerciseLogMutation = gql`
     }
   }
 `;
+
+export const updateExerciseLogMutation = gql`
+  mutation UpdateExerciseLog($input: UpdateExerciseLogInput!) {
+    updateExerciseLog(input: $input) {
+      id
+      planExerciseId
+      date
+      sets
+      clientNotes
+    }
+  }
+`;

@@ -18,6 +18,7 @@ interface ExerciseInputProps {
 }
 
 const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, onChange }) => {
+    const [submittedLog, setSubmittedLog] = useState<null | { id: string, sets: any[] }>(null);
     const [setsData, setSetsData] = useState(
         savedData ??
         Array.from({ length: planExercise.suggestedSets }, () => ({
@@ -38,22 +39,32 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
             return updated;
         });
     };
+    
+    const handleEdit = (logId: string) => {
+        console.log("Editing Exercise Log:", logId);
+        // 🔜 later you’ll dispatch(getExerciseLogThunk(logId)) here
+        // then repopulate the inputs using setSetsData(result.sets)
+        setSubmittedLog(null); // unlocks editing mode again
+    };
+
 
     const handleSubmit = () => {
-        console.log("Submit ExerciseLog for", planExercise.id, setsData);
+        console.log("Submit ExerciseLog: ", planExercise.id, setsData);
         
         const filteredSets = setsData.filter((s) => s.reps !== "" || s.weight !== "");
         
         const logData = {
             planExerciseId : planExercise.id,
             date: new Date().toISOString(),
-            sets: JSON.stringify(filteredSets), //TODO chatGPT thinks I should be able to send straight Data rather than this.
+            sets: JSON.stringify(filteredSets), //Perhaps I should be able to send straight Data rather than this.. this works for now though
         }
         console.log("about to submit exercise: ", logData)
+        
         dispatch(submitExerciseLogThunk(logData))
             .unwrap()
             .then((result: any) => {
                 console.log("Exercise Log Submitted!: ", result)
+                setSubmittedLog(result);
             })
             .catch((err: any) => {
                 console.error("Submission failed:", err)
@@ -95,9 +106,15 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                 ))}
                 </tbody>
             </table>
-            <button 
-                style={{float: "right"}}
-                onClick={handleSubmit}>Finish Exercise</button>
+            {submittedLog ? (
+                <button style={{ float: "right" }} onClick={() => handleEdit(submittedLog.id)}>
+                    Edit Exercise
+                </button>
+            ) : (
+                <button style={{ float: "right" }} onClick={handleSubmit}>
+                    Finish Exercise
+                </button>
+            )}
         </div>
     );
 };

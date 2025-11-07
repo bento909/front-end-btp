@@ -1,17 +1,24 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { client } from "../graphql/graphqlClient";
-import { createExerciseLogMutation } from "../graphql/ExerciseLog/exerciseLogMutations"; // ✅ correct import
+import {createExerciseLogMutation, updateExerciseLogMutation} from "../graphql/ExerciseLog/exerciseLogMutations"; // ✅ correct import
 import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { CreateExerciseLogInput, ExerciseLogMutationResult } from "../graphql/ExerciseLog/exerciseLogTypes.ts";
+import {
+    CreateExerciseLogInput,
+    ExerciseLog,
+    ExerciseLogMutationResult, ExerciseLogQueryResult, ExerciseLogUpdateResult, UpdateExerciseLogInput
+} from "../graphql/ExerciseLog/exerciseLogTypes.ts";
+import {getExerciseLogQuery} from "../graphql/ExerciseLog/exerciseLogQueries.ts";
 
 interface ExerciseLogsState {
     loading: boolean;
     error: string | null;
+    logsByExerciseId: Record<string, ExerciseLog | undefined>;
 }
 
 const initialState: ExerciseLogsState = {
     loading: false,
     error: null,
+    logsByExerciseId: {},
 };
 
 export const submitExerciseLogThunk = createAsyncThunk(
@@ -27,6 +34,40 @@ export const submitExerciseLogThunk = createAsyncThunk(
         } catch (err) {
             console.error("Failed to submit exercise log", err);
             return thunkAPI.rejectWithValue("Failed to submit exercise log");
+        }
+    }
+);
+
+export const getExerciseLogThunk = createAsyncThunk(
+    "exerciseLogs/getOne",
+    async (id: string, thunkAPI) => {
+        try {
+            const result = (await client.graphql({
+                query: getExerciseLogQuery,
+                variables: { id },
+            })) as GraphQLResult<ExerciseLogQueryResult>;
+
+            return result.data?.getExerciseLog;
+        } catch (err) {
+            console.error("Failed to fetch exercise log", err);
+            return thunkAPI.rejectWithValue("Failed to fetch exercise log");
+        }
+    }
+);
+
+export const updateExerciseLogThunk = createAsyncThunk(
+    "exerciseLogs/update",
+    async (input: UpdateExerciseLogInput, thunkAPI) => {
+        try {
+            const result = (await client.graphql({
+                query: updateExerciseLogMutation,
+                variables: { input },
+            })) as GraphQLResult<ExerciseLogUpdateResult>;
+
+            return result.data?.updateExerciseLog;
+        } catch (err) {
+            console.error("Failed to update exercise log", err);
+            return thunkAPI.rejectWithValue("Failed to update exercise log");
         }
     }
 );
@@ -47,6 +88,14 @@ const exerciseLogsSlice = createSlice({
             .addCase(submitExerciseLogThunk.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(getExerciseLogThunk.fulfilled, (state, action) => {
+                const log = action.payload;
+                if (log) state.logsByExerciseId[log.planExerciseId] = log;
+            })
+            .addCase(updateExerciseLogThunk.fulfilled, (state, action) => {
+                const log = action.payload;
+                if (log) state.logsByExerciseId[log.planExerciseId] = log;
             });
     },
 });
