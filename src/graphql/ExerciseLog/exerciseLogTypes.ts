@@ -1,10 +1,7 @@
 export interface CreateExerciseLogInput {
     planExerciseId: string;
     date: string;
-    sets: {
-        reps: string;
-        weight: string;
-    }[];
+    sets: string;
     clientNotes?: string;
 }
 
