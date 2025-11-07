@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {submitExerciseLogThunk} from "../../../redux/exerciseLogSlice.tsx";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../redux/store.tsx";
@@ -13,10 +13,13 @@ interface PlanExercise {
 
 interface ExerciseInputProps {
     planExercise: PlanExercise;
+    savedData?: {reps: string; weight: string}[];
+    onChange?: (data: {reps: string; weight: string}[]) => void;
 }
 
-const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
+const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, onChange }) => {
     const [setsData, setSetsData] = useState(
+        savedData ??
         Array.from({ length: planExercise.suggestedSets }, () => ({
             reps: planExercise.suggestedReps?.toString() ?? "",
             weight: planExercise.suggestedWeight?.toString() ?? "",
@@ -24,10 +27,16 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
     );
     const dispatch: AppDispatch = useDispatch();
     
+    useEffect(() => {
+        if(onChange) onChange(setsData);
+    }, [setsData, onChange]);
+
     const handleChange = (index: number, field: "reps" | "weight", value: string) => {
-        const updated = [...setsData];
-        updated[index] = { ...updated[index], [field]: value };
-        setSetsData(updated);
+        setSetsData((prev) => {
+            const updated = [...prev];
+            updated[index] = { ...updated[index], [field]: value };
+            return updated;
+        });
     };
 
     const handleSubmit = () => {
@@ -38,12 +47,17 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise }) => {
         const logData = {
             planExerciseId : planExercise.id,
             date: new Date().toISOString(),
-            sets: JSON.stringify(filteredSets),
+            sets: JSON.stringify(filteredSets), //TODO chatGPT thinks I should be able to send straight Data rather than this.
         }
         console.log("about to submit exercise: ", logData)
-        dispatch(submitExerciseLogThunk(logData)).unwrap()
-            .then((result: any) => {console.log("Exercise Log Submitted!: ", result)})
-            .catch((err: any) => {console.error("Submission failed:", err)})
+        dispatch(submitExerciseLogThunk(logData))
+            .unwrap()
+            .then((result: any) => {
+                console.log("Exercise Log Submitted!: ", result)
+            })
+            .catch((err: any) => {
+                console.error("Submission failed:", err)
+            });
     };
 
     return (

@@ -20,7 +20,6 @@ export type DayOfWeek = typeof DaysOfWeek[number];
 
 const ViewPlan: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
-
     const user = useSelector((state: RootState) => state.auth.user);
     const { plan, loading: planLoading, error: planError } = useSelector(
         (state: RootState) => state.plans
@@ -37,6 +36,7 @@ const ViewPlan: React.FC = () => {
         .toUpperCase() as DayOfWeek;
 
     const [expandedDay, setExpandedDay] = useState<DayOfWeek | null>(today);
+    const [exerciseInputs, setExerciseInputs] = useState<Record<string, any>>({});
 
     // fetch plan for user
     useEffect(() => {
@@ -63,6 +63,13 @@ const ViewPlan: React.FC = () => {
         exercises.map((ex) => [ex.id, ex.name])
     );
 
+    const handleExerciseChange = (exerciseId: string, data: any) => {
+        setExerciseInputs((prev) => ({
+            ...prev,
+            [exerciseId]: data,
+        }));
+    };
+    
     return (
         <div>
             <h3>{plan.name}</h3>
@@ -90,6 +97,8 @@ const ViewPlan: React.FC = () => {
                                             suggestedReps: ex.suggestedReps?? 1,
                                             suggestedWeight: ex.suggestedWeight?? 1
                                         }}
+                                        savedData={exerciseInputs[ex.id]}
+                                        onChange={(data) => handleExerciseChange(ex.id, data)}
                                     />
                                 ))}
                             </div>
