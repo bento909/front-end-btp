@@ -1,7 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "../../../redux/store";
-import {submitExerciseLogThunk, updateExerciseLogThunk} from "../../../redux/exerciseLogSlice";
+import {
+    fetchLatestExerciseLogByPlanExerciseIdThunk,
+    submitExerciseLogThunk,
+    updateExerciseLogThunk
+} from "../../../redux/exerciseLogSlice";
 
 interface PlanExercise {
     id: string;
@@ -27,10 +31,22 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             weight: planExercise.suggestedWeight?.toString() ?? "",
         }))
     );
-    const [submitted, setSubmitted] = useState<null | { id: string }>(null);
+    const [submitted, setSubmitted] = useState<null | { id: string; sets: any[] }>(null);
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        dispatch(fetchLatestExerciseLogByPlanExerciseIdThunk(planExercise.id))
+            .unwrap()
+            .then((log) => {
+                if (log) {
+                    setSetsData(JSON.parse(log.sets));
+                    setSubmitted({ id: log.id, sets: JSON.parse(log.sets) });
+                }
+            })
+            .catch((err) => console.error("No previous log or failed fetch:", err));
+    }, [dispatch, planExercise.id]);
+    
     useEffect(() => {
         onChange?.(setsData);
     }, [setsData, onChange]);
@@ -54,7 +70,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
 
         try {
             const result = await dispatch(submitExerciseLogThunk(logData)).unwrap();
-            setSubmitted({id: result.id});
+            setSubmitted({id: result.id, sets: filteredSets});
         } catch (err) {
             console.error("Submission failed:", err);
         } finally {

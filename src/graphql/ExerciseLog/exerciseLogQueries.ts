@@ -11,17 +11,21 @@ export const getExerciseLogQuery = gql`
     }
   }
 `;
-//
-// export const getExerciseLogByPlanExerciseIdQuery = gql`
-//   query GetExerciseLogByPlanExerciseId($planExerciseId: ID!) {
-//     listExerciseLogs(filter: { planExerciseId: { eq: $planExerciseId } }) {
-//       items {
-//         id
-//         planExerciseId
-//         date
-//         sets
-//         clientNotes
-//       }
-//     }
-//   }
-// `;
+
+export const getLatestExerciseLogByPlanExerciseIdQuery = /* GraphQL */ `
+  query GetLatestExerciseLogByPlanExerciseId($planExerciseId: ID!) {
+    listExerciseLogs(
+      filter: { planExerciseId: { eq: $planExerciseId } }
+      sortDirection: DESC
+      limit: 1
+    ) {
+      items {
+        id
+        planExerciseId
+        date
+        sets
+        clientNotes
+      }
+    }
+  }
+`;

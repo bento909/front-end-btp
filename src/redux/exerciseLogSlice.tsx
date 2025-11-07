@@ -1,13 +1,17 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { client } from "../graphql/graphqlClient";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {client} from "../graphql/graphqlClient";
 import {createExerciseLogMutation, updateExerciseLogMutation} from "../graphql/ExerciseLog/exerciseLogMutations"; // ✅ correct import
-import { GraphQLResult } from "@aws-amplify/api-graphql";
+import {GraphQLResult} from "@aws-amplify/api-graphql";
 import {
     CreateExerciseLogInput,
     ExerciseLog,
-    ExerciseLogMutationResult, ExerciseLogQueryResult
+    ExerciseLogMutationResult,
+    ExerciseLogQueryResult
 } from "../graphql/ExerciseLog/exerciseLogTypes.ts";
-import { getExerciseLogQuery} from "../graphql/ExerciseLog/exerciseLogQueries.ts";
+import {
+    getExerciseLogQuery,
+    getLatestExerciseLogByPlanExerciseIdQuery
+} from "../graphql/ExerciseLog/exerciseLogQueries.ts";
 
 interface ExerciseLogsState {
     loading: boolean;
@@ -27,7 +31,7 @@ export const submitExerciseLogThunk = createAsyncThunk(
         try {
             const result = (await client.graphql({
                 query: createExerciseLogMutation,
-                variables: { input },
+                variables: {input},
             })) as GraphQLResult<ExerciseLogMutationResult>;
 
             return result.data?.createExerciseLog;
@@ -44,7 +48,7 @@ export const getExerciseLogThunk = createAsyncThunk(
         try {
             const result = (await client.graphql({
                 query: getExerciseLogQuery,
-                variables: { id },
+                variables: {id},
             })) as GraphQLResult<ExerciseLogQueryResult>;
 
             return result.data?.getExerciseLog;
@@ -61,7 +65,7 @@ export const updateExerciseLogThunk = createAsyncThunk(
         try {
             const result = (await client.graphql({
                 query: updateExerciseLogMutation,
-                variables: { input },
+                variables: {input},
             })) as GraphQLResult<any>;
             return result.data?.updateExerciseLog;
         } catch (err) {
@@ -70,22 +74,25 @@ export const updateExerciseLogThunk = createAsyncThunk(
         }
     }
 );
-//
-// export const fetchExerciseLogByPlanExerciseIdThunk = createAsyncThunk(
-//     "exerciseLogs/fetchByPlanExerciseId",
-//     async (planExerciseId: string, thunkAPI) => {
-//         try {
-//             const result = (await client.graphql({
-//                 query: getExerciseLogByPlanExerciseIdQuery,
-//                 variables: { planExerciseId },
-//             })) as GraphQLResult<any>;
-//             return result.data?.getExerciseLogByPlanExerciseId;
-//         } catch (err) {
-//             console.error("Failed to fetch log", err);
-//             return thunkAPI.rejectWithValue("Failed to fetch log");
-//         }
-//     }
-// );
+
+export const fetchLatestExerciseLogByPlanExerciseIdThunk = createAsyncThunk(
+    "exerciseLogs/fetchLatestByPlanExerciseId",
+    async (planExerciseId: string, thunkAPI) => {
+        try {
+            const result = (await client.graphql({
+                query: getLatestExerciseLogByPlanExerciseIdQuery,
+                variables: {planExerciseId},
+            })) as GraphQLResult<any>;
+
+            const log = result.data?.listExerciseLogs?.items?.[0] ?? null;
+            console.log("Results from fetchLatestExerciseLogByPlaneExerciseIdThunk: ", log);
+            return log;
+        } catch (err) {
+            console.error("Failed to fetch latest log", err);
+            return thunkAPI.rejectWithValue("Failed to fetch latest log");
+        }
+    }
+);
 
 const exerciseLogsSlice = createSlice({
     name: "exerciseLogs",
@@ -111,7 +118,10 @@ const exerciseLogsSlice = createSlice({
             .addCase(updateExerciseLogThunk.fulfilled, (state, action) => {
                 const log = action.payload;
                 if (log) state.logsByExerciseId[log.planExerciseId] = log;
-            });
+            }).addCase(fetchLatestExerciseLogByPlanExerciseIdThunk.fulfilled, (state, action) => {
+            const log = action.payload;
+            if (log) state.logsByExerciseId[log.planExerciseId] = log;
+        });
     },
 });
 
