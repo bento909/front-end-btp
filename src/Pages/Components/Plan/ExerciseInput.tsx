@@ -1,24 +1,27 @@
-import React, {useEffect, useState} from "react";
-import {submitExerciseLogThunk} from "../../../redux/exerciseLogSlice.tsx";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../../redux/store.tsx";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../redux/store";
+import {
+    submitExerciseLogThunk
+} from "../../../redux/exerciseLogSlice";
 
 interface PlanExercise {
     id: string;
     exerciseName: string;
     suggestedSets: number;
     suggestedReps: number;
-    suggestedWeight: number,
+    suggestedWeight: number;
 }
 
 interface ExerciseInputProps {
     planExercise: PlanExercise;
-    savedData?: {reps: string; weight: string}[];
-    onChange?: (data: {reps: string; weight: string}[]) => void;
+    savedData?: { reps: string; weight: string }[];
+    onChange?: (data: { reps: string; weight: string }[]) => void;
 }
 
 const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, onChange }) => {
-    const [submittedLog, setSubmittedLog] = useState<null | { id: string, sets: any[] }>(null);
+    const dispatch: AppDispatch = useDispatch();
+
     const [setsData, setSetsData] = useState(
         savedData ??
         Array.from({ length: planExercise.suggestedSets }, () => ({
@@ -26,10 +29,12 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
             weight: planExercise.suggestedWeight?.toString() ?? "",
         }))
     );
-    const dispatch: AppDispatch = useDispatch();
-    
+    const [submitted, setSubmitted] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        if(onChange) onChange(setsData);
+        onChange?.(setsData);
     }, [setsData, onChange]);
 
     const handleChange = (index: number, field: "reps" | "weight", value: string) => {
@@ -39,36 +44,31 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
             return updated;
         });
     };
-    
-    const handleEdit = (logId: string) => {
-        console.log("Editing Exercise Log:", logId);
-        // 🔜 later you’ll dispatch(getExerciseLogThunk(logId)) here
-        // then repopulate the inputs using setSetsData(result.sets)
-        setSubmittedLog(null); // unlocks editing mode again
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        const filteredSets = setsData.filter((s) => s.reps !== "" || s.weight !== "");
+        const logData = {
+            planExerciseId: planExercise.id,
+            date: new Date().toISOString(),
+            sets: JSON.stringify(filteredSets),
+        };
+
+        try {
+            await dispatch(submitExerciseLogThunk(logData)).unwrap();
+            setSubmitted(true);
+        } catch (err) {
+            console.error("Submission failed:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-
-    const handleSubmit = () => {
-        console.log("Submit ExerciseLog: ", planExercise.id, setsData);
-        
-        const filteredSets = setsData.filter((s) => s.reps !== "" || s.weight !== "");
-        
-        const logData = {
-            planExerciseId : planExercise.id,
-            date: new Date().toISOString(),
-            sets: JSON.stringify(filteredSets), //Perhaps I should be able to send straight Data rather than this.. this works for now though
-        }
-        console.log("about to submit exercise: ", logData)
-        
-        dispatch(submitExerciseLogThunk(logData))
-            .unwrap()
-            .then((result: any) => {
-                console.log("Exercise Log Submitted!: ", result)
-                setSubmittedLog(result);
-            })
-            .catch((err: any) => {
-                console.error("Submission failed:", err)
-            });
+    const handleEdit = () => setEditing(true);
+    const handleSaveEdit = () => {
+        setEditing(false);
+        // optionally re-submit updated data
+        // dispatch(submitExerciseLogThunk({ ...same logData, updated fields }));
     };
 
     return (
@@ -91,6 +91,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                                 type="number"
                                 min={0}
                                 value={set.reps}
+                                disabled={submitted && !editing}
                                 onChange={(e) => handleChange(index, "reps", e.target.value)}
                             />
                         </td>
@@ -99,6 +100,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                                 type="number"
                                 min={0}
                                 value={set.weight}
+                                disabled={submitted && !editing}
                                 onChange={(e) => handleChange(index, "weight", e.target.value)}
                             />
                         </td>
@@ -106,17 +108,19 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({ planExercise, savedData, 
                 ))}
                 </tbody>
             </table>
-            {submittedLog ? (
-                <button style={{ float: "right" }} onClick={() => handleEdit(submittedLog.id)}>
-                    Edit Exercise
-                </button>
-            ) : (
-                <button style={{ float: "right" }} onClick={handleSubmit}>
-                    Finish Exercise
-                </button>
-            )}
+
+            <div style={{ textAlign: "right" }}>
+                {!submitted && (
+                    <button onClick={handleSubmit} disabled={loading}>
+                        {loading ? "Saving..." : "Finish Exercise"}
+                    </button>
+                )}
+                {submitted && !editing && <button onClick={handleEdit}>Edit</button>}
+                {editing && <button onClick={handleSaveEdit}>Save Changes</button>}
+            </div>
         </div>
     );
 };
+
 
 export default ExerciseInput;

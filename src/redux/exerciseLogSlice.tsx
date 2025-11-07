@@ -5,9 +5,9 @@ import { GraphQLResult } from "@aws-amplify/api-graphql";
 import {
     CreateExerciseLogInput,
     ExerciseLog,
-    ExerciseLogMutationResult, ExerciseLogQueryResult, ExerciseLogUpdateResult, UpdateExerciseLogInput
+    ExerciseLogMutationResult, ExerciseLogQueryResult
 } from "../graphql/ExerciseLog/exerciseLogTypes.ts";
-import {getExerciseLogQuery} from "../graphql/ExerciseLog/exerciseLogQueries.ts";
+import { getExerciseLogQuery} from "../graphql/ExerciseLog/exerciseLogQueries.ts";
 
 interface ExerciseLogsState {
     loading: boolean;
@@ -57,13 +57,12 @@ export const getExerciseLogThunk = createAsyncThunk(
 
 export const updateExerciseLogThunk = createAsyncThunk(
     "exerciseLogs/update",
-    async (input: UpdateExerciseLogInput, thunkAPI) => {
+    async (input: { id: string; sets: string }, thunkAPI) => {
         try {
             const result = (await client.graphql({
                 query: updateExerciseLogMutation,
                 variables: { input },
-            })) as GraphQLResult<ExerciseLogUpdateResult>;
-
+            })) as GraphQLResult<any>;
             return result.data?.updateExerciseLog;
         } catch (err) {
             console.error("Failed to update exercise log", err);
@@ -71,6 +70,22 @@ export const updateExerciseLogThunk = createAsyncThunk(
         }
     }
 );
+//
+// export const fetchExerciseLogByPlanExerciseIdThunk = createAsyncThunk(
+//     "exerciseLogs/fetchByPlanExerciseId",
+//     async (planExerciseId: string, thunkAPI) => {
+//         try {
+//             const result = (await client.graphql({
+//                 query: getExerciseLogByPlanExerciseIdQuery,
+//                 variables: { planExerciseId },
+//             })) as GraphQLResult<any>;
+//             return result.data?.getExerciseLogByPlanExerciseId;
+//         } catch (err) {
+//             console.error("Failed to fetch log", err);
+//             return thunkAPI.rejectWithValue("Failed to fetch log");
+//         }
+//     }
+// );
 
 const exerciseLogsSlice = createSlice({
     name: "exerciseLogs",

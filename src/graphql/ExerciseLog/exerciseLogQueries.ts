@@ -11,3 +11,17 @@ export const getExerciseLogQuery = gql`
     }
   }
 `;
+//
+// export const getExerciseLogByPlanExerciseIdQuery = gql`
+//   query GetExerciseLogByPlanExerciseId($planExerciseId: ID!) {
+//     listExerciseLogs(filter: { planExerciseId: { eq: $planExerciseId } }) {
+//       items {
+//         id
+//         planExerciseId
+//         date
+//         sets
+//         clientNotes
+//       }
+//     }
+//   }
+// `;
