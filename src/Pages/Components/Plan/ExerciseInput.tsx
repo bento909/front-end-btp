@@ -43,8 +43,8 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
 
     function addSet() {
         setSetsData(prev => {
-            const last = prev[prev.length - 1] ?? { reps: "", weight: "" };
-            return [...prev, { ...last }];
+            const last = prev[prev.length - 1] ?? {reps: "", weight: ""};
+            return [...prev, {...last}];
         });
     }
 
@@ -119,37 +119,49 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         const isFirstRow = index === 0;
         return (
             <td>
+                <span style={{display: "flex"}}>
                 {isEditingThisRow ? (
                     <TableButton label="Done"
-                        onClick={() => {
-                            console.log("submitting index ", index);
-                            setEditingIndex(index + 1);
-                        }}
+                                 onClick={() => {
+                                     console.log("submitting index ", index);
+                                     setEditingIndex(index + 1);
+                                 }}
                     />
                 ) : (
                     <TableButton label="Edit"
-                        onClick={() => {
-                            console.log("submitting index ", index);
-                            setEditingIndex(index);
-                        }}
+                                 onClick={() => {
+                                     console.log("submitting index ", index);
+                                     setEditingIndex(index);
+                                 }}
                     />
                 )}
+                </span>
 
                 {(isLastRow && !isFirstRow) && (
                     <>
                         <TableButton label="+"
-                            onClick={() => {
-                                console.log("submitting index ", index);
-                                addSet();
-                            }}
+                                     onClick={() => {
+                                         console.log("submitting index ", index);
+                                         addSet();
+                                     }}
                         />
                         <TableButton label="-"
-                            onClick={() => {
-                                console.log("submitting index ", index);
-                                removeSet();
-                            }}
+                                     onClick={() => {
+                                         console.log("submitting index ", index);
+                                         removeSet();
+                                     }}
                         />
                     </>)}
+                {(isLastRow && isFirstRow) && (
+                    <>
+                        <TableButton label="+"
+                                     onClick={() => {
+                                         console.log("submitting index ", index);
+                                         addSet();
+                                     }}
+                        />
+                    </>)}
+
             </td>
 
         )
@@ -196,7 +208,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             </table>
 
             <div style={{marginTop: "10px"}}/>
-            
+
 
             <div style={{textAlign: "right"}}>
                 {!submitted && (
