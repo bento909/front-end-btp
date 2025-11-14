@@ -107,7 +107,6 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             setSubmitted(updatedLog); // refresh local state with backend result
             setEditing(false);
         } catch (err) {
-            
             console.error("Update failed:", err);
         } finally {
             setLoading(false);
