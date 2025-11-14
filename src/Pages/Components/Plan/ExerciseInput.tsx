@@ -136,7 +136,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                 )}
 
                 {(isLastRow && !isFirstRow) && (
-                    <td>
+                    <div>
                         <TableButton
                             label="+"
                             onClick={() => {
@@ -151,7 +151,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 removeSet();
                             }}
                         />
-                    </td>)}
+                    </div>)}
             </td>
 
         )
