@@ -35,6 +35,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     const [submitted, setSubmitted] = useState<null | { id: string; sets: any[] }>(null);
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [editingIndex, setEditingIndex] = useState(0);
 
     useEffect(() => {
         dispatch(fetchLatestExerciseLogByPlanExerciseIdThunk(planExercise.id))
@@ -101,6 +102,22 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         }
     };
 
+    const renderControlButtons = (index: number) => {
+        if (editingIndex === index) {
+            return (
+                <td>
+                    <TableButton
+                        label="Submit"
+                        onClick={() => {
+                            console.log("submitting index ", index);
+                            setEditingIndex(index + 1);
+                        }}
+                    />
+                </td>
+            );
+        } else return null;
+    };
+
     return (
         <div>
             <h4>{planExercise.exerciseName}</h4>
@@ -121,7 +138,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 type="number"
                                 min={0}
                                 value={set.reps}
-                                disabled={!!submitted && !editing}
+                                disabled={(editingIndex != index) || (!!submitted && !editing)}
                                 onChange={(e) => handleChange(index, "reps", e.target.value)}
                             />
                         </td>
@@ -130,16 +147,11 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 type="number"
                                 min={0}
                                 value={set.weight}
-                                disabled={!!submitted && !editing}
+                                disabled={(editingIndex != index) || (!!submitted && !editing)}
                                 onChange={(e) => handleChange(index, "weight", e.target.value)}
                             />
                         </td>
-                        <td>
-                            <TableButton label="bla" onClick={() => console.log("bla")}/>
-                        </td>
-                        <td>
-                            <TableButton label="gay bar" onClick={() => console.log("gay bar")}/>
-                        </td>
+                        {renderControlButtons(index)}
                     </tr>
                 ))}
                 </tbody>
