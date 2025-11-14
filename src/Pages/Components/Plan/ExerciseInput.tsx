@@ -119,13 +119,9 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         const isFirstRow = index === 0;
 
         return (
-            <td style={{textAlign: "right", paddingRight: "8px"}}>
-                <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end",   // 👈 THIS aligns buttons to the right
-                    gap: "6px",
-                }}>
+            <td style={{ textAlign: "right", paddingRight: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+
                     {isEditingThisRow ? (
                         <TableButton
                             label="Done"
