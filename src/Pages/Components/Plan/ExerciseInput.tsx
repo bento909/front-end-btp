@@ -119,7 +119,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             <td>
                 {isEditingThisRow ? (
                     <TableButton
-                        label="Submit"
+                        label="Done"
                         onClick={() => {
                             console.log("submitting index ", index);
                             setEditingIndex(index + 1);
@@ -196,6 +196,8 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                 </tbody>
             </table>
 
+            <div style={{marginTop: "10px"}}/>
+            
 
             <div style={{textAlign: "right"}}>
                 {!submitted && (
