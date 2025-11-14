@@ -117,16 +117,14 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         return (
             <td>
                 {isEditingThisRow ? (
-                    <TableButton
-                        label="Done"
+                    <TableButton label="Done"
                         onClick={() => {
                             console.log("submitting index ", index);
                             setEditingIndex(index + 1);
                         }}
                     />
                 ) : (
-                    <TableButton
-                        label="Edit"
+                    <TableButton label="Edit"
                         onClick={() => {
                             console.log("submitting index ", index);
                             setEditingIndex(index);
@@ -135,22 +133,20 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                 )}
 
                 {(isLastRow && !isFirstRow) && (
-                    <div>
-                        <TableButton
-                            label="+"
+                    <>
+                        <TableButton label="+"
                             onClick={() => {
                                 console.log("submitting index ", index);
                                 addSet();
                             }}
                         />
-                        <TableButton
-                            label="-"
+                        <TableButton label="-"
                             onClick={() => {
                                 console.log("submitting index ", index);
                                 removeSet();
                             }}
                         />
-                    </div>)}
+                    </>)}
             </td>
 
         )
