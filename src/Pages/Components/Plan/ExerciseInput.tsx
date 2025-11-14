@@ -118,51 +118,46 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         const isLastRow = index + 1 === setsData.length;
         const isFirstRow = index === 0;
         return (
-            <td>
-                {isEditingThisRow ? (
-                    <TableButton label="Done"
-                                 onClick={() => {
-                                     console.log("submitting index ", index);
-                                     setEditingIndex(index + 1);
-                                 }}
-                    />
-                ) : (
-                    <TableButton label="Edit"
-                                 onClick={() => {
-                                     console.log("submitting index ", index);
-                                     setEditingIndex(index);
-                                 }}
-                    />
-                )}
+            <td style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+
+                {/* LEFT SIDE: Edit/Done */}
+                <div style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "flex-end",   // right-align button
+                    marginRight: "8px",
+                }}>
+                    {isEditingThisRow ? (
+                        <TableButton
+                            label="Done"
+                            onClick={() => setEditingIndex(index + 1)}
+                        />
+                    ) : (
+                        <TableButton
+                            label="Edit"
+                            onClick={() => setEditingIndex(index)}
+                        />
+                    )}
+                </div>
+
+                {/* RIGHT SIDE: + / - */}
                 {(isLastRow && !isFirstRow) && (
-                    <>
-                        <TableButton label="+"
-                                     onClick={() => {
-                                         console.log("submitting index ", index);
-                                         addSet();
-                                     }}
-                        />
-                        <TableButton label="-"
-                                     onClick={() => {
-                                         console.log("submitting index ", index);
-                                         removeSet();
-                                     }}
-                        />
-                    </>)}
+                    <div style={{display: "flex", gap: "4px"}}>
+                        <TableButton label="+" onClick={addSet}/>
+                        <TableButton label="-" onClick={removeSet}/>
+                    </div>
+                )}
+
+                {/* Very first row only gets + */}
                 {(isLastRow && isFirstRow) && (
-                    <>
-                        <TableButton label="+"
-                                     onClick={() => {
-                                         console.log("submitting index ", index);
-                                         addSet();
-                                     }}
-                        />
-                    </>)}
-
+                    <div style={{display: "flex", gap: "4px"}}>
+                        <TableButton label="+" onClick={addSet}/>
+                    </div>
+                )}
             </td>
-
         )
     };
+
     const isRowDisabled = (index: number) =>
         editingIndex !== index || (submitted !== null && !editing);
     return (
