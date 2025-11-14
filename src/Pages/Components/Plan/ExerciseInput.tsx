@@ -6,6 +6,7 @@ import {
     submitExerciseLogThunk,
     updateExerciseLogThunk
 } from "../../../redux/exerciseLogSlice";
+import TableButton from "../../../Styles/TableButton.tsx";
 
 interface PlanExercise {
     id: string;
@@ -132,6 +133,12 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 disabled={!!submitted && !editing}
                                 onChange={(e) => handleChange(index, "weight", e.target.value)}
                             />
+                        </td>
+                        <td>
+                            <TableButton label="bla" onClick={() => console.log("bla")}/>
+                        </td>
+                        <td>
+                            <TableButton label="gay bar" onClick={() => console.log("gay bar")}/>
                         </td>
                     </tr>
                 ))}
