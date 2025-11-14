@@ -38,8 +38,10 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     const [editingIndex, setEditingIndex] = useState(0);
 
     function removeSet() {
-        
-        console.log('remove Set');
+        console.log('before we remove Set: ', setsData);
+        const duplicateSetsData = setsData.slice(0, -1);
+        setSetsData(duplicateSetsData)
+        console.log('after we remove Set: ', setsData);
     }
 
     function addSet() {
