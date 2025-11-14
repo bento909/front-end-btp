@@ -38,19 +38,14 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     const [editingIndex, setEditingIndex] = useState(0);
 
     function removeSet() {
-        console.log('before we remove Set: ', setsData);
-        const duplicateSetsData = setsData.slice(0, -1);
-        setSetsData(duplicateSetsData)
-        console.log('after we remove Set: ', setsData);
+        setSetsData(setsData.slice(0, -1))
     }
 
     function addSet() {
-        console.log('setsData before addSet: ', setsData)
-        const lastElement = setsData.slice(-1)[0];
-        const duplicateSetsData = setsData;
-        duplicateSetsData.push(lastElement);
-        setSetsData(duplicateSetsData);
-        console.log('setsData after addSet: ', setsData)
+        setSetsData(prev => {
+            const last = prev[prev.length - 1] ?? { reps: "", weight: "" };
+            return [...prev, { ...last }];
+        });
     }
 
     useEffect(() => {
@@ -159,7 +154,8 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
 
         )
     };
-
+    const isRowDisabled = (index: number) =>
+        editingIndex !== index || (submitted !== null && !editing);
     return (
         <div>
             <h4>{planExercise.exerciseName}</h4>
@@ -180,7 +176,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 type="number"
                                 min={0}
                                 value={set.reps}
-                                disabled={(editingIndex != index) || (!!submitted && !editing)}
+                                disabled={isRowDisabled(index)}
                                 onChange={(e) => handleChange(index, "reps", e.target.value)}
                             />
                         </td>
@@ -189,7 +185,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 type="number"
                                 min={0}
                                 value={set.weight}
-                                disabled={(editingIndex != index) || (!!submitted && !editing)}
+                                disabled={isRowDisabled(index)}
                                 onChange={(e) => handleChange(index, "weight", e.target.value)}
                             />
                         </td>
