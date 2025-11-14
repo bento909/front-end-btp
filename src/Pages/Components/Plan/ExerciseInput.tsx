@@ -22,6 +22,14 @@ interface ExerciseInputProps {
     onChange?: (data: { reps: string; weight: string }[]) => void;
 }
 
+function removeSet() {
+    console.log('remove Set');
+}
+
+function addSet() {
+    console.log('add Set');
+}
+
 const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, onChange}) => {
     const dispatch: AppDispatch = useDispatch();
 
@@ -43,12 +51,12 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             .then((log) => {
                 if (log) {
                     setSetsData(JSON.parse(log.sets));
-                    setSubmitted({ id: log.id, sets: JSON.parse(log.sets) });
+                    setSubmitted({id: log.id, sets: JSON.parse(log.sets)});
                 }
             })
             .catch((err) => console.error("No previous log or failed fetch:", err));
     }, [dispatch, planExercise.id]);
-    
+
     useEffect(() => {
         onChange?.(setsData);
     }, [setsData, onChange]);
@@ -103,9 +111,13 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     };
 
     const renderControlButtons = (index: number) => {
-        if (editingIndex === index) {
-            return (
-                <td>
+        const isEditingThisRow = editingIndex === index;
+        console.log('index is ' + index, 'there are ' + setsData.length + 'sets in this exercise');
+        const isLastRow = index === setsData.length;
+        const isFirstRow = index === 0;
+        return (
+            <td>
+                {isEditingThisRow ? (
                     <TableButton
                         label="Submit"
                         onClick={() => {
@@ -113,9 +125,36 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                             setEditingIndex(index + 1);
                         }}
                     />
-                </td>
-            );
-        } else return null;
+                ) : (
+                    <TableButton
+                        label="Edit"
+                        onClick={() => {
+                            console.log("submitting index ", index);
+                            setEditingIndex(index);
+                        }}
+                    />
+                )}
+
+                {(isLastRow && !isFirstRow) && (
+                    <td>
+                        <TableButton
+                            label="+"
+                            onClick={() => {
+                                console.log("submitting index ", index);
+                                addSet();
+                            }}
+                        />
+                        <TableButton
+                            label="-"
+                            onClick={() => {
+                                console.log("submitting index ", index);
+                                removeSet();
+                            }}
+                        />
+                    </td>)};
+            </td>
+
+        )
     };
 
     return (
@@ -157,7 +196,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                 </tbody>
             </table>
 
-            
+
             <div style={{textAlign: "right"}}>
                 {!submitted && (
                     <button onClick={handleSubmit} disabled={loading}>
