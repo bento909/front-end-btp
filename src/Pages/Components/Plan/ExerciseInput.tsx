@@ -113,7 +113,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     const renderControlButtons = (index: number) => {
         const isEditingThisRow = editingIndex === index;
         console.log('index is ' + index, 'there are ' + setsData.length + 'sets in this exercise');
-        const isLastRow = index === setsData.length;
+        const isLastRow = index + 1 === setsData.length;
         const isFirstRow = index === 0;
         return (
             <td>
@@ -151,7 +151,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                 removeSet();
                             }}
                         />
-                    </td>)};
+                    </td>)}
             </td>
 
         )
