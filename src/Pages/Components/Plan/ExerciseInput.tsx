@@ -138,6 +138,7 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                 </tbody>
             </table>
 
+            
             <div style={{textAlign: "right"}}>
                 {!submitted && (
                     <button onClick={handleSubmit} disabled={loading}>
