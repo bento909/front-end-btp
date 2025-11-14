@@ -119,7 +119,6 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         const isFirstRow = index === 0;
         return (
             <td>
-                <span style={{display: "flex"}}>
                 {isEditingThisRow ? (
                     <TableButton label="Done"
                                  onClick={() => {
@@ -135,8 +134,6 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                                  }}
                     />
                 )}
-                </span>
-
                 {(isLastRow && !isFirstRow) && (
                     <>
                         <TableButton label="+"
