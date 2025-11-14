@@ -22,14 +22,6 @@ interface ExerciseInputProps {
     onChange?: (data: { reps: string; weight: string }[]) => void;
 }
 
-function removeSet() {
-    console.log('remove Set');
-}
-
-function addSet() {
-    console.log('add Set');
-}
-
 const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, onChange}) => {
     const dispatch: AppDispatch = useDispatch();
 
@@ -44,6 +36,20 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     const [editing, setEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [editingIndex, setEditingIndex] = useState(0);
+
+    function removeSet() {
+        
+        console.log('remove Set');
+    }
+
+    function addSet() {
+        console.log('setsData before addSet: ', setsData)
+        const lastElement = setsData.slice(-1)[0];
+        const duplicateSetsData = setsData;
+        duplicateSetsData.push(lastElement);
+        setSetsData(duplicateSetsData);
+        console.log('setsData after addSet: ', setsData)
+    }
 
     useEffect(() => {
         dispatch(fetchLatestExerciseLogByPlanExerciseIdThunk(planExercise.id))
