@@ -117,16 +117,11 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
         const isEditingThisRow = editingIndex === index;
         const isLastRow = index + 1 === setsData.length;
         const isFirstRow = index === 0;
-        return (
-            <td style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
 
-                {/* LEFT SIDE: Edit/Done */}
-                <div style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "flex-end",   // right-align button
-                    marginRight: "8px",
-                }}>
+        return (
+            <td style={{ textAlign: "right", paddingRight: "8px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+
                     {isEditingThisRow ? (
                         <TableButton
                             label="Done"
@@ -138,24 +133,26 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                             onClick={() => setEditingIndex(index)}
                         />
                     )}
+
+                    {/* Only show + if last row */}
+                    {isLastRow && (
+                        <TableButton
+                            label="+"
+                            onClick={addSet}
+                        />
+                    )}
+
+                    {/* Only show - if last row AND not the first row */}
+                    {isLastRow && !isFirstRow && (
+                        <TableButton
+                            label="-"
+                            onClick={removeSet}
+                        />
+                    )}
+
                 </div>
-
-                {/* RIGHT SIDE: + / - */}
-                {(isLastRow && !isFirstRow) && (
-                    <div style={{display: "flex", gap: "4px"}}>
-                        <TableButton label="+" onClick={addSet}/>
-                        <TableButton label="-" onClick={removeSet}/>
-                    </div>
-                )}
-
-                {/* Very first row only gets + */}
-                {(isLastRow && isFirstRow) && (
-                    <div style={{display: "flex", gap: "4px"}}>
-                        <TableButton label="+" onClick={addSet}/>
-                    </div>
-                )}
             </td>
-        )
+        );
     };
 
     const isRowDisabled = (index: number) =>
