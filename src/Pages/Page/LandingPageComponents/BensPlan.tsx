@@ -135,12 +135,6 @@ function WorkoutScheduler() {
     // const endTimestampRef = useRef<number | null>(null);
     // const lastBeepSecondRef = useRef<number>(Infinity);
 
-    const timerRef = useRef<number | null>(null);
-    const prepRef = useRef<number | null>(null);
-    const lastClickExercise = useRef<string | null>(null);
-    const lastClickTime = useRef<number>(0);
-    const toggleState = useRef<boolean>(false);
-
     // let wakeLock: any = null;
 
     // async function requestWakeLock() {
@@ -165,15 +159,6 @@ function WorkoutScheduler() {
     //         }
     //     } catch {}
     // }
-
-    useEffect(() => {
-        // nothing needed on mount for now; week already initialized
-        return () => {
-            // cleanup intervals when unmounting
-            if (timerRef.current) window.clearInterval(timerRef.current);
-            if (prepRef.current) window.clearInterval(prepRef.current);
-        };
-    }, []);
 
     // const startTimer = (exName: string, durationSeconds: number) => {
     //     requestWakeLock(); // 👈 keeps the screen awake
@@ -247,6 +232,30 @@ function WorkoutScheduler() {
     //     requestAnimationFrame(tick);
     // };
 
+    // const stopTimer = () => {
+    //     releaseWakeLock(); // 👈 allow screen to sleep again
+    //     if (timerRef.current) window.clearInterval(timerRef.current);
+    //     if (prepRef.current) window.clearInterval(prepRef.current);
+    //     setTimerOpen(false);
+    //     setTimerDisplay("00:00");
+    // };
+    
+    const timerRef = useRef<number | null>(null);
+    const prepRef = useRef<number | null>(null);
+    const lastClickExercise = useRef<string | null>(null);
+    const lastClickTime = useRef<number>(0);
+    const toggleState = useRef<boolean>(false);
+    
+    useEffect(() => {
+        // nothing needed on mount for now; week already initialized
+        return () => {
+            // cleanup intervals when unmounting
+            if (timerRef.current) window.clearInterval(timerRef.current);
+            if (prepRef.current) window.clearInterval(prepRef.current);
+        };
+    }, []);
+
+    
     const handleExerciseClick = (exName: string) => {
         const now = Date.now();
 
@@ -263,13 +272,6 @@ function WorkoutScheduler() {
         start(exerciseNames[exName], duration);
     };
 
-    // const stopTimer = () => {
-    //     releaseWakeLock(); // 👈 allow screen to sleep again
-    //     if (timerRef.current) window.clearInterval(timerRef.current);
-    //     if (prepRef.current) window.clearInterval(prepRef.current);
-    //     setTimerOpen(false);
-    //     setTimerDisplay("00:00");
-    // };
 
     const today = new Date();
     const monday = getMonday(today);
