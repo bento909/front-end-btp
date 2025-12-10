@@ -39,7 +39,9 @@ export const WorkoutTimerPopup: React.FC<Props> = ({
 
                 {/* RIGHT SIDE */}
                 <Right>
-                    <Time>{display}</Time>
+                    <Time isPrep={display.startsWith("Get Ready")}>
+                        {display}
+                    </Time>
                 </Right>
             </Content>
         </Wrapper>
@@ -97,8 +99,8 @@ const Right = styled.div`
     align-items: center;
 `;
 
-const Time = styled.div`
-    font-size: 3.4rem;
+const Time = styled.div<{ isPrep: boolean }>`
+    font-size: ${({ isPrep }) => (isPrep ? "2rem" : "3.8rem")};
     font-weight: 900;
     letter-spacing: 1px;
 `;
