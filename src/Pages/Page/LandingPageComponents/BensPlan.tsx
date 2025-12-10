@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, {useRef, useState} from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
-import { useTimer } from "../../../Context/WorkoutTimerContext.tsx";
+import {useTimer} from "../../../Context/WorkoutTimerContext.tsx";
 
 /* ------------------------------------------
    TYPES
@@ -38,12 +38,12 @@ interface StoredWeek {
 ------------------------------------------- */
 
 const DEFAULT_EXERCISES: Exercise[] = [
-    { id: "e1", name: "Pull-ups" },
-    { id: "e2", name: "Clean & Press" },
-    { id: "e3", name: "Mill" },
-    { id: "e4", name: "Shield Cast" },
-    { id: "e5", name: "Burpees" },
-    { id: "e6", name: "Swing" },
+    {id: "e1", name: "Pull-ups"},
+    {id: "e2", name: "Clean & Press"},
+    {id: "e3", name: "Mill"},
+    {id: "e4", name: "Shield Cast"},
+    {id: "e5", name: "Burpees"},
+    {id: "e6", name: "Swing"},
 ];
 
 /* ------------------------------------------
@@ -56,7 +56,8 @@ function loadExercises(): Exercise[] {
         try {
             const parsed = JSON.parse(stored) as Exercise[];
             if (Array.isArray(parsed)) return parsed;
-        } catch {}
+        } catch {
+        }
     }
 
     localStorage.setItem("exercises", JSON.stringify(DEFAULT_EXERCISES));
@@ -195,7 +196,8 @@ function loadOrCreateWeek(exerciseIDs: ExerciseID[]): WeekData {
             if (storedMonday.getTime() === monday.getTime()) {
                 return parsed.week;
             }
-        } catch {}
+        } catch {
+        }
     }
 
     const newWeek = makeWeek(exerciseIDs);
@@ -223,7 +225,7 @@ const WorkoutScheduler: React.FC = () => {
 
     const [week] = useState<WeekData>(() => loadOrCreateWeek(exerciseIDs));
 
-    const { start } = useTimer();
+    const {start} = useTimer();
 
     const [editing, setEditing] = useState<boolean>(false);
 
@@ -253,7 +255,7 @@ const WorkoutScheduler: React.FC = () => {
 
     const updateExerciseName = (id: ExerciseID, name: string) => {
         const updated = exercises.map((e) =>
-            e.id === id ? { ...e, name } : e
+            e.id === id ? {...e, name} : e
         );
         setExercises(updated);
         saveExercises(updated);
@@ -264,29 +266,23 @@ const WorkoutScheduler: React.FC = () => {
 
     return (
         <div>
-            <h2>Workout Scheduler</h2>
-
-            <button onClick={() => setEditing((x) => !x)}>
-                {editing ? "Done Editing" : "Edit Exercises"}
-            </button>
-
             {editing && (
-                <div style={{ padding: 10, marginTop: 10 }}>
+                <div style={{padding: 10, marginTop: 10}}>
                     {exercises.map((ex) => (
-                        <div key={ex.id} style={{ marginBottom: 8 }}>
+                        <div key={ex.id} style={{marginBottom: 8}}>
                             <input
                                 value={ex.name}
                                 onChange={(e) =>
                                     updateExerciseName(ex.id, e.target.value)
                                 }
-                                style={{ width: "100%", padding: 6 }}
+                                style={{width: "100%", padding: 6}}
                             />
                         </div>
                     ))}
                 </div>
             )}
 
-            <table style={{ borderCollapse: "collapse", width: "100%", marginTop: 16 }}>
+            <table style={{borderCollapse: "collapse", width: "100%", marginTop: 16}}>
                 <thead>
                 <tr>
                     <th>Date</th>
@@ -337,12 +333,22 @@ const WorkoutScheduler: React.FC = () => {
                 </tbody>
             </table>
 
-            <button
-                style={{ marginTop: 20 }}
-                onClick={() => beep(300, 600)}
-            >
-                Test Beep
-            </button>
+            <div>
+                <span>
+                    <button
+                        style={{marginTop: 20}}
+                        onClick={() => beep(300, 600)}>
+                        Test Beep
+                    </button>
+                </span>
+                <span>
+                    <button onClick={() => setEditing((x) => !x)}>
+                        {editing ? "Done Editing" : "Edit Exercises"}
+                    </button>
+                </span>
+            </div>
+
+
         </div>
     );
 };
@@ -359,7 +365,7 @@ const BensPlan: React.FC = () => {
             isOpen={isOpen}
             toggle={() => setIsOpen((x) => !x)}
         >
-            <WorkoutScheduler />
+            <WorkoutScheduler/>
         </CollapsiblePanel>
     );
 };
