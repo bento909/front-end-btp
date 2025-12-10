@@ -1,6 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
+import {useWorkoutTimer} from "../../../Hooks/useWorkoutTimer.ts";
+import {WorkoutTimerPopup} from "../../../PopupComponents/WorkoutTimerPopup.tsx";
 
+const {open, title, display, start, stop} = useWorkoutTimer();
 const exercises = ["e1", "e2", "e3", "e4", "e5", "e6"];
 
 const exerciseNames: Record<string, string> = {
@@ -14,6 +17,7 @@ const exerciseNames: Record<string, string> = {
 
 // ----- AUDIO (shared) -----
 let audioCtx: AudioContext | null = null;
+
 function getAudioCtx() {
     if (!audioCtx) {
         // handle Safari prefixed context
@@ -21,6 +25,7 @@ function getAudioCtx() {
     }
     return audioCtx;
 }
+
 function beep(duration = 200, frequency = 600, volume = 1) {
     const ctx = getAudioCtx();
     const oscillator = ctx.createOscillator();
@@ -46,7 +51,7 @@ function makeWeek() {
         C: Array(6).fill(null),
     };
 
-    const usedWeek: any = { A: {}, B: {}, C: {} };
+    const usedWeek: any = {A: {}, B: {}, C: {}};
     exercises.forEach((e) => {
         usedWeek.A[e] = usedWeek.B[e] = usedWeek.C[e] = false;
     });
@@ -124,12 +129,12 @@ function loadOrCreateWeek() {
  */
 function WorkoutScheduler() {
     const [week] = useState<any>(() => loadOrCreateWeek());
-    const [timerOpen, setTimerOpen] = useState(false);
-    const [timerTitle, setTimerTitle] = useState("");
-    const [timerDisplay, setTimerDisplay] = useState("00:00");
-    const startTimestampRef = useRef<number | null>(null);
-    const endTimestampRef = useRef<number | null>(null);
-    const lastBeepSecondRef = useRef<number>(Infinity);
+    // const [timerOpen, setTimerOpen] = useState(false);
+    // const [timerTitle, setTimerTitle] = useState("");
+    // const [timerDisplay, setTimerDisplay] = useState("00:00");
+    // const startTimestampRef = useRef<number | null>(null);
+    // const endTimestampRef = useRef<number | null>(null);
+    // const lastBeepSecondRef = useRef<number>(Infinity);
 
     const timerRef = useRef<number | null>(null);
     const prepRef = useRef<number | null>(null);
@@ -137,30 +142,30 @@ function WorkoutScheduler() {
     const lastClickTime = useRef<number>(0);
     const toggleState = useRef<boolean>(false);
 
-    let wakeLock: any = null;
+    // let wakeLock: any = null;
 
-    async function requestWakeLock() {
-        try {
-            // @ts-ignore - TS doesn't know this API yet
-            wakeLock = await navigator.wakeLock.request("screen");
-            wakeLock.addEventListener("release", () => {
-                console.log("Wake Lock was released");
-            });
-            console.log("Wake Lock active");
-        } catch (err) {
-            const e = err as any;
-            console.error(`${e.name}, ${e.message}`);
-        }
-    }
+    // async function requestWakeLock() {
+    //     try {
+    //         // @ts-ignore - TS doesn't know this API yet
+    //         wakeLock = await navigator.wakeLock.request("screen");
+    //         wakeLock.addEventListener("release", () => {
+    //             console.log("Wake Lock was released");
+    //         });
+    //         console.log("Wake Lock active");
+    //     } catch (err) {
+    //         const e = err as any;
+    //         console.error(`${e.name}, ${e.message}`);
+    //     }
+    // }
 
-    function releaseWakeLock() {
-        try {
-            if (wakeLock) {
-                wakeLock.release();
-                wakeLock = null;
-            }
-        } catch {}
-    }
+    // function releaseWakeLock() {
+    //     try {
+    //         if (wakeLock) {
+    //             wakeLock.release();
+    //             wakeLock = null;
+    //         }
+    //     } catch {}
+    // }
 
     useEffect(() => {
         // nothing needed on mount for now; week already initialized
@@ -171,99 +176,101 @@ function WorkoutScheduler() {
         };
     }, []);
 
-    const startTimer = (exName: string, durationSeconds: number) => {
-        requestWakeLock(); // 👈 keeps the screen awake
-        let prep = 7;
-        setTimerOpen(true);
-        setTimerTitle(`${exerciseNames[exName]} — ${durationSeconds / 60} min`);
-        setTimerDisplay(`Get Ready: ${prep}`);
+    // const startTimer = (exName: string, durationSeconds: number) => {
+    //     requestWakeLock(); // 👈 keeps the screen awake
+    //     let prep = 7;
+    //     setTimerOpen(true);
+    //     setTimerTitle(`${exerciseNames[exName]} — ${durationSeconds / 60} min`);
+    //     setTimerDisplay(`Get Ready: ${prep}`);
+    //
+    //     if (timerRef.current) window.clearInterval(timerRef.current);
+    //     if (prepRef.current) window.clearInterval(prepRef.current);
+    //
+    //     prepRef.current = window.setInterval(() => {
+    //         prep--;
+    //         setTimerDisplay(`Get Ready: ${prep}`);
+    //         if (prep === 0) {
+    //             if (prepRef.current) window.clearInterval(prepRef.current);
+    //             beep();
+    //             runMainTimer(durationSeconds);
+    //         }
+    //     }, 1000);
+    // };
 
-        if (timerRef.current) window.clearInterval(timerRef.current);
-        if (prepRef.current) window.clearInterval(prepRef.current);
-
-        prepRef.current = window.setInterval(() => {
-            prep--;
-            setTimerDisplay(`Get Ready: ${prep}`);
-            if (prep === 0) {
-                if (prepRef.current) window.clearInterval(prepRef.current);
-                beep();
-                runMainTimer(durationSeconds);
-            }
-        }, 1000);
-    };
-
-    const runMainTimer = (totalSeconds: number) => {
-        const now = Date.now();
-        startTimestampRef.current = now;
-        endTimestampRef.current = now + totalSeconds * 1000;
-
-        const tick = () => {
-            const now = Date.now();
-            const remainingMs = endTimestampRef.current! - now;
-
-            if (remainingMs <= 0) {
-                setTimerDisplay("00:00");
-
-                // final triple beep
-                beep(200, 700);
-                setTimeout(() => beep(200, 700), 300);
-                setTimeout(() => beep(200, 700), 600);
-
-                return;
-            }
-
-            // seconds remaining (ceiling so 1.4s → 2s)
-            const remainingSeconds = Math.ceil(remainingMs / 1000);
-
-            const m = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
-            const s = String(remainingSeconds % 60).padStart(2, "0");
-
-            setTimerDisplay(`${m}:${s}`);
-
-            // ---- FIXED precise minute-beep logic ----
-            // Fires WHEN seconds cross a boundary like 180 -> 179,
-            // meaning "we just entered a new minute".
-            const justHitNewMinute =
-                remainingSeconds < lastBeepSecondRef.current &&
-                remainingSeconds % 60 === 0 &&
-                remainingSeconds !== totalSeconds; // no beep on the very first tick
-
-            
-            
-            if (justHitNewMinute) {
-                beep(150, 700);
-            }
-
-            lastBeepSecondRef.current = remainingSeconds;
-            // ------------------------------------------
-
-            requestAnimationFrame(tick);
-        };
-
-        requestAnimationFrame(tick);
-    };
+    // const runMainTimer = (totalSeconds: number) => {
+    //     const now = Date.now();
+    //     startTimestampRef.current = now;
+    //     endTimestampRef.current = now + totalSeconds * 1000;
+    //
+    //     const tick = () => {
+    //         const now = Date.now();
+    //         const remainingMs = endTimestampRef.current! - now;
+    //
+    //         if (remainingMs <= 0) {
+    //             setTimerDisplay("00:00");
+    //
+    //             // final triple beep
+    //             beep(200, 700);
+    //             setTimeout(() => beep(200, 700), 300);
+    //             setTimeout(() => beep(200, 700), 600);
+    //
+    //             return;
+    //         }
+    //
+    //         // seconds remaining (ceiling so 1.4s → 2s)
+    //         const remainingSeconds = Math.ceil(remainingMs / 1000);
+    //
+    //         const m = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+    //         const s = String(remainingSeconds % 60).padStart(2, "0");
+    //
+    //         setTimerDisplay(`${m}:${s}`);
+    //
+    //         // ---- FIXED precise minute-beep logic ----
+    //         // Fires WHEN seconds cross a boundary like 180 -> 179,
+    //         // meaning "we just entered a new minute".
+    //         const justHitNewMinute =
+    //             remainingSeconds < lastBeepSecondRef.current &&
+    //             remainingSeconds % 60 === 0 &&
+    //             remainingSeconds !== totalSeconds; // no beep on the very first tick
+    //
+    //        
+    //        
+    //         if (justHitNewMinute) {
+    //             beep(150, 700);
+    //         }
+    //
+    //         lastBeepSecondRef.current = remainingSeconds;
+    //         // ------------------------------------------
+    //
+    //         requestAnimationFrame(tick);
+    //     };
+    //
+    //     requestAnimationFrame(tick);
+    // };
 
     const handleExerciseClick = (exName: string) => {
         const now = Date.now();
+
         if (lastClickExercise.current === exName && now - lastClickTime.current < 2000) {
             toggleState.current = !toggleState.current;
         } else {
             toggleState.current = false;
         }
+
         lastClickExercise.current = exName;
         lastClickTime.current = now;
 
         const duration = toggleState.current ? 10 * 60 : 5 * 60;
-        startTimer(exName, duration);
+        start(exerciseNames[exName], duration);
     };
 
-    const stopTimer = () => {
-        releaseWakeLock(); // 👈 allow screen to sleep again
-        if (timerRef.current) window.clearInterval(timerRef.current);
-        if (prepRef.current) window.clearInterval(prepRef.current);
-        setTimerOpen(false);
-        setTimerDisplay("00:00");
-    };
+    // const stopTimer = () => {
+    //     releaseWakeLock(); // 👈 allow screen to sleep again
+    //     if (timerRef.current) window.clearInterval(timerRef.current);
+    //     if (prepRef.current) window.clearInterval(prepRef.current);
+    //     setTimerOpen(false);
+    //     setTimerDisplay("00:00");
+    // };
 
     const today = new Date();
     const monday = getMonday(today);
@@ -272,13 +279,13 @@ function WorkoutScheduler() {
         <div>
             <h2>Workout Scheduler</h2>
 
-            <table style={{ borderCollapse: "collapse", width: "100%" }}>
+            <table style={{borderCollapse: "collapse", width: "100%"}}>
                 <thead>
                 <tr>
-                    <th style={{ border: "1px solid #ccc", padding: 8 }}>Date</th>
-                    <th style={{ border: "1px solid #ccc", padding: 8 }}>15 mins</th>
-                    <th style={{ border: "1px solid #ccc", padding: 8 }}>10 mins</th>
-                    <th style={{ border: "1px solid #ccc", padding: 8 }}>5 mins</th>
+                    <th style={{border: "1px solid #ccc", padding: 8}}>Date</th>
+                    <th style={{border: "1px solid #ccc", padding: 8}}>15 mins</th>
+                    <th style={{border: "1px solid #ccc", padding: 8}}>10 mins</th>
+                    <th style={{border: "1px solid #ccc", padding: 8}}>5 mins</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -293,7 +300,7 @@ function WorkoutScheduler() {
 
                     return (
                         <tr key={i}>
-                            <td style={{ border: "1px solid #ccc", padding: 8 }}>{day.toDateString()}</td>
+                            <td style={{border: "1px solid #ccc", padding: 8}}>{day.toDateString()}</td>
                             {[A, B, C].map((ex, idx) => (
                                 <td
                                     key={idx}
@@ -329,30 +336,14 @@ function WorkoutScheduler() {
             </table>
 
             {/* Timer popup */}
-            {timerOpen && (
-                <div
-                    style={{
-                        position: "fixed",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%,-50%)",
-                        padding: 20,
-                        border: "2px solid #444",
-                        background: "white",
-                        width: 240,
-                        textAlign: "center",
-                        borderRadius: 12,
-                        boxShadow: "0 0 20px rgba(0,0,0,0.3)",
-                        zIndex: 9999,
-                    }}
-                >
-                    <h3>{timerTitle}</h3>
-                    <div style={{ fontSize: 32, margin: "10px 0" }}>{timerDisplay}</div>
-                    <button onClick={stopTimer}>Stop</button>
-                </div>
-            )}
-
-            <div style={{ marginTop: 12 }}>
+            <WorkoutTimerPopup
+                open={open}
+                title={title}
+                display={display}
+                stop={stop}
+            />
+            
+            <div style={{marginTop: 12}}>
                 <button onClick={() => beep(300, 600)}>Test Beep</button>
             </div>
         </div>
@@ -368,7 +359,7 @@ const BensPlan: React.FC = () => {
 
     return (
         <CollapsiblePanel title="BensPlan" isOpen={isOpen} toggle={togglePanel}>
-            <WorkoutScheduler />
+            <WorkoutScheduler/>
         </CollapsiblePanel>
     );
 };
