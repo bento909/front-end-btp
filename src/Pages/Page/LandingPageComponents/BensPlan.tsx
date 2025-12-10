@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
-import {useWorkoutTimer} from "../../../Hooks/useWorkoutTimer.ts";
+import { useTimer } from "../../../Context/WorkoutTimerContext.tsx";
 
 const exercises = ["e1", "e2", "e3", "e4", "e5", "e6"];
 
@@ -127,7 +127,7 @@ function loadOrCreateWeek() {
  */
 function WorkoutScheduler() {
     const [week] = useState<any>(() => loadOrCreateWeek());
-    const { start } = useWorkoutTimer();
+    const { start } = useTimer();
     // const [timerOpen, setTimerOpen] = useState(false);
     // const [timerTitle, setTimerTitle] = useState("");
     // const [timerDisplay, setTimerDisplay] = useState("00:00");
