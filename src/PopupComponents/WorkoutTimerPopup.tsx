@@ -62,11 +62,11 @@ const slideUp = keyframes`
 /* ---- Wrapper ---- */
 const Wrapper = styled.div<{ open: boolean }>`
     width: 100%;
+    margin-top: 20px; /* ← ADDS THE PURPLE GAP ABOVE */
     background: #222;
     color: white;
     overflow: hidden;
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    padding-top: 20px;
 
     animation: ${({ open }) => (open ? slideDown : slideUp)} 0.35s ease forwards;
     height: ${({ open }) => (open ? "auto" : "0px")};
