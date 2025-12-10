@@ -135,6 +135,31 @@ function WorkoutScheduler() {
     const lastClickTime = useRef<number>(0);
     const toggleState = useRef<boolean>(false);
 
+    let wakeLock: any = null;
+
+    async function requestWakeLock() {
+        try {
+            // @ts-ignore - TS doesn't know this API yet
+            wakeLock = await navigator.wakeLock.request("screen");
+            wakeLock.addEventListener("release", () => {
+                console.log("Wake Lock was released");
+            });
+            console.log("Wake Lock active");
+        } catch (err) {
+            const e = err as any;
+            console.error(`${e.name}, ${e.message}`);
+        }
+    }
+
+    function releaseWakeLock() {
+        try {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+            }
+        } catch {}
+    }
+
     useEffect(() => {
         // nothing needed on mount for now; week already initialized
         return () => {
@@ -145,6 +170,7 @@ function WorkoutScheduler() {
     }, []);
 
     const startTimer = (exName: string, durationSeconds: number) => {
+        requestWakeLock(); // 👈 keeps the screen awake
         let prep = 7;
         setTimerOpen(true);
         setTimerTitle(`${exerciseNames[exName]} — ${durationSeconds / 60} min`);
@@ -201,6 +227,7 @@ function WorkoutScheduler() {
     };
 
     const stopTimer = () => {
+        releaseWakeLock(); // 👈 allow screen to sleep again
         if (timerRef.current) window.clearInterval(timerRef.current);
         if (prepRef.current) window.clearInterval(prepRef.current);
         setTimerOpen(false);
