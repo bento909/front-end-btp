@@ -1,9 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
 import {useWorkoutTimer} from "../../../Hooks/useWorkoutTimer.ts";
-import {WorkoutTimerPopup} from "../../../PopupComponents/WorkoutTimerPopup.tsx";
 
-const {open, title, display, start, stop} = useWorkoutTimer();
+const { start } = useWorkoutTimer();
 const exercises = ["e1", "e2", "e3", "e4", "e5", "e6"];
 
 const exerciseNames: Record<string, string> = {
@@ -336,12 +335,12 @@ function WorkoutScheduler() {
             </table>
 
             {/* Timer popup */}
-            <WorkoutTimerPopup
-                open={open}
-                title={title}
-                display={display}
-                stop={stop}
-            />
+            {/*<WorkoutTimerPopup*/}
+            {/*    open={open}*/}
+            {/*    title={title}*/}
+            {/*    display={display}*/}
+            {/*    stop={stop}*/}
+            {/*/>*/}
             
             <div style={{marginTop: 12}}>
                 <button onClick={() => beep(300, 600)}>Test Beep</button>

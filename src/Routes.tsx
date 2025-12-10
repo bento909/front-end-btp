@@ -16,30 +16,47 @@ import {updateAuthUser} from "./redux/authSlice.tsx";
 import {Profile} from "./Constants/constants.tsx";
 import {PermissionService} from "./Helpers/PermissionService.tsx";
 import ViewMessages from "./Pages/Components/CollapsiblePanels/ViewMessages.tsx";
+import {useTimer, WorkoutTimerProvider} from "./Context/WorkoutTimerContext";
+import {WorkoutTimerPopup} from "./PopupComponents/WorkoutTimerPopup.tsx";
+
+const WorkoutTimerPopupWrapper = () => {
+    const { open, title, display, stop } = useTimer();
+    return (
+        <WorkoutTimerPopup
+            open={open}
+            title={title}
+            display={display}
+            stop={stop}
+        />
+    );
+};
 
 function AppRoutes() {
     return (
         <Router>
-            <Routes>
-                {/* Public landing page */}
-                <Route path="/" element={<LandingPage />} />
+            <WorkoutTimerProvider>
+                <WorkoutTimerPopupWrapper/>
+                <Routes>
+                    {/* Public landing page */}
+                    <Route path="/" element={<LandingPage/>}/>
 
-                {/* Protected routes wrapped in Authenticator */}
-                <Route
-                    path="/app/*"
-                    element={
-                        <Authenticator hideSignUp={true}>
-                            <Layout>
-                                <Routes>
-                                    <Route path="home" element={<PostLoginScreen />} />
-                                    <Route path="trainingMenu" element={<Menu />} />
-                                    <Route path="testerMenu" element={<TesterMenu />} />
-                                </Routes>
-                            </Layout>
-                        </Authenticator>
-                    }
-                />
-            </Routes>
+                    {/* Protected routes wrapped in Authenticator */}
+                    <Route
+                        path="/app/*"
+                        element={
+                            <Authenticator hideSignUp={true}>
+                                <Layout>
+                                    <Routes>
+                                        <Route path="home" element={<PostLoginScreen/>}/>
+                                        <Route path="trainingMenu" element={<Menu/>}/>
+                                        <Route path="testerMenu" element={<TesterMenu/>}/>
+                                    </Routes>
+                                </Layout>
+                            </Authenticator>
+                        }
+                    />
+                </Routes>
+            </WorkoutTimerProvider>
         </Router>
     );
 }
@@ -48,12 +65,12 @@ const Menu = () => {
     return (
         <main>
             <ViewMessages/>
-            <ViewAllUsers />
-            <SignUp />
-            <CreateExercise />
-            <ListExercises />
-            <EditPlans />
-            <ViewPlan />
+            <ViewAllUsers/>
+            <SignUp/>
+            <CreateExercise/>
+            <ListExercises/>
+            <EditPlans/>
+            <ViewPlan/>
         </main>
     );
 };
@@ -65,7 +82,7 @@ const TesterMenu = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     function handleNameChange(role: string) {
-        const testName = role  + ' (test mode)';
+        const testName = role + ' (test mode)';
         dispatch(reset());
         dispatch(updateAuthUser({
                 profile: role as Profile,
