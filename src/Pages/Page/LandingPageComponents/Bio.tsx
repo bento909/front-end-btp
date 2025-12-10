@@ -8,8 +8,8 @@ const Bio: React.FC = () => {
     return (
         <CollapsiblePanel title="Biography" isOpen={isOpen} toggle={togglePanel}>
             <div>
-                Ben Thomas is a Software Engineer, Musician and Personal Trainer from Wirral. 
-                Please use the contact form on this page to send an enquiry
+                Ben Thomas is a Software Engineer, Personal Trainer and Electronic Music enthusiast from Wirral. 
+                Please use the contact form on this page to send an enquiry.
             </div>
         </CollapsiblePanel>
     )
