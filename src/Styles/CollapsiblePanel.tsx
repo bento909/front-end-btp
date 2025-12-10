@@ -16,7 +16,6 @@ const Panel = styled.div<{ isOpen: boolean }>`
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 12px;
-    flex: 0 0 100%; /* prevents width shrinking when collapsed?? */
     width: 100%;
     max-width: 600px;
     margin: 12px auto;
