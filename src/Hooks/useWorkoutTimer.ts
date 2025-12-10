@@ -6,13 +6,18 @@ export function useWorkoutTimer() {
     const [title, setTitle] = useState("");
     const [open, setOpen] = useState(false);
     const [isRunning, setIsRunning] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+
     useWakeLock(isRunning);
 
     const endTimestampRef = useRef<number | null>(null);
+    const pauseRemainingRef = useRef<number>(0);
     const lastBeepSecondRef = useRef<number>(Infinity);
     const rafRef = useRef<number | null>(null);
+    const prepIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const autoCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // ---- AUDIO ----
+    /* ---- AUDIO ---- */
     let audioCtx: AudioContext | null = null;
     function getCtx() {
         if (!audioCtx) {
@@ -33,20 +38,26 @@ export function useWorkoutTimer() {
         osc.stop(ctx.currentTime + duration / 1000);
     }
 
-    // ---- MAIN TICK ----
+    /* ---- TICK ---- */
     const tick = useCallback(
         (totalSeconds: number) => {
+            if (isPaused) return;
+
             const now = Date.now();
             const remainingMs = endTimestampRef.current! - now;
 
             if (remainingMs <= 0) {
                 setDisplay("00:00");
 
-                // final triple beep
+                // triple beep
                 beep(200, 700);
                 setTimeout(() => beep(200, 700), 300);
                 setTimeout(() => beep(200, 700), 600);
 
+                // schedule auto close
+                autoCloseTimeoutRef.current = setTimeout(() => setOpen(false), 3000);
+
+                setIsRunning(false);
                 rafRef.current = null;
                 return;
             }
@@ -57,7 +68,6 @@ export function useWorkoutTimer() {
             const s = String(remainingSeconds % 60).padStart(2, "0");
             setDisplay(`${m}:${s}`);
 
-            // --- BEEP LOGIC (minute + 30-second) ---
             const crossed = remainingSeconds < lastBeepSecondRef.current;
 
             const minuteMark =
@@ -80,29 +90,37 @@ export function useWorkoutTimer() {
                 tick(totalSeconds)
             );
         },
-        [setDisplay]
+        [isPaused]
     );
 
-    // ---- PUBLIC START ----
+    /* ---- START ---- */
     const start = useCallback((exerciseName: string, durationSeconds: number) => {
         setTitle(exerciseName);
         setOpen(true);
         setIsRunning(true);
+        setIsPaused(false);
 
-        // 7s prep phase
+        lastBeepSecondRef.current = Infinity;
+
+        // clear stale timeouts
+        if (autoCloseTimeoutRef.current) clearTimeout(autoCloseTimeoutRef.current);
+
+        // 7s prep
         let prep = 7;
         setDisplay(`Get Ready: ${prep}`);
 
-        const prepInterval = setInterval(() => {
+        if (prepIntervalRef.current) clearInterval(prepIntervalRef.current);
+
+        prepIntervalRef.current = setInterval(() => {
             prep--;
             setDisplay(`Get Ready: ${prep}`);
 
             if (prep === 0) {
-                clearInterval(prepInterval);
+                clearInterval(prepIntervalRef.current!);
                 beep();
-                // start main timer
-                lastBeepSecondRef.current = Infinity;
+
                 endTimestampRef.current = Date.now() + durationSeconds * 1000;
+
                 rafRef.current = requestAnimationFrame(() =>
                     tick(durationSeconds)
                 );
@@ -110,11 +128,37 @@ export function useWorkoutTimer() {
         }, 1000);
     }, [tick]);
 
+    /* ---- PAUSE ---- */
+    const pause = useCallback(() => {
+        if (!isRunning) return;
+        setIsPaused(true);
+
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+        pauseRemainingRef.current =
+            endTimestampRef.current! - Date.now();
+    }, [isRunning]);
+
+    /* ---- RESUME ---- */
+    const resume = useCallback(() => {
+        if (!isPaused) return;
+        setIsPaused(false);
+
+        endTimestampRef.current = Date.now() + pauseRemainingRef.current;
+        rafRef.current = requestAnimationFrame(() => tick(999999)); // seconds ignored
+    }, [isPaused, tick]);
+
+    /* ---- STOP ---- */
     const stop = useCallback(() => {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        if (prepIntervalRef.current) clearInterval(prepIntervalRef.current);
+        if (autoCloseTimeoutRef.current) clearTimeout(autoCloseTimeoutRef.current);
+
         rafRef.current = null;
-        setOpen(false);
+
         setIsRunning(false);
+        setIsPaused(false);
+        setOpen(false);
         setDisplay("00:00");
     }, []);
 
@@ -122,7 +166,10 @@ export function useWorkoutTimer() {
         open,
         title,
         display,
+        isPaused,
         start,
+        pause,
+        resume,
         stop,
     };
 }
