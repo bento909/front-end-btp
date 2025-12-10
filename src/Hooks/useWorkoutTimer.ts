@@ -145,10 +145,11 @@ export function useWorkoutTimer() {
     const resume = useCallback(() => {
         if (!isPaused) return;
         setIsPaused(false);
-
         endTimestampRef.current = Date.now() + pauseRemainingRef.current;
+        const remainingSeconds = Math.ceil(pauseRemainingRef.current / 1000);
+        lastBeepSecondRef.current = remainingSeconds;
         rafRef.current = requestAnimationFrame(() =>
-            tick(originalDurationRef.current)
+            tick(remainingSeconds)
         );
     }, [isPaused, tick]);
 
