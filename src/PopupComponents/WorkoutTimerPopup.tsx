@@ -23,9 +23,10 @@ export const WorkoutTimerPopup: React.FC<Props> = ({
     return (
         <Wrapper open={open}>
             <Content>
-                {/* LEFT SIDE */}
-                <Left>
-                    <Title>{title}</Title>
+
+                {/* --- TOP ROW --- */}
+                <TopRow>
+                    <ExerciseName>{title}</ExerciseName>
 
                     <ButtonRow>
                         <StopButton onClick={stop}>STOP</StopButton>
@@ -35,14 +36,13 @@ export const WorkoutTimerPopup: React.FC<Props> = ({
                             <PauseButton onClick={pause}>PAUSE</PauseButton>
                         )}
                     </ButtonRow>
-                </Left>
+                </TopRow>
 
-                {/* RIGHT SIDE */}
-                <Right>
-                    <Time isPrep={display.startsWith("Get Ready")}>
-                        {display}
-                    </Time>
-                </Right>
+                {/* --- MASSIVE TIME ROW --- */}
+                <TimeRow>
+                    <Time>{display}</Time>
+                </TimeRow>
+
             </Content>
         </Wrapper>
     );
@@ -73,21 +73,21 @@ const Wrapper = styled.div<{ open: boolean }>`
 `;
 
 const Content = styled.div`
-    padding: 20px; /* top padding included */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+`;
+
+const TopRow = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
 `;
 
-const Left = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-`;
-
-const Title = styled.div`
-    font-size: 1.4rem;
-    font-weight: bold;
+const ExerciseName = styled.div`
+    font-size: 1.6rem;
+    font-weight: 800;
 `;
 
 const ButtonRow = styled.div`
@@ -95,16 +95,18 @@ const ButtonRow = styled.div`
     gap: 10px;
 `;
 
-const Right = styled.div`
+const TimeRow = styled.div`
     display: flex;
-    align-items: center;
+    justify-content: center;
+    width: 100%;
 `;
 
-const Time = styled.div<{ isPrep: boolean }>`
-    font-size: ${({ isPrep }) => (isPrep ? "2rem" : "3.8rem")};
+const Time = styled.div`
+    font-size: 5rem;      /* MAHOOSIVE */
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 `;
+
 
 const ButtonBase = css`
     border: none;
