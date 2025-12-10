@@ -16,6 +16,7 @@ export function useWorkoutTimer() {
     const rafRef = useRef<number | null>(null);
     const prepIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const autoCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const originalDurationRef = useRef<number>(0);
 
     /* ---- AUDIO ---- */
     let audioCtx: AudioContext | null = null;
@@ -99,7 +100,8 @@ export function useWorkoutTimer() {
         setOpen(true);
         setIsRunning(true);
         setIsPaused(false);
-
+        
+        originalDurationRef.current = durationSeconds;
         lastBeepSecondRef.current = Infinity;
 
         // clear stale timeouts
@@ -145,7 +147,9 @@ export function useWorkoutTimer() {
         setIsPaused(false);
 
         endTimestampRef.current = Date.now() + pauseRemainingRef.current;
-        rafRef.current = requestAnimationFrame(() => tick(999999)); // seconds ignored
+        rafRef.current = requestAnimationFrame(() =>
+            tick(originalDurationRef.current)
+        );
     }, [isPaused, tick]);
 
     /* ---- STOP ---- */
