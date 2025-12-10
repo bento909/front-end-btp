@@ -359,7 +359,7 @@ const BensPlan: React.FC = () => {
     const togglePanel = () => setIsOpen((prev) => !prev);
 
     return (
-        <CollapsiblePanel title="BensPlan" isOpen={isOpen} toggle={togglePanel}>
+        <CollapsiblePanel title="Ben's Plan" isOpen={isOpen} toggle={togglePanel}>
             <WorkoutScheduler/>
         </CollapsiblePanel>
     );
