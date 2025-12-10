@@ -44,6 +44,12 @@ export function useWorkoutTimer() {
         osc.stop(ctx.currentTime + duration / 1000);
     }
 
+    function getMinSecsString(remainingSeconds: number) {
+        const m = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+        const s = String(remainingSeconds % 60).padStart(2, "0");
+        return `${m}:${s}`
+    }
+
     /* ---- TICK ---- */
     const tick = useCallback(
         (totalSeconds: number) => {
@@ -69,10 +75,7 @@ export function useWorkoutTimer() {
             }
 
             const remainingSeconds = Math.ceil(remainingMs / 1000);
-
-            const m = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
-            const s = String(remainingSeconds % 60).padStart(2, "0");
-            setDisplay(`${m}:${s}`);
+            setDisplay(getMinSecsString(remainingSeconds));
 
             const crossed = remainingSeconds < lastBeepSecondRef.current;
 
@@ -101,7 +104,7 @@ export function useWorkoutTimer() {
 
     /* ---- START ---- */
     const start = useCallback((exerciseName: string, durationSeconds: number) => {
-        setTitle(exerciseName);
+        setTitle(`${exerciseName} - ${getMinSecsString(durationSeconds)}`);
         setOpen(true);
         setIsRunning(true);
         setIsPaused(false);
