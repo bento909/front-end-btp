@@ -19,6 +19,11 @@ export function useWorkoutTimer() {
     const originalDurationRef = useRef<number>(0);
     const isPausedRef = useRef(false);
 
+    const onCompleteRef = useRef<(() => void) | null>(null);
+    const setOnComplete = (cb: () => void) => {
+        onCompleteRef.current = cb;
+    };
+
     useEffect(() => {
         isPausedRef.current = isPaused;
     }, [isPaused]);
@@ -71,6 +76,12 @@ export function useWorkoutTimer() {
 
                 setIsRunning(false);
                 rafRef.current = null;
+                // NEW: call onComplete callback if provided
+                if (onCompleteRef.current) {
+                    const cb = onCompleteRef.current;
+                    onCompleteRef.current = null;
+                    cb();
+                }
                 return;
             }
 
@@ -188,5 +199,6 @@ export function useWorkoutTimer() {
         pause,
         resume,
         stop,
+        setOnComplete,
     };
 }
