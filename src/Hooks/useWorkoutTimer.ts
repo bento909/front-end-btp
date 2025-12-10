@@ -1,9 +1,12 @@
 import { useRef, useState, useCallback } from "react";
+import { useWakeLock } from "./useWakeLock";
 
 export function useWorkoutTimer() {
     const [display, setDisplay] = useState("00:00");
     const [title, setTitle] = useState("");
     const [open, setOpen] = useState(false);
+    const [isRunning, setIsRunning] = useState(false);
+    useWakeLock(isRunning);
 
     const endTimestampRef = useRef<number | null>(null);
     const lastBeepSecondRef = useRef<number>(Infinity);
@@ -84,6 +87,7 @@ export function useWorkoutTimer() {
     const start = useCallback((exerciseName: string, durationSeconds: number) => {
         setTitle(exerciseName);
         setOpen(true);
+        setIsRunning(true);
 
         // 7s prep phase
         let prep = 7;
@@ -110,6 +114,7 @@ export function useWorkoutTimer() {
         if (rafRef.current) cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
         setOpen(false);
+        setIsRunning(false);
         setDisplay("00:00");
     }, []);
 
