@@ -14,11 +14,11 @@ export const WorkoutTimerPopup: React.FC<Props> = ({ open, title, display, stop 
             <Content>
                 <Left>
                     <Title>{title}</Title>
+                    <StopButton onClick={stop}>STOP</StopButton>
                 </Left>
-
+                
                 <Right>
                     <Time>{display}</Time>
-                    <StopButton onClick={stop}>STOP</StopButton>
                 </Right>
             </Content>
         </Wrapper>
@@ -28,16 +28,16 @@ export const WorkoutTimerPopup: React.FC<Props> = ({ open, title, display, stop 
 /* ---- Animations ---- */
 
 const slideDown = keyframes`
-  from { transform: translateY(-100%); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
+    from { transform: translateY(-100%); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
 `;
 
 const slideUp = keyframes`
-  from { transform: translateY(0); opacity: 1; }
-  to   { transform: translateY(-100%); opacity: 0; }
+    from { transform: translateY(0); opacity: 1; }
+    to   { transform: translateY(-100%); opacity: 0; }
 `;
 
-/* ---- Animated wrapper that pushes layout down ---- */
+/* ---- Dropdown wrapper ---- */
 const Wrapper = styled.div<{ open: boolean }>`
     width: 100%;
     overflow: hidden;
@@ -47,51 +47,55 @@ const Wrapper = styled.div<{ open: boolean }>`
 
     animation: ${({ open }) => (open ? slideDown : slideUp)} 0.35s ease forwards;
 
-    /* If closed, collapse height fully after animation */
     height: ${({ open }) => (open ? "auto" : "0px")};
 `;
 
-/* ---- Inside layout ---- */
+/* ---- Main internal layout ---- */
 const Content = styled.div`
-    padding: 12px 20px;
+    padding: 20px; /* equal on all sides including top */
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
 `;
 
 const Left = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     flex: 1;
 `;
 
 const Title = styled.div`
-    font-size: 1.2rem;
+    font-size: 1.6rem;
     font-weight: bold;
+    line-height: 1.2;
 `;
 
 const Right = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 6px;
 `;
 
 const Time = styled.div`
-    font-size: 2.4rem;
+    font-size: 3.4rem; /* MUCH bigger timer */
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
+    line-height: 1;
 `;
 
 const StopButton = styled.button`
     background: #ff4d4d;
     border: none;
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 6px;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: bold;
     color: white;
     cursor: pointer;
+    width: 110px;
 
     &:active {
-        transform: scale(0.97);
+        transform: scale(0.96);
     }
 `;
