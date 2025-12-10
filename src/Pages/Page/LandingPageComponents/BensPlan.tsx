@@ -127,10 +127,12 @@ function WorkoutScheduler() {
     const [timerOpen, setTimerOpen] = useState(false);
     const [timerTitle, setTimerTitle] = useState("");
     const [timerDisplay, setTimerDisplay] = useState("00:00");
+    const startTimestampRef = useRef<number | null>(null);
+    const endTimestampRef = useRef<number | null>(null);
+    const lastBeepSecondRef = useRef<number>(Infinity);
 
     const timerRef = useRef<number | null>(null);
     const prepRef = useRef<number | null>(null);
-    const secondsRef = useRef(0);
     const lastClickExercise = useRef<string | null>(null);
     const lastClickTime = useRef<number>(0);
     const toggleState = useRef<boolean>(false);
@@ -191,25 +193,54 @@ function WorkoutScheduler() {
     };
 
     const runMainTimer = (totalSeconds: number) => {
-        secondsRef.current = totalSeconds;
-        timerRef.current = window.setInterval(() => {
-            secondsRef.current--;
-            const m = String(Math.floor(secondsRef.current / 60)).padStart(2, "0");
-            const s = String(secondsRef.current % 60).padStart(2, "0");
-            setTimerDisplay(`${m}:${s}`);
+        const now = Date.now();
+        startTimestampRef.current = now;
+        endTimestampRef.current = now + totalSeconds * 1000;
 
-            if (s === "00" && secondsRef.current > 0 && secondsRef.current !== totalSeconds) {
-                beep(150, 700);
-            }
+        const tick = () => {
+            const now = Date.now();
+            const remainingMs = endTimestampRef.current! - now;
 
-            if (secondsRef.current <= 0) {
-                if (timerRef.current) window.clearInterval(timerRef.current);
+            if (remainingMs <= 0) {
+                setTimerDisplay("00:00");
+
+                // final triple beep
                 beep(200, 700);
                 setTimeout(() => beep(200, 700), 300);
                 setTimeout(() => beep(200, 700), 600);
-                setTimerDisplay("Done!");
+
+                return;
             }
-        }, 1000);
+
+            // seconds remaining (ceiling so 1.4s → 2s)
+            const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+            const m = String(Math.floor(remainingSeconds / 60)).padStart(2, "0");
+            const s = String(remainingSeconds % 60).padStart(2, "0");
+
+            setTimerDisplay(`${m}:${s}`);
+
+            // ---- FIXED precise minute-beep logic ----
+            // Fires WHEN seconds cross a boundary like 180 -> 179,
+            // meaning "we just entered a new minute".
+            const justHitNewMinute =
+                remainingSeconds < lastBeepSecondRef.current &&
+                remainingSeconds % 60 === 0 &&
+                remainingSeconds !== totalSeconds; // no beep on the very first tick
+
+            
+            
+            if (justHitNewMinute) {
+                beep(150, 700);
+            }
+
+            lastBeepSecondRef.current = remainingSeconds;
+            // ------------------------------------------
+
+            requestAnimationFrame(tick);
+        };
+
+        requestAnimationFrame(tick);
     };
 
     const handleExerciseClick = (exName: string) => {
