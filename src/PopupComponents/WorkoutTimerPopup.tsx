@@ -102,7 +102,7 @@ const TimeRow = styled.div`
 `;
 
 const Time = styled.div`
-    font-size: 5rem;      /* MAHOOSIVE */
+    font-size: 6rem;      /* MAHOOSIVE */
     font-weight: 900;
     letter-spacing: 2px;
 `;
