@@ -20,13 +20,16 @@ import {useTimer, WorkoutTimerProvider} from "./Context/WorkoutTimerContext";
 import {WorkoutTimerPopup} from "./PopupComponents/WorkoutTimerPopup.tsx";
 
 const WorkoutTimerPopupWrapper = () => {
-    const { open, title, display, stop } = useTimer();
+    const { open, title, display, stop, pause, isPaused, resume } = useTimer();
     return (
         <WorkoutTimerPopup
             open={open}
             title={title}
             display={display}
             stop={stop}
+            isPaused={isPaused}
+            pause={pause}
+            resume={resume}
         />
     );
 };
