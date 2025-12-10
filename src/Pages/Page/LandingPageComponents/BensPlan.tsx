@@ -8,6 +8,15 @@ import { useTimer } from "../../../Context/WorkoutTimerContext.tsx";
 
 type ExerciseID = "e1" | "e2" | "e3" | "e4" | "e5" | "e6";
 
+const EXERCISE_COLORS: Record<ExerciseID, string> = {
+    e1: "#ffdddd",
+    e2: "#ddffdd",
+    e3: "#ddddff",
+    e4: "#fff0cc",
+    e5: "#e0ccff",
+    e6: "#ccf0ff",
+};
+
 interface Exercise {
     id: ExerciseID;
     name: string;
@@ -313,13 +322,10 @@ const WorkoutScheduler: React.FC = () => {
                                     }
                                     style={{
                                         padding: 8,
-                                        cursor:
-                                            isToday && !editing
-                                                ? "pointer"
-                                                : "default",
-                                        background: "#eef",
+                                        cursor: isToday && !editing ? "pointer" : "default",
+                                        background: EXERCISE_COLORS[ex],
                                         textAlign: "center",
-                                        border: "1px solid #ccc",
+                                        border: isToday ? "3px solid #333" : "1px solid #ccc",
                                     }}
                                 >
                                     {exerciseNames[ex]}
