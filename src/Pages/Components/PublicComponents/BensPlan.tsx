@@ -228,6 +228,7 @@ const WorkoutScheduler: React.FC = () => {
     const {start} = useTimer();
 
     const [editing, setEditing] = useState<boolean>(false);
+    const [explanation, setExplanation] = useState<boolean>(false);
 
     // Double-click-ish logic
     const lastClickExercise = useRef<ExerciseID | null>(null);
@@ -326,10 +327,27 @@ const WorkoutScheduler: React.FC = () => {
                     </button>
                 </span>
                 <span>
-                    <button onClick={() => setEditing((x) => !x)}>
+                    <button style={{marginRight: 4}} onClick={() => setEditing((x) => !x)}>
                         {editing ? "Done Editing" : "Edit Exercises"}
                     </button>
                 </span>
+                <span>
+                    <button style={{marginRight: 4}} onClick={() => setExplanation((x) => !x)}>
+                        {explanation ? "I Understand!" : "EXPLAIN THIS TO ME"}
+                    </button>
+                </span>
+                {explanation && (
+                    <div style={{padding: 10, marginTop: 10}}>
+                        <div style={{marginBottom: 8}}>
+                            The goal is to do 30 mins of exercise a day, 6 days a week. There are 6 exercises, you will 
+                            do three exercises a day. The longest duration exercise, aim to do 1 long set and 1 short set.
+                            The 10 minute exercise, aim to do for a long set, and the short duration exercise, do 1 short set.
+                            clicking one of today's exercises brings up a timer. Clicking it again before the Get Ready timer
+                            finishes sets the timer for the longer duration.
+                            If you successfully complete a week of long sets for an exercise, consider increasing the weight.
+                        </div>
+                    </div>
+                )}
                 {editing && (
                     <div style={{padding: 10, marginTop: 10}}>
                         {exercises.map((ex) => (
