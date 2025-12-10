@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import {useRef, useState, useCallback, useEffect} from "react";
 import { useWakeLock } from "./useWakeLock";
 
 export function useWorkoutTimer() {
@@ -17,7 +17,12 @@ export function useWorkoutTimer() {
     const prepIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const autoCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const originalDurationRef = useRef<number>(0);
+    const isPausedRef = useRef(false);
 
+    useEffect(() => {
+        isPausedRef.current = isPaused;
+    }, [isPaused]);
+    
     /* ---- AUDIO ---- */
     let audioCtx: AudioContext | null = null;
     function getCtx() {
@@ -42,7 +47,7 @@ export function useWorkoutTimer() {
     /* ---- TICK ---- */
     const tick = useCallback(
         (totalSeconds: number) => {
-            if (isPaused) return;
+            if (isPausedRef.current) return;
 
             const now = Date.now();
             const remainingMs = endTimestampRef.current! - now;
@@ -91,7 +96,7 @@ export function useWorkoutTimer() {
                 tick(totalSeconds)
             );
         },
-        [isPaused]
+        []
     );
 
     /* ---- START ---- */
@@ -144,12 +149,16 @@ export function useWorkoutTimer() {
     /* ---- RESUME ---- */
     const resume = useCallback(() => {
         if (!isPaused) return;
+
         setIsPaused(false);
+
         endTimestampRef.current = Date.now() + pauseRemainingRef.current;
-        const remainingSeconds = Math.ceil(pauseRemainingRef.current / 1000);
-        lastBeepSecondRef.current = remainingSeconds;
+
+        // Reset beep tracker so it doesn’t beep immediately on resume
+        lastBeepSecondRef.current = Math.ceil(pauseRemainingRef.current / 1000);
+
         rafRef.current = requestAnimationFrame(() =>
-            tick(remainingSeconds)
+            tick(originalDurationRef.current)
         );
     }, [isPaused, tick]);
 
