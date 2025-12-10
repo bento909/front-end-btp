@@ -17,7 +17,7 @@ const Panel = styled.div<{ isOpen: boolean }>`
     border: 1px solid #ccc;
     border-radius: 12px;
     width: 100%;
-    max-width: 600px;
+    //max-width: 600px; TRY without max-width
     margin: 12px auto;
     box-sizing: border-box;
     
