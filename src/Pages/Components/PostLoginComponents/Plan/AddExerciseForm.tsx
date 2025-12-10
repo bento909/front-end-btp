@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../graphql/types.ts";
+import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../../graphql/types.ts";
 
 interface AddExerciseFormProps {
     onAddExercise: (

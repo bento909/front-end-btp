@@ -1,15 +1,15 @@
 import React from "react";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
+import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store.tsx";
-import { client } from "../../../graphql/graphqlClient.ts";
-import { createExercise } from "../../../graphql/mutations.ts";
+import { RootState } from "../../../../redux/store.tsx";
+import { client } from "../../../../graphql/graphqlClient.ts";
+import { createExercise } from "../../../../graphql/mutations.ts";
 import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { CreateExerciseMutation } from "../../../graphql/types.ts";
-import { ExerciseTypeEnum, ExerciseTypeMetadata } from "../../../graphql/types.ts"
+import { CreateExerciseMutation } from "../../../../graphql/types.ts";
+import { ExerciseTypeEnum, ExerciseTypeMetadata } from "../../../../graphql/types.ts"
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../redux/store.tsx";
-import { fetchExercisesThunk } from "../../../redux/exercisesSlice.tsx";
+import { AppDispatch } from "../../../../redux/store.tsx";
+import { fetchExercisesThunk } from "../../../../redux/exercisesSlice.tsx";
 
 const CreateExercise: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);

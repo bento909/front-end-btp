@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../../redux/store.tsx";
+import { RootState, AppDispatch } from "../../../../redux/store.tsx";
 import {
     fetchMessagesThunk,
     updateMessageThunk,
     deleteMessageThunk,
-} from "../../../redux/contactMessagesSlice";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
-import { canReadMessages } from "../../../Constants/constants.tsx";
+} from "../../../../redux/contactMessagesSlice.tsx";
+import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
+import { canReadMessages } from "../../../../Constants/constants.tsx";
 
 const ViewMessages: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);

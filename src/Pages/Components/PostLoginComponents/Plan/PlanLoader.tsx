@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PlanCreator from "./PlanCreator.tsx";
 import PlanEditor from "./PlanEditor.tsx";
-import { fetchPlanByClientEmailThunk } from "../../../redux/plansSlice";
-import { AppDispatch, RootState } from "../../../redux/store.tsx";
+import { fetchPlanByClientEmailThunk } from "../../../../redux/plansSlice.tsx";
+import { AppDispatch, RootState } from "../../../../redux/store.tsx";
 
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../redux/store";

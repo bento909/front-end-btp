@@ -1,10 +1,10 @@
 import {useState} from "react";
-import CollapsiblePanel, {Button} from "../../../Styles/CollapsiblePanel.tsx";
+import CollapsiblePanel, {Button} from "../../../../Styles/CollapsiblePanel.tsx";
 import {useDispatch, useSelector} from "react-redux";
-import {RootState, AppDispatch} from "../../../redux/store.tsx";
-import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
-import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../graphql/types.ts";
-import {canCreatePlan} from "../../../Constants/constants.tsx";
+import {RootState, AppDispatch} from "../../../../redux/store.tsx";
+import {fetchExercisesThunk} from "../../../../redux/exercisesSlice.tsx";
+import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../../graphql/types.ts";
+import {canCreatePlan} from "../../../../Constants/constants.tsx";
 
 const ListExercises: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);

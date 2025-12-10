@@ -1,21 +1,21 @@
 import {BrowserRouter as Router, Route, Routes, useNavigate} from 'react-router-dom';
-import PostLoginScreen from './Pages/Page/PostLoginScreen.tsx';
+import PostLoginScreen from './Pages/Components/PostLoginComponents/PostLoginScreen.tsx';
 import Layout from "./Pages/Components/Layout.tsx";
-import LandingPage from "./Pages/Page/LandingPage.tsx"
+import LandingPage from "./Pages/Landing/LandingPage.tsx"
 import {Authenticator} from "@aws-amplify/ui-react";
-import SignUp from "./Pages/Components/CollapsiblePanels/CreateUser.tsx";
-import ViewAllUsers from "./Pages/Components/CollapsiblePanels/ViewUsers.tsx";
-import CreateExercise from "./Pages/Components/CollapsiblePanels/CreateExercise.tsx";
-import ListExercises from "./Pages/Components/CollapsiblePanels/ListExercises.tsx";
-import EditPlans from "./Pages/Components/CollapsiblePanels/EditPlans.tsx"
-import ViewPlan from "./Pages/Components/CollapsiblePanels/ViewPlan.tsx"
+import SignUp from "./Pages/Components/PostLoginComponents/CollapsiblePanels/CreateUser.tsx";
+import ViewAllUsers from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewUsers.tsx";
+import CreateExercise from "./Pages/Components/PostLoginComponents/CollapsiblePanels/CreateExercise.tsx";
+import ListExercises from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ListExercises.tsx";
+import EditPlans from "./Pages/Components/PostLoginComponents/CollapsiblePanels/EditPlans.tsx"
+import ViewPlan from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewPlan.tsx"
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "./redux/store.tsx";
 import {reset} from "./redux/usersSlice.tsx";
 import {updateAuthUser} from "./redux/authSlice.tsx";
 import {Profile} from "./Constants/constants.tsx";
 import {PermissionService} from "./Helpers/PermissionService.tsx";
-import ViewMessages from "./Pages/Components/CollapsiblePanels/ViewMessages.tsx";
+import ViewMessages from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewMessages.tsx";
 import {useTimer, WorkoutTimerProvider} from "./Context/WorkoutTimerContext";
 import {WorkoutTimerPopup} from "./PopupComponents/WorkoutTimerPopup.tsx";
 

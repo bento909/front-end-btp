@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../../redux/store";
-import { fetchPlanByClientEmailThunk } from "../../../redux/plansSlice";
-import { fetchExercisesThunk } from "../../../redux/exercisesSlice";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel";
+import { RootState, AppDispatch } from "../../../../redux/store.tsx";
+import { fetchPlanByClientEmailThunk } from "../../../../redux/plansSlice.tsx";
+import { fetchExercisesThunk } from "../../../../redux/exercisesSlice.tsx";
+import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
 import ExerciseInput from "../Plan/ExerciseInput.tsx";
 // canonical ordered tuple for days of week
 export const DaysOfWeek = [

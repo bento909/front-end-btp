@@ -1,11 +1,11 @@
 import React from "react";
-import {ListPlansQuery} from "../../../graphql/types.ts";
+import {ListPlansQuery} from "../../../../graphql/types.ts";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../../redux/store.tsx";
-import {fetchExercisesThunk} from "../../../redux/exercisesSlice.tsx";
+import {AppDispatch, RootState} from "../../../../redux/store.tsx";
+import {fetchExercisesThunk} from "../../../../redux/exercisesSlice.tsx";
 
 import ExerciseListDraggable from "./PlanExerciseListDraggable.tsx";
-import AddExerciseForm from "./AddExerciseForm";
+import AddExerciseForm from "./AddExerciseForm.tsx";
 
 interface Props {
     day: NonNullable<ListPlansQuery["listPlans"]["items"][0]>["planDays"]["items"][0];

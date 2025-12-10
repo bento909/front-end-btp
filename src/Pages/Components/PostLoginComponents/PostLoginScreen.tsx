@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Profile } from '../../Constants/constants.tsx';
+import { Profile } from '../../../Constants/constants.tsx';
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store.tsx";
+import { RootState } from "../../../redux/store.tsx";
 
 const PostLoginScreen = () => {
     const user = useSelector((state: RootState) => state.auth.user);

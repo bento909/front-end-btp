@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from "react";
-import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
+import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
 import {useSelector, useDispatch} from "react-redux";
-import {AppDispatch, RootState} from "../../../redux/store.tsx";
-import {fetchUsersThunk} from "../../../redux/usersSlice.tsx"; // Adjust path as needed
+import {AppDispatch, RootState} from "../../../../redux/store.tsx";
+import {fetchUsersThunk} from "../../../../redux/usersSlice.tsx"; // Adjust path as needed
 import UserPlanView from "../Plan/UserPlanView.tsx"
-import {canCreatePlan} from "../../../Constants/constants.tsx";
+import {canCreatePlan} from "../../../../Constants/constants.tsx";
 
 const EditPlans: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);

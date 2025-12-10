@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../../redux/store";
+import {AppDispatch} from "../../../../redux/store.tsx";
 import {
     fetchLatestExerciseLogByPlanExerciseIdThunk,
     submitExerciseLogThunk,
     updateExerciseLogThunk
-} from "../../../redux/exerciseLogSlice";
-import TableButton from "../../../Styles/TableButton.tsx";
+} from "../../../../redux/exerciseLogSlice.tsx";
+import TableButton from "../../../../Styles/TableButton.tsx";
 
 interface PlanExercise {
     id: string;
