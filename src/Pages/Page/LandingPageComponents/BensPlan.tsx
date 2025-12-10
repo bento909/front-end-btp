@@ -266,22 +266,6 @@ const WorkoutScheduler: React.FC = () => {
 
     return (
         <div>
-            {editing && (
-                <div style={{padding: 10, marginTop: 10}}>
-                    {exercises.map((ex) => (
-                        <div key={ex.id} style={{marginBottom: 8}}>
-                            <input
-                                value={ex.name}
-                                onChange={(e) =>
-                                    updateExerciseName(ex.id, e.target.value)
-                                }
-                                style={{width: "100%", padding: 6}}
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
-
             <table style={{borderCollapse: "collapse", width: "100%", marginTop: 16}}>
                 <thead>
                 <tr>
@@ -336,7 +320,7 @@ const WorkoutScheduler: React.FC = () => {
             <div>
                 <span>
                     <button
-                        style={{marginTop: 20}}
+                        style={{marginTop: 20, marginRight: 4}}
                         onClick={() => beep(300, 600)}>
                         Test Beep
                     </button>
@@ -346,9 +330,22 @@ const WorkoutScheduler: React.FC = () => {
                         {editing ? "Done Editing" : "Edit Exercises"}
                     </button>
                 </span>
+                {editing && (
+                    <div style={{padding: 10, marginTop: 10}}>
+                        {exercises.map((ex) => (
+                            <div key={ex.id} style={{marginBottom: 8}}>
+                                <input
+                                    value={ex.name}
+                                    onChange={(e) =>
+                                        updateExerciseName(ex.id, e.target.value)
+                                    }
+                                    style={{width: "100%", padding: 6}}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
-
-
         </div>
     );
 };
