@@ -66,6 +66,7 @@ const Wrapper = styled.div<{ open: boolean }>`
     color: white;
     overflow: hidden;
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    padding-top: 20px;
 
     animation: ${({ open }) => (open ? slideDown : slideUp)} 0.35s ease forwards;
     height: ${({ open }) => (open ? "auto" : "0px")};
