@@ -31,7 +31,7 @@ export function runIntervalTimer(timerHook: ReturnType<typeof useTimer>, timerDa
                 }
             }
         });
-        timerHook.start(phase.name, phase.duration, { skipPrep: true });
+        timerHook.start(phase.name, phase.duration, { skipPrep: index !== 0 });
     };
 
     runNextPhase();
