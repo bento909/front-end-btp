@@ -1,12 +1,12 @@
 import React from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
-import {useWorkoutTimer} from "../../../Hooks/useWorkoutTimer.ts";
+import {useTimer} from "../../../Context/WorkoutTimerContext.tsx";
 
 const IntervalTimer: React.FC = () => {
     const togglePanel = () => setIsOpen(prev => !prev);
     const [isOpen, setIsOpen] = React.useState(false);
 
-    const timer = useWorkoutTimer();
+    const timer = useTimer();
 
     const phases = [
         {name: "Phase 1", duration: 10},
@@ -29,7 +29,7 @@ const IntervalTimer: React.FC = () => {
     return (
         <CollapsiblePanel title="Interval Timer" isOpen={isOpen} toggle={togglePanel}>
             <div>
-                <button onClick={runNextPhase}>CLICK ME I AM A SEX BUTTON</button>
+                <button onClick={runNextPhase}>CLICK ME AND I BEEP BUT NO UI APPEARS</button>
             </div>
         </CollapsiblePanel>
     )
