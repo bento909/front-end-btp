@@ -1,22 +1,117 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PostLoginScreen from './MainScreen/PostLoginScreen.tsx';
-import MainMenu from './UserMenus/Admin/MainMenu.tsx';
-import TesterMenu from './UserMenus/Tester/TesterMenu.tsx';
+import {BrowserRouter as Router, Route, Routes, useNavigate} from 'react-router-dom';
+import PostLoginScreen from './Pages/Components/PostLoginComponents/PostLoginScreen.tsx';
+import Layout from "./Pages/Components/Layout.tsx";
+import LandingPage from "./Pages/Landing/LandingPage.tsx"
+import {Authenticator} from "@aws-amplify/ui-react";
+import SignUp from "./Pages/Components/PostLoginComponents/CollapsiblePanels/CreateUser.tsx";
+import ViewAllUsers from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewUsers.tsx";
+import CreateExercise from "./Pages/Components/PostLoginComponents/CollapsiblePanels/CreateExercise.tsx";
+import ListExercises from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ListExercises.tsx";
+import EditPlans from "./Pages/Components/PostLoginComponents/CollapsiblePanels/EditPlans.tsx"
+import ViewPlan from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewPlan.tsx"
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "./redux/store.tsx";
+import {reset} from "./redux/usersSlice.tsx";
+import {updateAuthUser} from "./redux/authSlice.tsx";
+import {Profile} from "./Constants/constants.tsx";
+import {PermissionService} from "./Helpers/PermissionService.tsx";
+import ViewMessages from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewMessages.tsx";
+import {useTimer, WorkoutTimerProvider} from "./Context/WorkoutTimerContext";
+import {WorkoutTimerPopup} from "./PopupComponents/WorkoutTimerPopup.tsx";
 
-import Layout from "./Layout.tsx";
+const WorkoutTimerPopupWrapper = () => {
+    const { open, title, display, stop, pause, isPaused, resume } = useTimer();
+    return (
+        <WorkoutTimerPopup
+            open={open}
+            title={title}
+            display={display}
+            stop={stop}
+            isPaused={isPaused}
+            pause={pause}
+            resume={resume}
+        />
+    );
+};
 
 function AppRoutes() {
     return (
         <Router>
-            <Layout>
+            <WorkoutTimerProvider>
+                <WorkoutTimerPopupWrapper/>
                 <Routes>
-                    <Route path="/" element={<PostLoginScreen />} />
-                    <Route path="/adminMenu" element={<MainMenu />} />
-                    <Route path="/testerMenu" element={<TesterMenu />} />
+                    {/* Public landing page */}
+                    <Route path="/" element={<LandingPage/>}/>
+
+                    {/* Protected routes wrapped in Authenticator */}
+                    <Route
+                        path="/app/*"
+                        element={
+                            <Authenticator hideSignUp={true}>
+                                <Layout>
+                                    <Routes>
+                                        <Route path="home" element={<PostLoginScreen/>}/>
+                                        <Route path="trainingMenu" element={<Menu/>}/>
+                                        <Route path="testerMenu" element={<TesterMenu/>}/>
+                                    </Routes>
+                                </Layout>
+                            </Authenticator>
+                        }
+                    />
                 </Routes>
-            </Layout>
+            </WorkoutTimerProvider>
         </Router>
     );
 }
+
+const Menu = () => {
+    return (
+        <main>
+            <ViewMessages/>
+            <ViewAllUsers/>
+            <SignUp/>
+            <CreateExercise/>
+            <ListExercises/>
+            <EditPlans/>
+            <ViewPlan/>
+        </main>
+    );
+};
+
+
+const TesterMenu = () => {
+    const navigate = useNavigate();
+    const user = useSelector((state: RootState) => state.auth.user);
+    const dispatch = useDispatch<AppDispatch>();
+
+    function handleNameChange(role: string) {
+        const testName = role + ' (test mode)';
+        dispatch(reset());
+        dispatch(updateAuthUser({
+                profile: role as Profile,
+                name: testName,
+                permissions: PermissionService.getPermissions(role as Profile),
+                emailAddress: 'test@test.test',
+                creator: user ? user.emailAddress : 'Something odd has happened!'
+            })
+        );
+        navigate("/");
+    }
+
+    return (
+        <main>
+            <h1>Hello, this is the page for you, the tester</h1>
+            <h2>When you click one of the below roles you will magically take on their powers</h2>
+            <ul>
+                {Object.values(Profile).map((role) => (
+                    <li key={role as string} onClick={() => handleNameChange(role)}>
+                        {role as string}
+                    </li>
+                ))}
+            </ul>
+        </main>
+    );
+};
+
 
 export default AppRoutes;

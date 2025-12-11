@@ -1,4 +1,4 @@
-import { Config } from "../Constants/constants.ts";
+import { Config } from "../Constants/constants.tsx";
 
 // Cognito Config
 const clientId = Config.COGNITO_CLIENT;
