@@ -287,7 +287,7 @@ const WorkoutScheduler: React.FC = () => {
                 </tbody>
             </table>
 
-            <div>
+            <div style={{marginTop: 20}}>
                 <span>
                     <button style={{marginRight: 4}} onClick={() => setEditing((x) => !x)}>
                         {editing ? "Done Editing" : "Edit Exercises"}
