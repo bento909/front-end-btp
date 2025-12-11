@@ -1,5 +1,5 @@
-import {useRef, useState, useCallback, useEffect} from "react";
-import { useWakeLock } from "./useWakeLock";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {useWakeLock} from "./useWakeLock";
 
 export function useWorkoutTimer() {
     const [display, setDisplay] = useState("00:00");
@@ -27,9 +27,10 @@ export function useWorkoutTimer() {
     useEffect(() => {
         isPausedRef.current = isPaused;
     }, [isPaused]);
-    
+
     /* ---- AUDIO ---- */
     let audioCtx: AudioContext | null = null;
+
     function getCtx() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext ||
@@ -37,6 +38,7 @@ export function useWorkoutTimer() {
         }
         return audioCtx;
     }
+
     function beep(duration = 200, freq = 600, volume = 1) {
         const ctx = getCtx();
         const osc = ctx.createOscillator();
@@ -112,27 +114,40 @@ export function useWorkoutTimer() {
         },
         []
     );
-    
+
     /* ---- START ---- */
-    const start = useCallback((exerciseName: string, durationSeconds: number, skipPrep = false) => {
+    const start = (
+        exerciseName: string,
+        durationSeconds: number,
+        options?: { skipPrep?: boolean; isFinal?: boolean }
+    ) => {
         setTitle(`${exerciseName} - ${getMinSecsString(durationSeconds)}`);
         setOpen(true);
         setIsRunning(true);
         setIsPaused(false);
-        
+
         originalDurationRef.current = durationSeconds;
         lastBeepSecondRef.current = Infinity;
 
         // clear stale timeouts
         if (autoCloseTimeoutRef.current) clearTimeout(autoCloseTimeoutRef.current);
 
-        if (skipPrep) {
+        if (options?.isFinal) {
+            const previous = onCompleteRef.current;   // save before overwrite
+            setOnComplete(() => {
+                playFinalBeep();
+                if (previous) previous();
+            });
+        }
+        
+        if (options?.skipPrep) {
             endTimestampRef.current = Date.now() + durationSeconds * 1000;
             rafRef.current = requestAnimationFrame(() =>
                 tick(durationSeconds)
             );
             return;
         }
+
         // 7s prep
         let prep = 7;
         setDisplay(`Get Ready: ${prep}`);
@@ -154,7 +169,13 @@ export function useWorkoutTimer() {
                 );
             }
         }, 1000);
-    }, [tick]);
+    };
+
+    function playFinalBeep() {
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => beep(200, 700), i * 300);
+        }
+    }
 
     /* ---- PAUSE ---- */
     const pause = useCallback(() => {

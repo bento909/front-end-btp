@@ -22,8 +22,16 @@ const IntervalTimer: React.FC = () => {
         if (index >= phases.length) return;
 
         const phase = phases[index++];
-        timer.setOnComplete(runNextPhase);
-        timer.start(phase.name, phase.duration, true);
+        const isLast = index === phases.length - 1;
+
+        timer.setOnComplete(() => {
+            index++;
+            runNextPhase();
+        });
+        timer.start(phase.name, phase.duration, {
+            skipPrep: true,
+            isFinal: isLast
+        });
     }
 
     return (
