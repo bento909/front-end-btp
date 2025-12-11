@@ -69,36 +69,6 @@ function saveExercises(list: Exercise[]) {
 }
 
 /* ------------------------------------------
-   AUDIO
-------------------------------------------- */
-
-let audioCtx: AudioContext | null = null;
-
-function getAudioCtx(): AudioContext {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext ||
-            (window as any).webkitAudioContext)();
-    }
-    return audioCtx;
-}
-
-function beep(duration = 200, frequency = 600, volume = 1) {
-    const ctx = getAudioCtx();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.value = frequency;
-    gain.gain.value = volume;
-
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + duration / 1000);
-}
-
-/* ------------------------------------------
    WEEK GENERATION
 ------------------------------------------- */
 
@@ -135,7 +105,6 @@ function makeWeek(exerciseIDs: ExerciseID[]): WeekData {
             e6: false,
         };
 
-        // A (15 minutes)
         let allowedA = exerciseIDs.filter(
             (e) => !usedToday[e] && !usedWeek.A[e]
         );
@@ -250,7 +219,7 @@ const WorkoutScheduler: React.FC = () => {
         lastClickExercise.current = exID;
         lastClickTime.current = now;
 
-        const duration = toggleState.current ? 600 : 300; // 10 mins or 5 mins
+        const duration = toggleState.current ? 600 : 300; // 10 mins or 5 mins --//TODO make this configurable
         start(exerciseNames[exID], duration);
     };
 
@@ -320,20 +289,13 @@ const WorkoutScheduler: React.FC = () => {
 
             <div>
                 <span>
-                    <button
-                        style={{marginTop: 20, marginRight: 4}}
-                        onClick={() => beep(300, 600)}>
-                        Test Beep
-                    </button>
-                </span>
-                <span>
                     <button style={{marginRight: 4}} onClick={() => setEditing((x) => !x)}>
                         {editing ? "Done Editing" : "Edit Exercises"}
                     </button>
                 </span>
                 <span>
                     <button style={{marginRight: 4}} onClick={() => setExplanation((x) => !x)}>
-                        {explanation ? "I Understand!" : "EXPLAIN THIS TO ME"}
+                        {explanation ? "I Understand!" : "Explanation"}
                     </button>
                 </span>
                 {explanation && (
@@ -341,7 +303,7 @@ const WorkoutScheduler: React.FC = () => {
                         <div style={{marginBottom: 8}}>
                             The goal is to do 30 mins of exercise a day, 6 days a week. There are 6 exercises, you will 
                             do three exercises a day. The longest duration exercise, aim to do 1 long set and 1 short set.
-                            The 10 minute exercise, aim to do for a long set, and the short duration exercise, do 1 short set.
+                            The middle duration exercise, aim to do a long set, and the short duration exercise, do 1 short set.
                             clicking one of today's exercises brings up a timer. Clicking it again before the Get Ready timer
                             finishes sets the timer for the longer duration.
                             If you successfully complete a week of long sets for an exercise, consider increasing the weight.
