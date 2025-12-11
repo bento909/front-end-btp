@@ -9,8 +9,13 @@ const PersonalTraining: React.FC = () => {
     
     return (
         <CollapsiblePanel title="Personal Training" isOpen={isOpen} toggle={togglePanel}>
-            <div>
+            <div style={{fontStyle: "bold"}}>
                 Your Personal Training Programme
+            </div>
+            <div>
+                If you would like a personal training programme created for you,
+                or if you are a trainer and would like an app to help you deliver your programmes to your clients,
+                please get in touch with Ben using the Contact Form.
             </div>
             <button onClick={() => navigate("/app/home")}>
                 Enter
