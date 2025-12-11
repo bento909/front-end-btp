@@ -17,27 +17,36 @@ const IntervalTimer: React.FC = () => {
     ];
 
     let index = 0;
-
+    
     function runNextPhase() {
         if (index >= phases.length) return;
 
-        const phase = phases[index++];
+        const phase = phases[index];
         const isLast = index === phases.length - 1;
 
+        // Attach callback that handles next phase + final beep
         timer.setOnComplete(() => {
-            index++;
-            runNextPhase();
+            if (!isLast) {
+                index++;
+                runNextPhase();
+            } else {
+                playBeep(8); // only play at the end
+            }
         });
-        timer.start(phase.name, phase.duration, {
-            skipPrep: true,
-            isFinal: isLast
-        });
+
+        timer.start(phase.name, phase.duration, { skipPrep: index !== 0 });
+    }
+
+    function playBeep(numberOfBeeps: number) {
+        for (let i = 0; i < numberOfBeeps; i++) {
+            setTimeout(() => timer.beep(200, 700), i * 300);
+        }
     }
 
     return (
         <CollapsiblePanel title="Interval Timer" isOpen={isOpen} toggle={togglePanel}>
             <div>
-                <button onClick={runNextPhase}>CLICK ME AND I BEEP BUT NO UI APPEARS</button>
+                <button onClick={runNextPhase}>hardcoded test timer</button>
             </div>
         </CollapsiblePanel>
     )

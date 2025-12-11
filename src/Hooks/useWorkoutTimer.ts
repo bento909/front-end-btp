@@ -228,5 +228,6 @@ export function useWorkoutTimer() {
         resume,
         stop,
         setOnComplete,
+        beep,
     };
 }
