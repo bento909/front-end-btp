@@ -112,9 +112,9 @@ export function useWorkoutTimer() {
         },
         []
     );
-
+    
     /* ---- START ---- */
-    const start = useCallback((exerciseName: string, durationSeconds: number) => {
+    const start = useCallback((exerciseName: string, durationSeconds: number, skipPrep = false) => {
         setTitle(`${exerciseName} - ${getMinSecsString(durationSeconds)}`);
         setOpen(true);
         setIsRunning(true);
@@ -126,6 +126,13 @@ export function useWorkoutTimer() {
         // clear stale timeouts
         if (autoCloseTimeoutRef.current) clearTimeout(autoCloseTimeoutRef.current);
 
+        if (skipPrep) {
+            endTimestampRef.current = Date.now() + durationSeconds * 1000;
+            rafRef.current = requestAnimationFrame(() =>
+                tick(durationSeconds)
+            );
+            return;
+        }
         // 7s prep
         let prep = 7;
         setDisplay(`Get Ready: ${prep}`);

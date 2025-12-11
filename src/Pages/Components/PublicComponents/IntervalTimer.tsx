@@ -23,7 +23,7 @@ const IntervalTimer: React.FC = () => {
 
         const phase = phases[index++];
         timer.setOnComplete(runNextPhase);
-        timer.start(phase.name, phase.duration);
+        timer.start(phase.name, phase.duration, true);
     }
 
     return (
