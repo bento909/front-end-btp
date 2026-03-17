@@ -51,7 +51,7 @@ const MyMusic: React.FC = () => {
                 style={{
                     border: 0,
                     width: "100%",
-                    height: album.height || "120px",
+                    height: album.height || "42px",
                     marginBottom: "0.5rem",
                 }}
                 loading="lazy"
