@@ -19,9 +19,9 @@ const MyMusic: React.FC<MusicLinksProps> = ({
 
                                                 soundcloudEmbeds = [
                                                     {
-                                                        url: "https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/benjamin-thomas-162154641&color=%231DA1F2",
-                                                        title: "SoundCloud Player",
-                                                        height: "120px",
+                                                        url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1997731411&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true",
+                                                        title: "A Lullaby For Remy",
+                                                        height: "166px",
                                                     },
                                                 ],
 
