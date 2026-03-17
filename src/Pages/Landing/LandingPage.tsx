@@ -3,6 +3,7 @@ import Bio from "../Components/PublicComponents/Bio.tsx";
 import ContactForm from "../Components/PublicComponents/ContactForm.tsx"
 import BensPlan from "../Components/PublicComponents/BensPlan.tsx"
 import IntervalTimerPanel from "../Components/PublicComponents/IntervalTimerPanel.tsx";
+import MIDITracker from "../Components/PublicComponents/MIDITracker.tsx";
 
 export default function LandingPage() {
     return (
@@ -12,6 +13,7 @@ export default function LandingPage() {
             <BensPlan/>
             <Bio />
             <ContactForm />
+            <MIDITracker />
         </div>
     );
 }
