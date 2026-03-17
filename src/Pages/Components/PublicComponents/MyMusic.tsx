@@ -18,18 +18,20 @@ interface BandcampAlbum {
     height?: string;
 }
 
+// SoundCloud embed helper (unchanged)
 const buildSoundcloudEmbedUrl = (trackId: string) =>
     `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${trackId}` +
     `&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
 
-const buildBandcampEmbedUrl = (albumId: string, size: "small" | "large" = "small") =>
-    `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=${size}/bgcol=ffffff/linkcol=0687f5/transparent=true/`;
+// Bandcamp embed helper updated to new style
+const buildBandcampEmbedUrl = (albumId: string) =>
+    `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/`;
 
 const MyMusic: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const togglePanel = () => setIsOpen((prev) => !prev);
 
-    // Render embeds
+    // Render SoundCloud embeds
     const renderSoundcloudEmbeds = (tracks: SoundcloudTrack[]) =>
         tracks.map((track, index) => (
             <iframe
@@ -42,19 +44,21 @@ const MyMusic: React.FC = () => {
             />
         ));
 
+    // Render Bandcamp embeds
     const renderBandcampEmbeds = (albums: BandcampAlbum[]) =>
         albums.map((album, index) => (
             <iframe
                 key={index}
                 title={album.title}
-                src={buildBandcampEmbedUrl(album.albumId)} // always uses "small"
+                src={buildBandcampEmbedUrl(album.albumId)}
                 style={{
                     border: 0,
                     width: "100%",
-                    height: album.height || "42px",
+                    height: album.height || "120px", // match your example
                     marginBottom: "0.5rem",
                 }}
                 loading="lazy"
+                seamless
             />
         ));
 
