@@ -16,13 +16,22 @@ interface MusicLinksProps {
 
 const MyMusic: React.FC<MusicLinksProps> = ({
                                                 soundcloudUrl = "https://soundcloud.com/benjamin-thomas-162154641",
-
+    
+    
                                                 soundcloudEmbeds = [
                                                     {
                                                         url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1997731411&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true",
                                                         title: "A Lullaby For Remy",
                                                         height: "166px",
                                                     },
+                                                    {
+                                                        url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1652587413&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true",
+                                                        title: "Electro Mix - 30 October 2023",
+                                                        height: "166px",
+                                                    },
+                                                    
+                                                    
+                                                    
                                                 ],
 
                                                 bandcampEmbeds = [
