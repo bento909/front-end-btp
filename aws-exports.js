@@ -17,4 +17,8 @@ export default config;
  * If you need to change out the API key, which you will when it expires, go to 
  * https://eu-north-1.console.aws.amazon.com/appsync/home?region=eu-north-1#/2aya4vv425b73nv4x772orefry/v1/home
  * Download Config and replace the apikey above and replace API key with what you downloaded
+ * 
+ * You may also need to refresh the Cloudformation stacks:
+ * https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks?filteringText=&filteringStatus=active&viewNested=true&stackId=arn%3Aaws%3Acloudformation%3Aeu-north-1%3A277707117874%3Astack%2Famplify-d276q2mvykjvwc-main-branch-8773432c-amplifyDataConnectionStackNestedStackConne-1UTUAV0HZ16DD%2F0da85d80-224d-11f1-801b-0ea05cdd1147
+ * 
  */

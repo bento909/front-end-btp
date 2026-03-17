@@ -68,20 +68,18 @@ const MyMusic: React.FC = () => {
 
                 {/* SoundCloud Section */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <label style={{ fontWeight: "bold" }}>SoundCloud:</label>
-                    {renderSoundcloudEmbeds(soundcloudTracksData)}
                     <a href="https://soundcloud.com/benjamin-thomas-162154641" target="_blank" rel="noopener noreferrer" style={{ color: "#1DA1F2" }}>
                         Visit SoundCloud
                     </a>
+                    {renderSoundcloudEmbeds(soundcloudTracksData)}
                 </div>
 
                 {/* Bandcamp Section */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <label style={{ fontWeight: "bold" }}>Bandcamp:</label>
-                    {renderBandcampEmbeds(bandcampAlbumsData)}
                     <a href="https://lessismoreton.bandcamp.com/" target="_blank" rel="noopener noreferrer" style={{ color: "#009CFF" }}>
                         Visit Bandcamp
                     </a>
+                    {renderBandcampEmbeds(bandcampAlbumsData)}
                 </div>
             </div>
         </CollapsiblePanel>
