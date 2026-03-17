@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
 
 interface MIDITrackerProps {
@@ -92,22 +92,22 @@ const MIDITracker: React.FC<MIDITrackerProps> = ({
 
     return (
         <CollapsiblePanel title="MIDI Clock Tracker" isOpen={isOpen} toggle={togglePanel}>
-    <div style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
-    <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-    <label style={{ width: "120px", fontWeight: "bold" }}>Current Bar:</label>
-    <span>{currentBar}</span>
-    </div>
-    <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-    <label style={{ width: "120px", fontWeight: "bold" }}>Current Beat:</label>
-    <span>{currentBeat} / {beatsPerBar}</span>
-    </div>
-    <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-    <label style={{ width: "120px", fontWeight: "bold" }}>Clock Tick:</label>
-    <span>{clockCounter} / {CLOCKS_PER_BEAT}</span>
-    </div>
-    </div>
-    </CollapsiblePanel>
-);
+            <div style={{display: "flex", flexDirection: "column", gap: "1rem", width: "100%"}}>
+                <div style={{display: "flex", gap: "1rem", alignItems: "center"}}>
+                    <label style={{width: "120px", fontWeight: "bold"}}>Current Bar:</label>
+                    <span>{currentBar}</span>
+                </div>
+                <div style={{display: "flex", gap: "1rem", alignItems: "center"}}>
+                    <label style={{width: "120px", fontWeight: "bold"}}>Current Beat:</label>
+                    <span>{currentBeat} / {beatsPerBar}</span>
+                </div>
+                <div style={{display: "flex", gap: "1rem", alignItems: "center"}}>
+                    <label style={{width: "120px", fontWeight: "bold"}}>Clock Tick:</label>
+                    <span>{clockCounter} / {CLOCKS_PER_BEAT}</span>
+                </div>
+            </div>
+        </CollapsiblePanel>
+    );
 };
 
 export default MIDITracker;
