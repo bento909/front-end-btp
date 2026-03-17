@@ -31,6 +31,11 @@ const MyMusic: React.FC<MusicLinksProps> = ({
                                                         title: "Diesel Hyperspace",
                                                         height: "42px",
                                                     },
+                                                    {
+                                                        url: "https://bandcamp.com/EmbeddedPlayer/album=3601145018/size=large/bgcol=ffffff/linkcol=0687f5/transparent=true/",
+                                                        title: "EP1 by Benjamin Thomas",
+                                                        height: "42px",
+                                                    },
                                                 ],
                                             }) => {
     const [isOpen, setIsOpen] = useState(false);
