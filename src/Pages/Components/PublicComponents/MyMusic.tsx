@@ -2,67 +2,73 @@
 import React, { useState } from "react";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
 
-interface EmbedItem {
-    url: string;
+interface SoundcloudTrack {
     title: string;
-    height?: string;
+    trackId: string;
+    height?: string; // optional override
+}
+
+interface BandcampAlbum {
+    title: string;
+    albumId: string;
+    size?: "small" | "large"; // defaults to small
+    height?: string; // optional override
 }
 
 interface MusicLinksProps {
     soundcloudUrl?: string; // fallback link
-    soundcloudEmbeds?: EmbedItem[];
-    bandcampEmbeds?: EmbedItem[];
+    soundcloudTracks?: SoundcloudTrack[];
+    bandcampUrl?: string; // fallback link
+    bandcampAlbums?: BandcampAlbum[];
 }
+
+// Helper to build SoundCloud embed URL
+const buildSoundcloudEmbedUrl = (trackId: string) =>
+    `https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${trackId}` +
+    `&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`;
+
+// Helper to build Bandcamp embed URL
+const buildBandcampEmbedUrl = (albumId: string, size: "small" | "large" = "small") =>
+    `https://bandcamp.com/EmbeddedPlayer/album=${albumId}/size=${size}/bgcol=ffffff/linkcol=0687f5/transparent=true/`;
 
 const MyMusic: React.FC<MusicLinksProps> = ({
                                                 soundcloudUrl = "https://soundcloud.com/benjamin-thomas-162154641",
-    
-    
-                                                soundcloudEmbeds = [
-                                                    {
-                                                        url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/1997731411&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true",
-                                                        title: "A Lullaby For Remy",
-                                                        height: "166px",
-                                                    },
-                                                    {
-                                                        url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1652587413&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true",
-                                                        title: "Electro Mix - 30 October 2023",
-                                                        height: "166px",
-                                                    },
-                                                    
-                                                    
-                                                    
+                                                soundcloudTracks = [
+                                                    { title: "A Lullaby For Remy", trackId: "1997731411" },
+                                                    { title: "Electro Mix - 30 October 2023", trackId: "1652587413" },
                                                 ],
 
-                                                bandcampEmbeds = [
-                                                    {
-                                                        url: "https://bandcamp.com/EmbeddedPlayer/album=4100750596/size=small/bgcol=ffffff/linkcol=0687f5/transparent=true/",
-                                                        title: "Diesel Hyperspace",
-                                                        height: "42px",
-                                                    },
-                                                    {
-                                                        url: "https://bandcamp.com/EmbeddedPlayer/album=3601145018/size=large/bgcol=ffffff/linkcol=0687f5/transparent=true/",
-                                                        title: "EP1 by Benjamin Thomas",
-                                                        height: "42px",
-                                                    },
+                                                bandcampUrl = "https://lessismoreton.bandcamp.com/",
+                                                bandcampAlbums = [
+                                                    { title: "Diesel Hyperspace", albumId: "4100750596", size: "small" },
+                                                    { title: "EP1 by Benjamin Thomas", albumId: "3601145018", size: "large" },
                                                 ],
                                             }) => {
     const [isOpen, setIsOpen] = useState(false);
     const togglePanel = () => setIsOpen((prev) => !prev);
 
-    const renderEmbeds = (embeds: EmbedItem[]) =>
-        embeds.map((embed, index) => (
+    // Render SoundCloud embeds
+    const renderSoundcloudEmbeds = (tracks: SoundcloudTrack[]) =>
+        tracks.map((track, index) => (
             <iframe
                 key={index}
-                title={embed.title}
-                src={embed.url}
-                style={{
-                    border: 0,
-                    width: "100%",
-                    height: embed.height || "100px",
-                }}
+                title={track.title}
+                src={buildSoundcloudEmbedUrl(track.trackId)}
+                style={{ border: 0, width: "100%", height: track.height || "120px", marginBottom: "0.5rem" }}
                 loading="lazy"
                 allow="autoplay"
+            />
+        ));
+
+    // Render Bandcamp embeds
+    const renderBandcampEmbeds = (albums: BandcampAlbum[]) =>
+        albums.map((album, index) => (
+            <iframe
+                key={index}
+                title={album.title}
+                src={buildBandcampEmbedUrl(album.albumId, album.size || "small")}
+                style={{ border: 0, width: "100%", height: album.height || (album.size === "large" ? "120px" : "42px"), marginBottom: "0.5rem" }}
+                loading="lazy"
             />
         ));
 
@@ -73,10 +79,7 @@ const MyMusic: React.FC<MusicLinksProps> = ({
                 {/* SoundCloud Section */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     <label style={{ fontWeight: "bold" }}>SoundCloud:</label>
-
-                    {renderEmbeds(soundcloudEmbeds)}
-
-                    {/* fallback link */}
+                    {renderSoundcloudEmbeds(soundcloudTracks)}
                     <a href={soundcloudUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#1DA1F2" }}>
                         Visit SoundCloud
                     </a>
@@ -85,8 +88,10 @@ const MyMusic: React.FC<MusicLinksProps> = ({
                 {/* Bandcamp Section */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                     <label style={{ fontWeight: "bold" }}>Bandcamp:</label>
-
-                    {renderEmbeds(bandcampEmbeds)}
+                    {renderBandcampEmbeds(bandcampAlbums)}
+                    <a href={bandcampUrl} target="_blank" rel="noopener noreferrer" style={{ color: "#009CFF" }}>
+                        Visit Bandcamp
+                    </a>
                 </div>
             </div>
         </CollapsiblePanel>
