@@ -48,6 +48,7 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
                 trainerEmail: user.emailAddress,
                 clientEmail: userEmail,
                 organizationId: user.organizationId,
+                staffGroup: `${user.organizationId}-staff`,
             };
 
             const planRes = (await client.graphql({
@@ -70,11 +71,13 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
                     dayOfWeek,
                     dayNumber: i + 1,
                     organizationId: user.organizationId,
+                    staffGroup: `${user.organizationId}-staff`,
                 }))
                 : Array.from({ length: customDays }, (_, i) => ({
                     planId: newPlan.id,
                     dayNumber: i + 1,
                     organizationId: user.organizationId,
+                    staffGroup: `${user.organizationId}-staff`,
                 }));
 
             const dayResults = await Promise.allSettled(

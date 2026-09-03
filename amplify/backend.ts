@@ -24,6 +24,10 @@ const cognitoAdminPolicy = new iam.PolicyStatement({
     'cognito-idp:AdminAddUserToGroup',
     'cognito-idp:ListUsersInGroup',
     'cognito-idp:AdminGetUser',
+    // BTP-11: createOrgUser creates the per-org "-staff" group on first use
+    // (idempotently — CreateGroup on an existing group just errors, caught
+    // and ignored in the handler rather than checked for first via GetGroup).
+    'cognito-idp:CreateGroup',
   ],
   resources: [userPool.userPoolArn],
 });

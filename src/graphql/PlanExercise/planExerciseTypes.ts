@@ -35,6 +35,7 @@ export interface CreatePlanExerciseInput {
     suggestedWeight?: number;
     suggestedSets?: number;
     organizationId: string;
+    staffGroup: string;
 }
 
 export interface CreateExerciseLogInput {

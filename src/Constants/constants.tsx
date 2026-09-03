@@ -10,9 +10,7 @@ export interface User {
 
 export enum Profile {
     ADMIN = 'admin',
-    TESTER = 'tester',
     TRAINER = 'trainer',
-    TRAINER_USER = 'trainer_user',
     BASIC_USER = 'basic_user'
 }
 

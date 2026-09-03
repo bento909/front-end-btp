@@ -4,16 +4,9 @@ export class PermissionService {
     public static getPermissions(userType: Profile): Permissions {
         const permissionsMap: Record<Profile, Permissions> = {
             [Profile.ADMIN]: {
-                createUsers: [Profile.ADMIN, Profile.TESTER, Profile.TRAINER, Profile.TRAINER_USER, Profile.BASIC_USER],
+                createUsers: [Profile.ADMIN, Profile.TRAINER, Profile.BASIC_USER],
                 viewUsers: ViewUsers.ALL,
                 createPlan: CreatePlan.MY_OWN,
-                createExercise: false,
-                viewMyPlan: false,
-            },
-            [Profile.TESTER]: {
-                createUsers: [],
-                viewUsers: ViewUsers.NONE,
-                createPlan: CreatePlan.NONE,
                 createExercise: false,
                 viewMyPlan: false,
             },
@@ -23,13 +16,6 @@ export class PermissionService {
                 createPlan: CreatePlan.MY_USERS,
                 createExercise: true,
                 viewMyPlan: false,
-            },
-            [Profile.TRAINER_USER]: {
-                createUsers: [],
-                viewUsers: ViewUsers.NONE,
-                createPlan: CreatePlan.MY_OWN,
-                createExercise: true,
-                viewMyPlan: true,
             },
             [Profile.BASIC_USER]: {
                 createUsers: [],

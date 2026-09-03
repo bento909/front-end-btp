@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Profile } from '../../../Constants/constants.tsx';
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store.tsx";
 
@@ -11,11 +10,7 @@ const PostLoginScreen = () => {
 
     useEffect(() => {
         if (!loading && user) {
-            if (user.profile === Profile.TESTER) {
-                navigate('/app/testerMenu'); //this is a bit wank
-            } else {
-                navigate('/app/trainingMenu');
-            }
+            navigate('/app/trainingMenu');
         }
     }, [loading, user, navigate]);
 

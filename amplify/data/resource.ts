@@ -8,6 +8,16 @@ import {listOrgUsers} from "../functions/listOrgUsers/resource";
 // `allow.groupDefinedIn('organizationId')` means only members of that exact
 // group can read/write the record — this is the real, server-enforced
 // tenant boundary, not client-side UI gating.
+//
+// Role enforcement within an org (BTP-11): admin/trainer accounts are ALSO
+// added to a second, per-org "staff" Cognito Group (`${organizationId}-staff`,
+// created on first use by createOrgUser) — basic_user accounts are not.
+// `Plan`/`PlanDay`/`PlanExercise`/`Exercise` therefore carry a `staffGroup`
+// field (always `${organizationId}-staff`, set at creation) with two
+// authorization rules: any org member can read, but only staff-group members
+// get the (default, unrestricted) create/update/delete grant. Without this,
+// any authenticated org member — including a basic_user/client — could
+// write or delete any other member's plans/exercises.
 
 const schema = a.schema({
     // === ORGANIZATIONS (tenants) ===
@@ -47,9 +57,13 @@ const schema = a.schema({
             trainerEmail: a.string().required(),
             clientEmail: a.string().required(),
             organizationId: a.string().required(),
+            staffGroup: a.string().required(),
             planDays: a.hasMany("PlanDay", "planId"),
         })
-        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
+        .authorization((allow) => [
+            allow.groupDefinedIn("organizationId").to(["read"]),
+            allow.groupDefinedIn("staffGroup"),
+        ]),
 
     // === EXERCISE POOL (private per-organization) ===
     Exercise: a
@@ -60,9 +74,13 @@ const schema = a.schema({
             tips: a.string(),
             notes: a.string(),
             organizationId: a.string().required(),
+            staffGroup: a.string().required(),
             planExercises: a.hasMany("PlanExercise", "exerciseId"),
         })
-        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
+        .authorization((allow) => [
+            allow.groupDefinedIn("organizationId").to(["read"]),
+            allow.groupDefinedIn("staffGroup"),
+        ]),
 
     // === PLAN ↔ EXERCISE JOIN ===
     PlanExercise: a
@@ -76,11 +94,15 @@ const schema = a.schema({
             suggestedWeight: a.float(),
             suggestedSets: a.integer(),
             organizationId: a.string().required(),
+            staffGroup: a.string().required(),
             logs: a.hasMany("ExerciseLog", "planExerciseId"),
             exercise: a.belongsTo("Exercise", "exerciseId"),
             planDay: a.belongsTo("PlanDay", "planDayId"),
         })
-        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
+        .authorization((allow) => [
+            allow.groupDefinedIn("organizationId").to(["read"]),
+            allow.groupDefinedIn("staffGroup"),
+        ]),
 
     // === PLAN ↔ DAY JOIN ===
     PlanDay: a
@@ -91,11 +113,20 @@ const schema = a.schema({
             plan: a.belongsTo("Plan", "planId"),
             dayNumber: a.integer(),
             organizationId: a.string().required(),
+            staffGroup: a.string().required(),
             planExercises: a.hasMany("PlanExercise", "planDayId"),
         })
-        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
+        .authorization((allow) => [
+            allow.groupDefinedIn("organizationId").to(["read"]),
+            allow.groupDefinedIn("staffGroup"),
+        ]),
 
     // === USER LOGS FOR COMPLETED WORKOUTS ===
+    // Deliberately NOT staff-restricted like the models above (BTP-11) —
+    // clients need to create/update their OWN logs, which is an ownership
+    // concern, not a role concern. Left on org-wide read/write for now;
+    // scoping writes to the log's own client needs an owner field, tracked
+    // as its own follow-up rather than folded in here.
     ExerciseLog: a
         .model({
             id: a.id(),

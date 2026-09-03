@@ -21,7 +21,10 @@ export const handler: Schema['listOrgUsers']['functionHandler'] = async (event) 
   // org id directly (group name === organizationId by design), no lookup
   // required.
   const identity = event.identity as { groups?: string[] } | undefined;
-  const callerOrgId = identity?.groups?.[0];
+  // Staff members belong to TWO groups (their org + "<org>-staff", see
+  // BTP-11 in amplify/data/resource.ts) — find the one that isn't the staff
+  // group rather than relying on cognito:groups token ordering.
+  const callerOrgId = identity?.groups?.find((g) => !g.endsWith('-staff'));
 
   if (!callerOrgId) {
     throw new Error('Caller is not a member of any organization');

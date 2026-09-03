@@ -8,6 +8,7 @@ export interface CreatePlanDayInput {
     dayOfWeek?: DayOfWeek;    // optional—only for WEEK plans
     dayNumber?: number;       // optional—only for CUSTOM plans
     organizationId: string;
+    staffGroup: string;
 }
 
 export interface DeletePlanDayInput {

@@ -266,6 +266,7 @@ export interface CreatePlanInput {
     trainerEmail: string;
     clientEmail: string;
     organizationId: string;
+    staffGroup: string;
 }
 
 // --- MUTATION RESPONSE TYPES ---

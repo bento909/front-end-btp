@@ -26,7 +26,7 @@ const CreateExercise: React.FC = () => {
         setMessage(null);
 
         if (!user) return;
-        const input = { name, type, tips, notes, organizationId: user.organizationId };
+        const input = { name, type, tips, notes, organizationId: user.organizationId, staffGroup: `${user.organizationId}-staff` };
 
         try {
             const response = await dataClient.models.Exercise.create(input);

@@ -168,6 +168,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             suggestedWeight,
             suggestedSets,
             organizationId: plan.organizationId,
+            staffGroup: `${plan.organizationId}-staff`,
         };
         try {
             const result = await client.graphql({

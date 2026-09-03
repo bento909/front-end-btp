@@ -3,6 +3,8 @@ import {
   AdminCreateUserCommand,
   AdminGetUserCommand,
   CognitoIdentityProviderClient,
+  CreateGroupCommand,
+  GroupExistsException,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { randomBytes } from 'node:crypto';
 import type { Schema } from '../../data/resource';
@@ -20,12 +22,19 @@ function attr(
 // Mirrors src/Helpers/PermissionService.tsx's createUsers lists — kept in
 // sync manually since this runs server-side and can't import frontend code.
 const ROLE_HIERARCHY: Record<string, string[]> = {
-  admin: ['admin', 'tester', 'trainer', 'trainer_user', 'basic_user'],
+  admin: ['admin', 'trainer', 'basic_user'],
   trainer: ['basic_user'],
-  trainer_user: [],
   basic_user: [],
-  tester: [],
 };
+
+// Roles that also get added to the org's "-staff" group (BTP-11) — the
+// group that Plan/PlanDay/PlanExercise/Exercise's write authorization is
+// scoped to. Keep in sync with the roles that should have write access.
+const STAFF_ROLES = new Set(['admin', 'trainer']);
+
+function staffGroupName(orgId: string): string {
+  return `${orgId}-staff`;
+}
 
 function generateTemporaryPassword(): string {
   // Random per-user password instead of the old hardcoded "Pa55w0rd!"
@@ -45,7 +54,11 @@ export const handler: Schema['createOrgUser']['functionHandler'] = async (event)
   // pool's actual canonical username in this config, confirmed against the
   // real token — NOT the email string used at account creation).
   const identity = event.identity as { groups?: string[]; sub?: string } | undefined;
-  const callerOrgId = identity?.groups?.[0];
+  // Staff members belong to TWO groups (their org + "<org>-staff"), and
+  // cognito:groups order in the token isn't something to rely on
+  // positionally — find the one that isn't the staff group, rather than
+  // blindly taking groups[0].
+  const callerOrgId = identity?.groups?.find((g) => !g.endsWith('-staff'));
   const callerSub = identity?.sub;
 
   if (!callerOrgId || !callerSub) {
@@ -103,6 +116,28 @@ export const handler: Schema['createOrgUser']['functionHandler'] = async (event)
       GroupName: callerOrgId,
     })
   );
+
+  // BTP-11: admin/trainer accounts also join the org's "-staff" group, which
+  // is what Plan/PlanDay/PlanExercise/Exercise's write authorization checks.
+  if (STAFF_ROLES.has(role)) {
+    const staffGroup = staffGroupName(callerOrgId);
+    try {
+      await client.send(
+        new CreateGroupCommand({ UserPoolId: userPoolId, GroupName: staffGroup })
+      );
+    } catch (err) {
+      if (!(err instanceof GroupExistsException)) {
+        throw err;
+      }
+    }
+    await client.send(
+      new AdminAddUserToGroupCommand({
+        UserPoolId: userPoolId,
+        Username: email,
+        GroupName: staffGroup,
+      })
+    );
+  }
 
   return {
     success: true,

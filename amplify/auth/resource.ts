@@ -10,7 +10,7 @@ import { defineAuth } from '@aws-amplify/backend';
  * group membership against this value.
  * custom:role — replaces the old, misused standard "profile" attribute
  * (which OIDC defines as a profile-page URL, not a role). Holds the app's
- * Profile enum value (admin/trainer/trainer_user/basic_user/tester).
+ * Profile enum value (admin/trainer/basic_user).
  *
  * platform-admin — a single static Cognito Group, separate from the
  * per-org groups (which are dynamic, one per Organization). Not a tenant
