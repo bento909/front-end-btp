@@ -38,21 +38,24 @@ const ViewPlan: React.FC = () => {
     const [expandedDay, setExpandedDay] = useState<DayOfWeek | null>(today);
     const [exerciseInputs, setExerciseInputs] = useState<Record<string, any>>({});
 
+    const canView = !!user?.permissions?.viewMyPlan;
+
     // fetch plan for user
     useEffect(() => {
         const userEmail = user?.emailAddress;
-        if (userEmail) {
+        if (canView && userEmail) {
             dispatch(fetchPlanByClientEmailThunk(userEmail));
         }
-    }, [dispatch, user?.emailAddress]);
+    }, [dispatch, canView, user?.emailAddress]);
 
     // fetch exercises if not loaded
     useEffect(() => {
-        if (exercises.length === 0) {
+        if (canView && exercises.length === 0) {
             dispatch(fetchExercisesThunk());
         }
-    }, [dispatch, exercises.length]);
+    }, [dispatch, canView, exercises.length]);
 
+    if (!canView) return null;
     if (planLoading || exercisesLoading) return <p>Loading plan…</p>;
     if (planError) return <p style={{ color: "red" }}>{planError}</p>;
     if (exercisesError) return <p style={{ color: "red" }}>{exercisesError}</p>;

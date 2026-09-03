@@ -18,8 +18,10 @@ const ViewMessages: React.FC = () => {
     );
 
     useEffect(() => {
-        dispatch(fetchMessagesThunk());
-    }, [dispatch]);
+        if (user && canReadMessages(user)) {
+            dispatch(fetchMessagesThunk());
+        }
+    }, [dispatch, user]);
 
     const toggleRead = (id: string, current: boolean) => {
         dispatch(updateMessageThunk({ id, read: !current }));

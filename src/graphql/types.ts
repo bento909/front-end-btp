@@ -259,26 +259,6 @@ export interface GetExerciseLogByIdQuery {
 }
 
 
-// --- the GraphQL input type for createExercise ---
-export interface CreateExerciseInput {
-    name: string;
-    type: ExerciseTypeEnum;
-    tips?: string;
-    notes?: string;
-    organizationId: string;
-}
-
-// --- the shape of the data you get back from the mutation ---
-export interface CreateExerciseMutation {
-    createExercise: {
-        id: string;
-        name: string;
-        type: ExerciseTypeEnum;
-        tips?: string;
-        notes?: string;
-    };
-}
-
 // --- INPUT TYPES ---
 
 export interface CreatePlanInput {
@@ -306,16 +286,6 @@ export interface DeletePlanInput {
 export interface DeletePlanMutation {
     deletePlan: {
         id: string;
-    };
-}
-
-export interface CreateExerciseMutation {
-    createExercise: {
-        id: string;
-        name: string;
-        type: ExerciseTypeEnum;
-        tips?: string;
-        notes?: string;
     };
 }
 

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {signOut} from "aws-amplify/auth";
 import {useNavigate} from "react-router-dom";
 import {Button} from "../../Styles/CollapsiblePanel.tsx"
@@ -7,30 +7,11 @@ import {RootState} from "../../redux/store.tsx";
 import {resetAuthState} from "../../redux/authSlice.tsx";
 import {reset} from "../../redux/usersSlice.tsx";
 
-function reloadPage() {
-    window.location.reload();
-}
-
 const Layout: React.FC<{ children: React.ReactNode }> = ({children}) => {
 
-    const user = useSelector((state: RootState) => state.auth.user); // Extract 'user' instead of using the whole object
+    const {user, loading, error} = useSelector((state: RootState) => state.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [reloadCount, setReloadCount] = useState(0);
-    const [ready, setReady] = useState(false);
-
-    useEffect(() => {
-        if (!user && reloadCount < 3) {
-            const timeout = setTimeout(() => {
-                setReloadCount(prev => prev + 1);
-                reloadPage();
-            }, 500);
-            return () => clearTimeout(timeout);
-        }
-        if (user || reloadCount >= 3) {
-            setReady(true);
-        }
-    }, [user, reloadCount]);
 
     const handleLogout = async () => {
         try {
@@ -42,11 +23,21 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({children}) => {
             console.error("Error logging out:", error);
         }
     };
-    if (!ready) {
-        return null;
+
+    if (loading) {
+        return <p style={{textAlign: "center", marginTop: "2rem"}}>Loading...</p>;
     }
 
-    const userName = user ? user.name : "unexpected guest";
+    if (!user) {
+        return (
+            <div style={{textAlign: "center", marginTop: "2rem"}}>
+                <p>{error ? `Sign-in error: ${error}` : "You need to sign in to continue."}</p>
+                <Button onClick={() => navigate("/")} isOpen={true}>Return to sign-in</Button>
+            </div>
+        );
+    }
+
+    const userName = user.name;
 
     return (
         <div>

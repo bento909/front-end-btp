@@ -73,7 +73,6 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
         const input: PlanExerciseDeletionInput = {
             id: id
         };
-        console.log('deleting planExercise with id ', input)
         try {
             await client.graphql({
                 query: deletePlanExercise,
@@ -119,7 +118,6 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
                 authMode: "userPool",
             }) as GraphQLResult<UpdatePlanExerciseOrderMutation>;
 
-            console.log(`✅ Updated exercise ${exerciseId}`);
         } catch (error) {
             console.error("❌ Failed to update exercise:", error);
             await onRefreshPlan(); // rollback with fresh data
@@ -171,7 +169,6 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             suggestedSets,
             organizationId: plan.organizationId,
         };
-        console.log('Creating exercise with input ', input);
         try {
             const result = await client.graphql({
                 query: createPlanExercise,
@@ -251,7 +248,6 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
                     }) as Promise<GraphQLResult<UpdatePlanExerciseOrderMutation>>
                 )
             );
-            console.log(`✅ Exercise order updated for day ${dayId}`);
         } catch (error) {
             console.error("❌ Error updating exercise order", error);
             await onRefreshPlan()

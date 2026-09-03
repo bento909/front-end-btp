@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {ListPlansQuery} from "../../../../graphql/types.ts";
 import {ExerciseTypeEnum} from "../../../../graphql/types.ts";
 import {useDispatch, useSelector} from "react-redux";
@@ -63,9 +63,11 @@ const PlanDayItem: React.FC<Props> = ({
     const {exercises} = useSelector((state: RootState) => state.exercises);
     const dispatch = useDispatch<AppDispatch>();
 
-    if (exercises.length === 0) {
-        dispatch(fetchExercisesThunk());
-    }
+    useEffect(() => {
+        if (exercises.length === 0) {
+            dispatch(fetchExercisesThunk());
+        }
+    }, [exercises.length, dispatch]);
 
     // Amplify's generated Exercise type marks id/name/type as nullable
     // (conservative client typing); every persisted record actually has

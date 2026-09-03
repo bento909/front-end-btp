@@ -108,7 +108,6 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
                 sets: JSON.stringify(filteredSets),
             };
             const updatedLog = await dispatch(updateExerciseLogThunk(updatedData)).unwrap();
-            console.log("Updated Exercise Log:", updatedLog);
             if (updatedLog) {
                 setSubmitted({id: updatedLog.id ?? "", sets: JSON.parse(updatedLog.sets as string)}); // refresh local state with backend result
             }
