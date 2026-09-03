@@ -7,10 +7,8 @@ import type { Schema } from '../../amplify/data/resource';
 // now; migrating the rest of the app to this client is BTP-7's job, not this
 // change's.
 //
-// authMode explicitly set to 'userPool': the schema's *default* auth mode is
-// apiKey (for ContactMessage's public form + backwards compat with the old
-// client), but createOrgUser/listOrgUsers both require allow.authenticated()
-// — Cognito login. Without this, generateClient() falls back to the schema
-// default (apiKey), which doesn't satisfy allow.authenticated() and fails
-// with "Not Authorized" even for a properly logged-in user.
+// authMode explicitly set to 'userPool' for clarity — matches the schema's
+// own default, but createOrgUser/listOrgUsers both require
+// allow.authenticated() (Cognito login) so this must never silently follow
+// a future default-mode change.
 export const dataClient = generateClient<Schema>({ authMode: 'userPool' });

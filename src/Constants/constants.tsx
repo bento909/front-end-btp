@@ -5,6 +5,7 @@ export interface User {
     organizationId: string;
     permissions: Permissions;
     id : string;
+    groups: string[];
 }
 
 export enum Profile {
@@ -35,8 +36,10 @@ export interface Permissions {
     viewMyPlan: boolean;
 }
 
+// Matches the server-side rule on ContactMessage (allow.group('platform-admin'))
+// — the actual enforcement is that Cognito Group, not the per-org admin role.
 export function canReadMessages(user: User): boolean {
-    return user.profile === Profile.ADMIN;
+    return user.groups.includes('platform-admin');
 }
 
 export function canCreatePlan(user: User): boolean {

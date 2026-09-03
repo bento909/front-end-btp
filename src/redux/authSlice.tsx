@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { fetchUserAttributes } from "aws-amplify/auth";
+import { fetchUserAttributes, fetchAuthSession } from "aws-amplify/auth";
 import { Profile, User } from "../Constants/constants.tsx";
 import { PermissionService } from "../Helpers/PermissionService.tsx";
 
@@ -29,6 +29,8 @@ export const fetchAuthUser = createAsyncThunk<User>(
             // this account" email string.
             const userTypeString = attributes['custom:role'] || "basic_user";
             const userType: Profile = userTypeString as Profile;
+            const session = await fetchAuthSession();
+            const groups = (session.tokens?.idToken?.payload['cognito:groups'] as string[] | undefined) || [];
             return {
                 id: attributes.sub || "", // Use `sub` as a unique user ID
                 name: attributes.name || "wonderful human",
@@ -36,6 +38,7 @@ export const fetchAuthUser = createAsyncThunk<User>(
                 profile: userType,
                 organizationId: attributes['custom:organizationId'] || "",
                 permissions: PermissionService.getPermissions(userType),
+                groups,
             };
         } catch (error) {
             return rejectWithValue("Failed to fetch user attributes");

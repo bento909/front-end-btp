@@ -33,6 +33,7 @@ export const fetchMessagesThunk = createAsyncThunk(
         try {
             const res = (await client.graphql({
                 query: listContactMessages,
+                authMode: "userPool",
             })) as GraphQLResult<ListContactMessagesQuery>;
 
             return res.data?.listContactMessages?.items ?? [];
@@ -49,6 +50,7 @@ export const fetchUnreadMessagesThunk = createAsyncThunk(
         try {
             const res = (await client.graphql({
                 query: listUnreadContactMessages,
+                authMode: "userPool",
             })) as GraphQLResult<ListUnreadContactMessagesQuery>;
 
             return res.data?.listContactMessages?.items ?? [];
@@ -64,9 +66,14 @@ export const addMessageThunk = createAsyncThunk(
     async (input: CreateContactMessageInput, thunkAPI) => {
         try {
             console.log('Inside AddMessageThunk - input is: ' + input)
+            // iam, not userPool: the public contact form is submitted by
+            // anonymous visitors with no Cognito session — this runs under
+            // the identity pool's guest role, matching allow.guest() on
+            // ContactMessage's create rule.
             const res = (await client.graphql({
                 query: createContactMessage,
                 variables: { input },
+                authMode: "iam",
             })) as GraphQLResult<{ createContactMessage: any }>;
             console.log('GraphQL response:', res);
             return res.data?.createContactMessage;
@@ -84,6 +91,7 @@ export const updateMessageThunk = createAsyncThunk(
             const res = (await client.graphql({
                 query: updateContactMessage,
                 variables: { input },
+                authMode: "userPool",
             })) as GraphQLResult<{ updateContactMessage: any }>;
 
             return res.data?.updateContactMessage;
@@ -101,6 +109,7 @@ export const deleteMessageThunk = createAsyncThunk(
             const res = (await client.graphql({
                 query: deleteContactMessage,
                 variables: { input },
+                authMode: "userPool",
             })) as GraphQLResult<{ deleteContactMessage: { id: string } }>;
 
             return res.data?.deleteContactMessage.id;

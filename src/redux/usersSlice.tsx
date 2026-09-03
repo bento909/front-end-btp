@@ -38,6 +38,7 @@ export const fetchUsersThunk = createAsyncThunk<User[]>(
                     profile: (u.role as Profile) || Profile.BASIC_USER,
                     organizationId: u.organizationId ?? "",
                     permissions: PermissionService.getPermissions((u.role as Profile) || Profile.BASIC_USER),
+                    groups: [],
                 }));
         } catch (error) {
             return rejectWithValue(error instanceof Error ? error.message : "Failed to fetch users");
