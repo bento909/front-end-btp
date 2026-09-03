@@ -47,11 +47,13 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
                 name: planType === "WEEK" ? `${userName}'s Weekly Plan` : `${userName}'s ${customDays}-Day Plan`,
                 trainerEmail: user.emailAddress,
                 clientEmail: userEmail,
+                organizationId: user.organizationId,
             };
 
             const planRes = (await client.graphql({
                 query: createPlan,
                 variables: { input: planInput },
+                authMode: "userPool",
             })) as GraphQLResult<CreatePlanMutation>;
 
             const newPlan = planRes.data?.createPlan;
@@ -67,10 +69,12 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
                         planId: newPlan.id,
                         dayOfWeek: WEEK_DAYS[i],
                         dayNumber: i + 1,
+                        organizationId: user.organizationId,
                     };
                     await client.graphql({
                         query: createPlanDay,
                         variables: { input },
+                        authMode: "userPool",
                     }) as GraphQLResult<CreatePlanDayMutation>;
                 }
             } else {
@@ -78,10 +82,12 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
                     const input: CreatePlanDayInput = {
                         planId: newPlan.id,
                         dayNumber: i,
+                        organizationId: user.organizationId,
                     };
                     await client.graphql({
                         query: createPlanDay,
                         variables: { input },
+                        authMode: "userPool",
                     }) as GraphQLResult<CreatePlanDayMutation>;
                 }
             }

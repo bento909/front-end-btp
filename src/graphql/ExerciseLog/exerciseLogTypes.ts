@@ -3,6 +3,7 @@ export interface CreateExerciseLogInput {
     date: string;
     sets: string;
     clientNotes?: string;
+    organizationId: string;
 }
 
 export interface ExerciseLog {

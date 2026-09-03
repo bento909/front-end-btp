@@ -7,6 +7,7 @@ export interface CreatePlanDayInput {
     notes?: string;           // describe what you want client to do today
     dayOfWeek?: DayOfWeek;    // optional—only for WEEK plans
     dayNumber?: number;       // optional—only for CUSTOM plans
+    organizationId: string;
 }
 
 export interface ListPlanDaysQuery {

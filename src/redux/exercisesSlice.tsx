@@ -22,6 +22,7 @@ export const fetchExercisesThunk = createAsyncThunk(
         try {
             const res = (await client.graphql({
                 query: GraphQLQueries.listExercises,
+                authMode: "userPool",
             })) as GraphQLResult<ListExercisesQuery>;
 
             return res.data?.listExercises?.items ?? [];

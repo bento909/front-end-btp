@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../../../redux/store.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../../../redux/store.tsx";
 import {
     fetchLatestExerciseLogByPlanExerciseIdThunk,
     submitExerciseLogThunk,
@@ -24,6 +24,7 @@ interface ExerciseInputProps {
 
 const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, onChange}) => {
     const dispatch: AppDispatch = useDispatch();
+    const user = useSelector((state: RootState) => state.auth.user);
 
     const [setsData, setSetsData] = useState(
         savedData ??
@@ -73,12 +74,14 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
     };
 
     const handleSubmit = async () => {
+        if (!user) return;
         setLoading(true);
         const filteredSets = setsData.filter((s) => s.reps !== "" || s.weight !== "");
         const logData = {
             planExerciseId: planExercise.id,
             date: new Date().toISOString(),
             sets: JSON.stringify(filteredSets),
+            organizationId: user.organizationId,
         };
 
         try {

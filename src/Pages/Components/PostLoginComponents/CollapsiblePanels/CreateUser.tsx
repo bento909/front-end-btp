@@ -1,42 +1,33 @@
 import { useState, useEffect } from "react";
-import { CognitoIdentityProviderClient, AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { fromCognitoIdentityPool } from "@aws-sdk/credential-provider-cognito-identity";
-import { Config, Profile, User } from "../../../../Constants/constants.tsx";
+import { Profile, User } from "../../../../Constants/constants.tsx";
 import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
-import { useSelector, useDispatch } from "react-redux";  // Import useDispatch
+import { useSelector, useDispatch } from "react-redux";
 import {AppDispatch, RootState} from "../../../../redux/store.tsx";
-import { fetchUsersThunk } from "../../../../redux/usersSlice.tsx";  // Import the fetchUsersThunk
+import { fetchUsersThunk } from "../../../../redux/usersSlice.tsx";
+import { dataClient } from "../../../../graphql/dataClient.ts";
 
-const client = new CognitoIdentityProviderClient({
-    region: Config.REGION,
-    credentials: fromCognitoIdentityPool({
-        clientConfig: { region: Config.REGION },
-        identityPoolId: Config.IDENTITY_POOL_ID,
-    }),
-});
-
-export const signUpUser = async (email: string, name: string, newUserProfile: Profile, creatorEmail: string) => {
-    const command = new AdminCreateUserCommand({
-        UserPoolId: Config.USER_POOL_ID,
-        Username: email,
-        TemporaryPassword: "Pa55w0rd!",
-        MessageAction: "SUPPRESS",
-        UserAttributes: [
-            { Name: "email", Value: email },
-            { Name: "name", Value: name },
-            { Name: "profile", Value: newUserProfile },
-            { Name: "creatorEmail", Value: creatorEmail}
-        ],
+// Creates a user server-side via the createOrgUser custom mutation
+// (amplify/functions/createOrgUser). The caller's org and permitted target
+// roles are enforced inside that function from the caller's own verified
+// identity — never trust anything client-supplied for that decision. This
+// replaces the old direct-from-browser AdminCreateUserCommand call, which
+// used a dead Cognito Identity Pool ID and an authenticated role with zero
+// attached policies, so it could never actually have succeeded.
+export const signUpUser = async (email: string, name: string, newUserProfile: Profile) => {
+    const response = await dataClient.mutations.createOrgUser({
+        email,
+        name,
+        role: newUserProfile,
     });
 
-    try {
-        const response = await client.send(command);
-        console.log("User created successfully:", response);
-        return response;
-    } catch (error) {
-        console.error("Error signing up:", error);
-        throw error;
+    if (response.errors?.length) {
+        throw new Error(response.errors.map((e) => e.message).join("; "));
     }
+    if (!response.data?.success) {
+        throw new Error(response.data?.message || "User creation failed");
+    }
+
+    return response.data;
 };
 
 // User Form Component
@@ -65,11 +56,11 @@ const UserForm: React.FC<CreateUserFormProps> = ({ user }) => {
             return;
         }
         try {
-            await signUpUser(email, name, profile, user.emailAddress);
+            const result = await signUpUser(email, name, profile);
             dispatch(fetchUsersThunk());
-            setMessage("Signup successful! User should 1. Sign in with Pa55w0rd! 2. Give a new password, 3. See their email for a security code, and enter it when prompted.");
-        } catch {
-            setMessage("Error signing up. Please try again.");
+            setMessage(result.message || "Signup successful! The new user will receive their temporary password by email.");
+        } catch (error) {
+            setMessage(error instanceof Error ? error.message : "Error signing up. Please try again.");
         }
     };
 

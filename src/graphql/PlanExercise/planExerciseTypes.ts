@@ -34,6 +34,7 @@ export interface CreatePlanExerciseInput {
     suggestedReps?: number;
     suggestedWeight?: number;
     suggestedSets?: number;
+    organizationId: string;
 }
 
 export interface CreateExerciseLogInput {
@@ -41,6 +42,7 @@ export interface CreateExerciseLogInput {
     date: string;             // ISO string of when the exercise was done
     sets: number;
     clientNotes?: string;
+    organizationId: string;
 }
 
 export interface PlanExerciseDeletionInput {

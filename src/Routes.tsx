@@ -92,7 +92,7 @@ const TesterMenu = () => {
                 name: testName,
                 permissions: PermissionService.getPermissions(role as Profile),
                 emailAddress: 'test@test.test',
-                creator: user ? user.emailAddress : 'Something odd has happened!'
+                organizationId: user ? user.organizationId : ''
             })
         );
         navigate("/");

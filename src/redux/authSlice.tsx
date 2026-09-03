@@ -21,14 +21,20 @@ export const fetchAuthUser = createAsyncThunk<User>(
     async (_, { rejectWithValue }) => {
         try {
             const attributes = await fetchUserAttributes();
-            const userTypeString = attributes.profile || "basic_user";
+            // custom:role replaces the old, misused standard "profile"
+            // attribute (OIDC defines "profile" as a profile-page URL, not
+            // a role). custom:organizationId replaces custom:creatorEmail —
+            // the real tenant relationship is Cognito group membership, of
+            // which this is the group name, not an informal "who created
+            // this account" email string.
+            const userTypeString = attributes['custom:role'] || "basic_user";
             const userType: Profile = userTypeString as Profile;
             return {
                 id: attributes.sub || "", // Use `sub` as a unique user ID
                 name: attributes.name || "wonderful human",
                 emailAddress: attributes.email || "",
                 profile: userType,
-                creator: attributes['custom:creatorEmail'] || "who created you?",
+                organizationId: attributes['custom:organizationId'] || "",
                 permissions: PermissionService.getPermissions(userType),
             };
         } catch (error) {

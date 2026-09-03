@@ -35,6 +35,7 @@ export interface Plan {
     name: string;
     trainerEmail: string;
     clientEmail: string;
+    organizationId: string;
     planDays: {
         items: Array<{
             id: string;
@@ -63,6 +64,7 @@ export interface ListPlansQuery {
             name: string;
             trainerEmail: string;
             clientEmail: string;
+            organizationId: string;
             planDays: {
                 items: Array<{
                     id: string;
@@ -156,6 +158,7 @@ export interface GetPlanByIdQuery {
         name: string;
         trainerEmail: string;
         clientEmail: string;
+        organizationId: string;
         planDays: {
             items: Array<{
                 id: string;
@@ -262,6 +265,7 @@ export interface CreateExerciseInput {
     type: ExerciseTypeEnum;
     tips?: string;
     notes?: string;
+    organizationId: string;
 }
 
 // --- the shape of the data you get back from the mutation ---
@@ -281,6 +285,7 @@ export interface CreatePlanInput {
     name: string;
     trainerEmail: string;
     clientEmail: string;
+    organizationId: string;
 }
 
 // --- MUTATION RESPONSE TYPES ---

@@ -1,8 +1,30 @@
 import {a, type ClientSchema, defineData} from "@aws-amplify/backend";
+import {createOrgUser} from "../functions/createOrgUser/resource";
+import {listOrgUsers} from "../functions/listOrgUsers/resource";
 
+// Multi-tenant design (BTP-10): every org-scoped model carries an
+// `organizationId` field whose value IS the name of a Cognito Group — every
+// user belonging to an org (any role) is added to that group at creation.
+// `allow.groupDefinedIn('organizationId')` means only members of that exact
+// group can read/write the record — this is the real, server-enforced
+// tenant boundary, not client-side UI gating.
 
 const schema = a.schema({
-    // ===CONTACT MESSAGES+++ 
+    // === ORGANIZATIONS (tenants) ===
+    Organization: a
+        .model({
+            id: a.id(),
+            name: a.string().required(),
+            createdAt: a.datetime().required(),
+        })
+        .authorization((allow) => [allow.groupDefinedIn("id")]),
+
+    // === CONTACT MESSAGES ===
+    // Ungated by org — belongs to the single shared public marketing page,
+    // not to any tenant. Public create (the contact form), admin-only read
+    // is enforced by the app's own IAM/group setup for the admin org — left
+    // as apiKey here since this is intentionally public-facing, not
+    // multi-tenant data.
     ContactMessage: a
         .model({
             id: a.id(),
@@ -10,33 +32,34 @@ const schema = a.schema({
             email: a.string().required(),
             message: a.string().required(),
             createdAt: a.datetime().required(),
-            read: a.boolean().default(false), // ← add this
+            read: a.boolean().default(false),
         })
         .authorization((allow) => [allow.publicApiKey()]),
-
 
     // === PLANS ===
     Plan: a
         .model({
-            id: a.id(), // required by default
+            id: a.id(),
             name: a.string().required(),
             trainerEmail: a.string().required(),
             clientEmail: a.string().required(),
-            planDays: a.hasMany("PlanDay", "planId"), // Plan has many days
+            organizationId: a.string().required(),
+            planDays: a.hasMany("PlanDay", "planId"),
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
 
-    // === EXERCISE POOL ===
+    // === EXERCISE POOL (private per-organization) ===
     Exercise: a
         .model({
             id: a.id(),
             name: a.string().required(),
             type: a.enum(["LIFT", "RUN", "CYCLE", "INTERVAL", "KB_SWING"]),
-            tips: a.string(), // Optional: We can leave this as a string without .optional()
-            notes: a.string(), // Optional: Same here
+            tips: a.string(),
+            notes: a.string(),
+            organizationId: a.string().required(),
             planExercises: a.hasMany("PlanExercise", "exerciseId"),
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
 
     // === PLAN ↔ EXERCISE JOIN ===
     PlanExercise: a
@@ -44,17 +67,17 @@ const schema = a.schema({
             id: a.id(),
             planId: a.string().required(),
             exerciseId: a.string().required(),
-            planDayId: a.string(), // ← add this
+            planDayId: a.string(),
             order: a.integer().required(),
             suggestedReps: a.integer(),
             suggestedWeight: a.float(),
             suggestedSets: a.integer(),
+            organizationId: a.string().required(),
             logs: a.hasMany("ExerciseLog", "planExerciseId"),
             exercise: a.belongsTo("Exercise", "exerciseId"),
-            planDay: a.belongsTo("PlanDay", "planDayId"), // ← and this
+            planDay: a.belongsTo("PlanDay", "planDayId"),
         })
-        .authorization((allow) => [allow.publicApiKey()]),
-
+        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
 
     // === PLAN ↔ DAY JOIN ===
     PlanDay: a
@@ -64,9 +87,10 @@ const schema = a.schema({
             dayOfWeek: a.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]),
             plan: a.belongsTo("Plan", "planId"),
             dayNumber: a.integer(),
-            planExercises: a.hasMany("PlanExercise", "planDayId"), // Exercises for this day
+            organizationId: a.string().required(),
+            planExercises: a.hasMany("PlanExercise", "planDayId"),
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
 
     // === USER LOGS FOR COMPLETED WORKOUTS ===
     ExerciseLog: a
@@ -76,9 +100,50 @@ const schema = a.schema({
             date: a.datetime().required(),
             sets: a.json().required(),
             clientNotes: a.string(),
+            organizationId: a.string().required(),
             planExercise: a.belongsTo("PlanExercise", "planExerciseId"),
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [allow.groupDefinedIn("organizationId")]),
+
+    // === CUSTOM MUTATION: create a user in the caller's own organization ===
+    // Replaces the old client-side AdminCreateUserCommand call in
+    // CreateUser.tsx. All authorization/org-forcing logic lives server-side
+    // in the function handler — the caller's own verified identity claims
+    // decide the org and permitted roles, never client input.
+    createOrgUser: a
+        .mutation()
+        .arguments({
+            email: a.string().required(),
+            name: a.string().required(),
+            role: a.string().required(),
+        })
+        .returns(
+            a.customType({
+                success: a.boolean(),
+                message: a.string(),
+            })
+        )
+        .authorization((allow) => [allow.authenticated()])
+        .handler(a.handler.function(createOrgUser)),
+
+    // === CUSTOM QUERY: list users in the caller's own organization ===
+    // Replaces the standalone hand-deployed getUsersAPI/getUsers Lambda.
+    OrgUser: a.customType({
+        id: a.string(),
+        email: a.string(),
+        name: a.string(),
+        role: a.string(),
+        organizationId: a.string(),
+        enabled: a.boolean(),
+        status: a.string(),
+        createdAt: a.string(),
+    }),
+    listOrgUsers: a
+        .query()
+        .arguments({})
+        .returns(a.ref("OrgUser").array())
+        .authorization((allow) => [allow.authenticated()])
+        .handler(a.handler.function(listOrgUsers)),
 });
 
 export type Schema = ClientSchema<typeof schema>;
@@ -92,106 +157,3 @@ export const data = defineData({
         },
     },
 });
-
-//Reusable stuff for Refactoring??
-//import { a, type ClientSchema, defineData } from "@aws-amplify/backend";
-// 
-// // === Reusable TypeScript type ===
-// export type CompletedSet = {
-//   weight?: number;
-//   reps?: number;
-//   time?: number;
-//   distance?: number;
-//   [key: string]: any;
-// };
-// 
-// // === Reusable schema field objects ===
-// const idField = a.id();
-// const stringRequired = a.string().required();
-// const stringOptional = a.string();
-// const datetimeRequired = a.datetime().required();
-// const booleanDefault = (def: boolean) => a.boolean().default(def);
-// const integerOptional = a.integer();
-// const floatOptional = a.float();
-// 
-// // === Prebuilt objects for models ===
-// const contactMessageFields = {
-//   id: idField,
-//   name: stringRequired,
-//   email: stringRequired,
-//   message: stringRequired,
-//   createdAt: datetimeRequired,
-//   read: booleanDefault(false),
-// };
-// 
-// const planFields = {
-//   id: idField,
-//   name: stringRequired,
-//   trainerEmail: stringRequired,
-//   clientEmail: stringRequired,
-//   planDays: a.hasMany("PlanDay", "planId"),
-// };
-// 
-// const exerciseFields = {
-//   id: idField,
-//   name: stringRequired,
-//   type: a.enum(["LIFT", "RUN", "CYCLE", "INTERVAL", "KB_SWING"]),
-//   tips: stringOptional,
-//   notes: stringOptional,
-//   planExercises: a.hasMany("PlanExercise", "exerciseId"),
-// };
-// 
-// const planExerciseFields = {
-//   id: idField,
-//   planId: stringRequired,
-//   exerciseId: stringRequired,
-//   planDayId: stringOptional,
-//   order: a.integer().required(),
-//   suggestedReps: integerOptional,
-//   suggestedWeight: floatOptional,
-//   suggestedSets: integerOptional,
-//   logs: a.hasMany("ExerciseLog", "planExerciseId"),
-//   exercise: a.belongsTo("Exercise", "exerciseId"),
-//   planDay: a.belongsTo("PlanDay", "planDayId"),
-// };
-// 
-// const planDayFields = {
-//   id: idField,
-//   planId: stringRequired,
-//   dayOfWeek: a.enum(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]),
-//   plan: a.belongsTo("Plan", "planId"),
-//   dayNumber: integerOptional,
-//   planExercises: a.hasMany("PlanExercise", "planDayId"),
-// };
-// 
-// const exerciseLogFields = {
-//   id: idField,
-//   planExerciseId: stringRequired,
-//   date: datetimeRequired,
-//   sets: a.json<CompletedSet[]>().required(),
-//   clientNotes: stringOptional,
-//   planExercise: a.belongsTo("PlanExercise", "planExerciseId"),
-// };
-// 
-// // === Schema ===
-// const schema = a.schema({
-//   ContactMessage: a.model(contactMessageFields).authorization((allow) => [allow.publicApiKey()]),
-//   Plan: a.model(planFields).authorization((allow) => [allow.publicApiKey()]),
-//   Exercise: a.model(exerciseFields).authorization((allow) => [allow.publicApiKey()]),
-//   PlanExercise: a.model(planExerciseFields).authorization((allow) => [allow.publicApiKey()]),
-//   PlanDay: a.model(planDayFields).authorization((allow) => [allow.publicApiKey()]),
-//   ExerciseLog: a.model(exerciseLogFields).authorization((allow) => [allow.publicApiKey()]),
-// });
-// 
-// // === Export ===
-// export type Schema = ClientSchema<typeof schema>;
-// 
-// export const data = defineData({
-//   schema,
-//   authorizationModes: {
-//     defaultAuthorizationMode: "apiKey",
-//     apiKeyAuthorizationMode: {
-//       expiresInDays: 30,
-//     },
-//   },
-// });

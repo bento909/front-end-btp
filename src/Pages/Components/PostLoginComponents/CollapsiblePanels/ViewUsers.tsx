@@ -25,7 +25,7 @@ const UserList: React.FC<GetUserListProps> = () => {
                 <li key={user.id}>
                     <div>Name: {user.name}</div>
                     <div>Email: {user.emailAddress}</div>
-                    <div>Trainer: {user.creator}</div>
+                    <div>Role: {user.profile}</div>
                 </li>
             ))}
         </ul>

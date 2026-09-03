@@ -28,12 +28,14 @@ const CreateExercise: React.FC = () => {
         setLoading(true);
         setMessage(null);
 
-        const input = { name, type, tips, notes };
+        if (!user) return;
+        const input = { name, type, tips, notes, organizationId: user.organizationId };
 
         try {
             const response = (await client.graphql({
                 query: createExercise,
                 variables: { input },
+                authMode: "userPool",
             })) as GraphQLResult<CreateExerciseMutation>;
 
             const created = response.data?.createExercise;

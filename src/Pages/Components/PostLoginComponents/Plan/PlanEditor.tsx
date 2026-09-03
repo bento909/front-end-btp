@@ -77,7 +77,8 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
         try {
             await client.graphql({
                 query: deletePlanExercise,
-                variables: {input}
+                variables: {input},
+                authMode: "userPool",
             }) as GraphQLResult<PlanExerciseDeletionInput>
         } catch (error) {
             console.error("Failed to delete exercise:", error);
@@ -115,6 +116,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             await client.graphql({
                 query: updatePlanExercise,
                 variables: { input: { id: exerciseId, ...updates } },
+                authMode: "userPool",
             }) as GraphQLResult<UpdatePlanExerciseOrderMutation>;
 
             console.log(`✅ Updated exercise ${exerciseId}`);
@@ -166,13 +168,15 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             order,
             suggestedReps,
             suggestedWeight,
-            suggestedSets
+            suggestedSets,
+            organizationId: plan.organizationId,
         };
         console.log('Creating exercise with input ', input);
         try {
             const result = await client.graphql({
                 query: createPlanExercise,
                 variables: {input},
+                authMode: "userPool",
             }) as GraphQLResult<CreatePlanExerciseMutation>;
 
             const realId = result.data?.createPlanExercise?.id;
@@ -243,6 +247,7 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
                     client.graphql({
                         query: updatePlanExercise,
                         variables: {input: {id: item.id, order: item.order}},
+                        authMode: "userPool",
                     }) as Promise<GraphQLResult<UpdatePlanExerciseOrderMutation>>
                 )
             );

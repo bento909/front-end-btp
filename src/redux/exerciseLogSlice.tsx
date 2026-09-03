@@ -32,6 +32,7 @@ export const submitExerciseLogThunk = createAsyncThunk(
             const result = (await client.graphql({
                 query: createExerciseLogMutation,
                 variables: {input},
+                authMode: "userPool",
             })) as GraphQLResult<ExerciseLogMutationResult>;
 
             return result.data?.createExerciseLog;
@@ -49,6 +50,7 @@ export const getExerciseLogThunk = createAsyncThunk(
             const result = (await client.graphql({
                 query: getExerciseLogQuery,
                 variables: {id},
+                authMode: "userPool",
             })) as GraphQLResult<ExerciseLogQueryResult>;
 
             return result.data?.getExerciseLog;
@@ -66,6 +68,7 @@ export const updateExerciseLogThunk = createAsyncThunk(
             const result = (await client.graphql({
                 query: updateExerciseLogMutation,
                 variables: {input},
+                authMode: "userPool",
             })) as GraphQLResult<any>;
             return result.data?.updateExerciseLog;
         } catch (err) {
@@ -82,6 +85,7 @@ export const fetchLatestExerciseLogByPlanExerciseIdThunk = createAsyncThunk(
             const result = (await client.graphql({
                 query: getLatestExerciseLogByPlanExerciseIdQuery,
                 variables: {planExerciseId},
+                authMode: "userPool",
             })) as GraphQLResult<any>;
 
             const log = result.data?.listExerciseLogs?.items?.[0] ?? null;

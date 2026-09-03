@@ -6,8 +6,6 @@ export const createPlanDay = gql`
     createPlanDay(input: $input) {
       id
       planId
-      name
-      notes
       dayOfWeek
       dayNumber
     }

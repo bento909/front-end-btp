@@ -11,6 +11,7 @@ export class GraphQLQueries {
           name
           trainerEmail
           clientEmail
+          organizationId
           planDays {
             items {
               id
@@ -141,6 +142,7 @@ export class GraphQLQueries {
         name
         trainerEmail
         clientEmail
+        organizationId
         planDays {
           items {
             id

@@ -28,6 +28,7 @@ export const fetchPlanByClientEmailThunk = createAsyncThunk<
         try {
             const resp = (await client.graphql({
                 query: GraphQLQueries.listPlans,
+                authMode: "userPool",
             })) as GraphQLResult<ListPlansQuery>;
 
             const items = resp.data?.listPlans?.items ?? [];
