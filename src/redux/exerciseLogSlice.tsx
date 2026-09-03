@@ -1,17 +1,8 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {client} from "../graphql/graphqlClient";
-import {createExerciseLogMutation, updateExerciseLogMutation} from "../graphql/ExerciseLog/exerciseLogMutations"; // ✅ correct import
-import {GraphQLResult} from "@aws-amplify/api-graphql";
-import {
-    CreateExerciseLogInput,
-    ExerciseLog,
-    ExerciseLogMutationResult,
-    ExerciseLogQueryResult
-} from "../graphql/ExerciseLog/exerciseLogTypes.ts";
-import {
-    getExerciseLogQuery,
-    getLatestExerciseLogByPlanExerciseIdQuery
-} from "../graphql/ExerciseLog/exerciseLogQueries.ts";
+import {dataClient} from "../graphql/dataClient.ts";
+import type {Schema} from "../../amplify/data/resource";
+
+type ExerciseLog = Schema["ExerciseLog"]["type"];
 
 interface ExerciseLogsState {
     loading: boolean;
@@ -25,17 +16,21 @@ const initialState: ExerciseLogsState = {
     logsByExerciseId: {},
 };
 
+interface CreateExerciseLogInput {
+    planExerciseId: string;
+    date: string;
+    sets: string;
+    clientNotes?: string;
+    organizationId: string;
+}
+
 export const submitExerciseLogThunk = createAsyncThunk(
     "exerciseLogs/submit",
     async (input: CreateExerciseLogInput, thunkAPI) => {
         try {
-            const result = (await client.graphql({
-                query: createExerciseLogMutation,
-                variables: {input},
-                authMode: "userPool",
-            })) as GraphQLResult<ExerciseLogMutationResult>;
-
-            return result.data?.createExerciseLog;
+            const result = await dataClient.models.ExerciseLog.create(input);
+            if (result.errors?.length) throw new Error(result.errors.map((e) => e.message).join("; "));
+            return result.data;
         } catch (err) {
             console.error("Failed to submit exercise log", err);
             return thunkAPI.rejectWithValue("Failed to submit exercise log");
@@ -47,13 +42,9 @@ export const getExerciseLogThunk = createAsyncThunk(
     "exerciseLogs/getOne",
     async (id: string, thunkAPI) => {
         try {
-            const result = (await client.graphql({
-                query: getExerciseLogQuery,
-                variables: {id},
-                authMode: "userPool",
-            })) as GraphQLResult<ExerciseLogQueryResult>;
-
-            return result.data?.getExerciseLog;
+            const result = await dataClient.models.ExerciseLog.get({id});
+            if (result.errors?.length) throw new Error(result.errors.map((e) => e.message).join("; "));
+            return result.data;
         } catch (err) {
             console.error("Failed to fetch exercise log", err);
             return thunkAPI.rejectWithValue("Failed to fetch exercise log");
@@ -65,12 +56,9 @@ export const updateExerciseLogThunk = createAsyncThunk(
     "exerciseLogs/update",
     async (input: { id: string; sets: string }, thunkAPI) => {
         try {
-            const result = (await client.graphql({
-                query: updateExerciseLogMutation,
-                variables: {input},
-                authMode: "userPool",
-            })) as GraphQLResult<any>;
-            return result.data?.updateExerciseLog;
+            const result = await dataClient.models.ExerciseLog.update(input);
+            if (result.errors?.length) throw new Error(result.errors.map((e) => e.message).join("; "));
+            return result.data;
         } catch (err) {
             console.error("Failed to update exercise log", err);
             return thunkAPI.rejectWithValue("Failed to update exercise log");
@@ -82,15 +70,18 @@ export const fetchLatestExerciseLogByPlanExerciseIdThunk = createAsyncThunk(
     "exerciseLogs/fetchLatestByPlanExerciseId",
     async (planExerciseId: string, thunkAPI) => {
         try {
-            const result = (await client.graphql({
-                query: getLatestExerciseLogByPlanExerciseIdQuery,
-                variables: {planExerciseId},
-                authMode: "userPool",
-            })) as GraphQLResult<any>;
+            // Filter-only list (a DynamoDB scan under the hood, same as the
+            // hand-written query this replaces) has no guaranteed order —
+            // sort client-side by date to actually get the latest, rather
+            // than relying on an unenforced sortDirection like the old
+            // hand-written query did.
+            const result = await dataClient.models.ExerciseLog.list({
+                filter: {planExerciseId: {eq: planExerciseId}},
+            });
+            if (result.errors?.length) throw new Error(result.errors.map((e) => e.message).join("; "));
 
-            const log = result.data?.listExerciseLogs?.items?.[0] ?? null;
-            console.log("Results from fetchLatestExerciseLogByPlaneExerciseIdThunk: ", log);
-            return log;
+            const items = [...result.data].sort((a, b) => b.date.localeCompare(a.date));
+            return items[0] ?? null;
         } catch (err) {
             console.error("Failed to fetch latest log", err);
             return thunkAPI.rejectWithValue("Failed to fetch latest log");

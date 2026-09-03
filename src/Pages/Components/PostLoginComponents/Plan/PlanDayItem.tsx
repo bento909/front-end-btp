@@ -1,5 +1,6 @@
 import React from "react";
 import {ListPlansQuery} from "../../../../graphql/types.ts";
+import {ExerciseTypeEnum} from "../../../../graphql/types.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../../../redux/store.tsx";
 import {fetchExercisesThunk} from "../../../../redux/exercisesSlice.tsx";
@@ -66,6 +67,16 @@ const PlanDayItem: React.FC<Props> = ({
         dispatch(fetchExercisesThunk());
     }
 
+    // Amplify's generated Exercise type marks id/name/type as nullable
+    // (conservative client typing); every persisted record actually has
+    // them, so normalize once here rather than optional-chaining at every
+    // call site below.
+    const normalizedExercises = exercises.map((ex) => ({
+        id: ex.id ?? "",
+        name: ex.name ?? "",
+        type: ex.type as ExerciseTypeEnum,
+    }));
+
     const handleAddExercise = (
         exerciseId: string,
         suggestedReps: number,
@@ -88,12 +99,12 @@ const PlanDayItem: React.FC<Props> = ({
                     <ExerciseListDraggable
                         dayId={day.id}
                         exercises={day.planExercises.items}
-                        allExercises={exercises}
+                        allExercises={normalizedExercises}
                         onDeleteExercise={onDeleteExercise}
                         onReorderExercises={onReorderExercises}
                         onEditExercises={onEditExercises}
                     />
-                    <AddExerciseForm onAddExercise={handleAddExercise} exercises={exercises}/>
+                    <AddExerciseForm onAddExercise={handleAddExercise} exercises={normalizedExercises}/>
                 </>
             )}
         </li>

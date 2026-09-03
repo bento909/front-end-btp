@@ -1,8 +1,7 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { addMessageThunk } from "../../../redux/contactMessagesSlice.tsx";
+import { addMessageThunk, CreateContactMessageInput } from "../../../redux/contactMessagesSlice.tsx";
 import CollapsiblePanel from "../../../Styles/CollapsiblePanel.tsx";
-import { CreateContactMessageInput } from "../../../graphql/ContactMessage/contactMessageTypes.ts";
 import {AppDispatch} from "../../../redux/store.tsx"; 
 
 interface FormData {

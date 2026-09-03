@@ -58,10 +58,10 @@ const ViewMessages: React.FC = () => {
                                 {msg.read ? "Read" : "Unread"}
                             </span>
                         </p>
-                        <button onClick={() => toggleRead(msg.id, msg.read)}>
+                        <button onClick={() => toggleRead(msg.id ?? "", !!msg.read)}>
                             Mark as {msg.read ? "Unread" : "Read"}
                         </button>
-                        <button onClick={() => handleDelete(msg.id)} style={{ marginLeft: "8px", color: "red" }}>
+                        <button onClick={() => handleDelete(msg.id ?? "")} style={{ marginLeft: "8px", color: "red" }}>
                             Delete
                         </button>
                     </li>

@@ -28,11 +28,12 @@ export const fetchPlanByClientEmailThunk = createAsyncThunk<
         try {
             const resp = (await client.graphql({
                 query: GraphQLQueries.listPlans,
+                variables: { filter: { clientEmail: { eq: clientEmail } } },
                 authMode: "userPool",
             })) as GraphQLResult<ListPlansQuery>;
 
             const items = resp.data?.listPlans?.items ?? [];
-            return items.find((p) => p?.clientEmail === clientEmail) ?? null;
+            return items[0] ?? null;
         } catch (err) {
             console.error(err);
             return rejectWithValue("Failed to fetch plan");

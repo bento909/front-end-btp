@@ -1,5 +1,5 @@
 import React from "react";
-import {DragDropContext, Draggable, Droppable, DropResult} from "react-beautiful-dnd";
+import {DragDropContext, Draggable, Droppable, DropResult} from "@hello-pangea/dnd";
 
 interface ExerciseListDraggableProps {
     dayId: string;

@@ -10,6 +10,16 @@ export interface CreatePlanDayInput {
     organizationId: string;
 }
 
+export interface DeletePlanDayInput {
+    id: string;
+}
+
+export interface DeletePlanDayMutation {
+    deletePlanDay: {
+        id: string;
+    };
+}
+
 export interface ListPlanDaysQuery {
     listPlanDays: {
         items: Array<{

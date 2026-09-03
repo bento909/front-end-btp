@@ -2,10 +2,7 @@ import React from "react";
 import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../redux/store.tsx";
-import { client } from "../../../../graphql/graphqlClient.ts";
-import { createExercise } from "../../../../graphql/mutations.ts";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { CreateExerciseMutation } from "../../../../graphql/types.ts";
+import { dataClient } from "../../../../graphql/dataClient.ts";
 import { ExerciseTypeEnum, ExerciseTypeMetadata } from "../../../../graphql/types.ts"
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../../redux/store.tsx";
@@ -32,13 +29,10 @@ const CreateExercise: React.FC = () => {
         const input = { name, type, tips, notes, organizationId: user.organizationId };
 
         try {
-            const response = (await client.graphql({
-                query: createExercise,
-                variables: { input },
-                authMode: "userPool",
-            })) as GraphQLResult<CreateExerciseMutation>;
+            const response = await dataClient.models.Exercise.create(input);
+            if (response.errors?.length) throw new Error(response.errors.map((e) => e.message).join("; "));
 
-            const created = response.data?.createExercise;
+            const created = response.data;
             if (created) {
                 dispatch(fetchExercisesThunk());
                 setMessage(`✅ Created exercise: ${created.name}`);

@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { client } from "../graphql/graphqlClient";
-import { GraphQLQueries } from "../graphql/queries";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { ListExercisesQuery } from "../graphql/types";
+import { dataClient } from "../graphql/dataClient.ts";
+import type { Schema } from "../../amplify/data/resource";
+
+type Exercise = Schema["Exercise"]["type"];
 
 interface ExercisesState {
-    exercises: ListExercisesQuery["listExercises"]["items"];
+    exercises: Exercise[];
     loading: boolean;
     error: string | null;
 }
@@ -20,12 +20,9 @@ export const fetchExercisesThunk = createAsyncThunk(
     "exercises/fetchAll",
     async (_, thunkAPI) => {
         try {
-            const res = (await client.graphql({
-                query: GraphQLQueries.listExercises,
-                authMode: "userPool",
-            })) as GraphQLResult<ListExercisesQuery>;
-
-            return res.data?.listExercises?.items ?? [];
+            const res = await dataClient.models.Exercise.list();
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to fetch exercises");
         }

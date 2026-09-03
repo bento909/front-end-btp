@@ -1,19 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { client } from "../graphql/graphqlClient";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { listContactMessages, listUnreadContactMessages } from "../graphql/ContactMessage/contactMessageQueries.ts";
-import { createContactMessage, updateContactMessage, deleteContactMessage } from "../graphql/ContactMessage/contactMessageMutations.ts";
+import { dataClient } from "../graphql/dataClient.ts";
+import type { Schema } from "../../amplify/data/resource";
 
-import {
-    ListContactMessagesQuery,
-    ListUnreadContactMessagesQuery,
-    CreateContactMessageInput,
-    UpdateContactMessageInput,
-    DeleteContactMessageInput
-} from "../graphql/ContactMessage/contactMessageTypes.ts";
+type ContactMessage = Schema["ContactMessage"]["type"];
+export type CreateContactMessageInput = { name: string; email: string; message: string; createdAt: string; read?: boolean };
+export type UpdateContactMessageInput = { id: string; read: boolean };
+export type DeleteContactMessageInput = { id: string };
 
 interface ContactMessagesState {
-    messages: ListContactMessagesQuery["listContactMessages"]["items"];
+    messages: ContactMessage[];
     loading: boolean;
     error: string | null;
 }
@@ -31,12 +26,9 @@ export const fetchMessagesThunk = createAsyncThunk(
     "contactMessages/fetchAll",
     async (_, thunkAPI) => {
         try {
-            const res = (await client.graphql({
-                query: listContactMessages,
-                authMode: "userPool",
-            })) as GraphQLResult<ListContactMessagesQuery>;
-
-            return res.data?.listContactMessages?.items ?? [];
+            const res = await dataClient.models.ContactMessage.list();
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to fetch contact messages");
         }
@@ -48,35 +40,26 @@ export const fetchUnreadMessagesThunk = createAsyncThunk(
     "contactMessages/fetchUnread",
     async (_, thunkAPI) => {
         try {
-            const res = (await client.graphql({
-                query: listUnreadContactMessages,
-                authMode: "userPool",
-            })) as GraphQLResult<ListUnreadContactMessagesQuery>;
-
-            return res.data?.listContactMessages?.items ?? [];
+            const res = await dataClient.models.ContactMessage.list({ filter: { read: { eq: false } } });
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to fetch unread messages");
         }
     }
 );
 
-// Create message
+// Create message — iam, not the client's default userPool: the public
+// contact form is submitted by anonymous visitors with no Cognito session —
+// this runs under the identity pool's guest role, matching allow.guest() on
+// ContactMessage's create rule.
 export const addMessageThunk = createAsyncThunk(
     "contactMessages/add",
     async (input: CreateContactMessageInput, thunkAPI) => {
         try {
-            console.log('Inside AddMessageThunk - input is: ' + input)
-            // iam, not userPool: the public contact form is submitted by
-            // anonymous visitors with no Cognito session — this runs under
-            // the identity pool's guest role, matching allow.guest() on
-            // ContactMessage's create rule.
-            const res = (await client.graphql({
-                query: createContactMessage,
-                variables: { input },
-                authMode: "iam",
-            })) as GraphQLResult<{ createContactMessage: any }>;
-            console.log('GraphQL response:', res);
-            return res.data?.createContactMessage;
+            const res = await dataClient.models.ContactMessage.create(input, { authMode: "iam" });
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to create message");
         }
@@ -88,13 +71,9 @@ export const updateMessageThunk = createAsyncThunk(
     "contactMessages/update",
     async (input: UpdateContactMessageInput, thunkAPI) => {
         try {
-            const res = (await client.graphql({
-                query: updateContactMessage,
-                variables: { input },
-                authMode: "userPool",
-            })) as GraphQLResult<{ updateContactMessage: any }>;
-
-            return res.data?.updateContactMessage;
+            const res = await dataClient.models.ContactMessage.update(input);
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to update message");
         }
@@ -106,13 +85,9 @@ export const deleteMessageThunk = createAsyncThunk(
     "contactMessages/delete",
     async (input: DeleteContactMessageInput, thunkAPI) => {
         try {
-            const res = (await client.graphql({
-                query: deleteContactMessage,
-                variables: { input },
-                authMode: "userPool",
-            })) as GraphQLResult<{ deleteContactMessage: { id: string } }>;
-
-            return res.data?.deleteContactMessage.id;
+            const res = await dataClient.models.ContactMessage.delete(input);
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data?.id;
         } catch (err) {
             return thunkAPI.rejectWithValue("Failed to delete message");
         }
@@ -160,12 +135,13 @@ const contactMessagesSlice = createSlice({
 
             // Add
             .addCase(addMessageThunk.fulfilled, (state, action) => {
-                state.messages.push(action.payload);
+                if (action.payload) state.messages.push(action.payload);
             })
 
             // Update
             .addCase(updateMessageThunk.fulfilled, (state, action) => {
-                const index = state.messages.findIndex(m => m.id === action.payload.id);
+                if (!action.payload) return;
+                const index = state.messages.findIndex(m => m.id === action.payload!.id);
                 if (index >= 0) state.messages[index] = { ...state.messages[index], ...action.payload };
             })
 

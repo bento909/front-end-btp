@@ -50,9 +50,10 @@ const ListExercises: React.FC = () => {
             {!loading && exercises.length > 0 && (
                 <ul>
                     {exercises.map((ex) => {
-                        const isOpen = expandedIds.has(ex.id);
+                        const id = ex.id ?? "";
+                        const isOpen = expandedIds.has(id);
                         return (
-                            <li key={ex.id}>
+                            <li key={id}>
                                 <div
                                     style={{
                                         display: "flex",
@@ -62,9 +63,9 @@ const ListExercises: React.FC = () => {
                                     }}
                                 >
                                     <div>
-                                        <strong>{ex.name}</strong>{ex.type && ` (${getExerciseTypeLabel(ex.type)})`}
+                                        <strong>{ex.name}</strong>{ex.type && ` (${getExerciseTypeLabel(ex.type as ExerciseTypeEnum)})`}
                                     </div>
-                                    <Button isOpen={isOpen} onClick={() => toggleExercise(ex.id)}>
+                                    <Button isOpen={isOpen} onClick={() => toggleExercise(id)}>
                                         {isOpen ? "Hide Details" : "Show Details"}
                                     </Button>
                                 </div>

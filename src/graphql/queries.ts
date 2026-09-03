@@ -2,10 +2,10 @@ import {gql} from "graphql-tag";
 import {DocumentNode} from "graphql";
 
 export class GraphQLQueries {
-    // 1. Fetch all Plans
+    // 1. Fetch Plans, optionally filtered server-side (e.g. by clientEmail)
     static listPlans: DocumentNode = gql`
-    query ListPlans {
-      listPlans {
+    query ListPlans($filter: ModelPlanFilterInput) {
+      listPlans(filter: $filter) {
         items {
           id
           name

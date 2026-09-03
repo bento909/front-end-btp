@@ -11,3 +11,13 @@ export const createPlanDay = gql`
     }
   }
 `;
+
+// Mutation to delete a PlanDay — used as compensating cleanup (BTP-5) when
+// parallel PlanDay creation partially fails.
+export const deletePlanDay = gql`
+  mutation DeletePlanDay($input: DeletePlanDayInput!) {
+    deletePlanDay(input: $input) {
+      id
+    }
+  }
+`;

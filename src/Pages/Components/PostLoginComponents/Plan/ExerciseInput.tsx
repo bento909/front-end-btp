@@ -54,8 +54,9 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             .unwrap()
             .then((log) => {
                 if (log) {
-                    setSetsData(JSON.parse(log.sets));
-                    setSubmitted({id: log.id, sets: JSON.parse(log.sets)});
+                    const sets = JSON.parse(log.sets as string);
+                    setSetsData(sets);
+                    setSubmitted({id: log.id ?? "", sets});
                 }
             })
             .catch((err) => console.error("No previous log or failed fetch:", err));
@@ -86,7 +87,8 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
 
         try {
             const result = await dispatch(submitExerciseLogThunk(logData)).unwrap();
-            setSubmitted({id: result.id, sets: filteredSets});
+            if (!result) throw new Error("No exercise log returned from create");
+            setSubmitted({id: result.id ?? "", sets: filteredSets});
         } catch (err) {
             console.error("Submission failed:", err);
         } finally {
@@ -107,7 +109,9 @@ const ExerciseInput: React.FC<ExerciseInputProps> = ({planExercise, savedData, o
             };
             const updatedLog = await dispatch(updateExerciseLogThunk(updatedData)).unwrap();
             console.log("Updated Exercise Log:", updatedLog);
-            setSubmitted(updatedLog); // refresh local state with backend result
+            if (updatedLog) {
+                setSubmitted({id: updatedLog.id ?? "", sets: JSON.parse(updatedLog.sets as string)}); // refresh local state with backend result
+            }
             setEditing(false);
         } catch (err) {
             console.error("Update failed:", err);

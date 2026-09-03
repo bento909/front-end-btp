@@ -299,6 +299,16 @@ export interface CreatePlanMutation {
     };
 }
 
+export interface DeletePlanInput {
+    id: string;
+}
+
+export interface DeletePlanMutation {
+    deletePlan: {
+        id: string;
+    };
+}
+
 export interface CreateExerciseMutation {
     createExercise: {
         id: string;
