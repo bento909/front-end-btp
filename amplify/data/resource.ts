@@ -21,10 +21,10 @@ const schema = a.schema({
 
     // === CONTACT MESSAGES ===
     // Ungated by org — belongs to the single shared public marketing page,
-    // not to any tenant. Public create (the contact form), admin-only read
-    // is enforced by the app's own IAM/group setup for the admin org — left
-    // as apiKey here since this is intentionally public-facing, not
-    // multi-tenant data.
+    // not to any tenant. Public create (the contact form, via the identity
+    // pool's guest/unauthenticated role — no API key involved), read/update
+    // (mark read)/delete restricted to the static cross-org `platform-admin`
+    // Cognito Group.
     ContactMessage: a
         .model({
             id: a.id(),
@@ -34,7 +34,10 @@ const schema = a.schema({
             createdAt: a.datetime().required(),
             read: a.boolean().default(false),
         })
-        .authorization((allow) => [allow.publicApiKey()]),
+        .authorization((allow) => [
+            allow.guest().to(["create"]),
+            allow.group("platform-admin"),
+        ]),
 
     // === PLANS ===
     Plan: a
@@ -148,12 +151,15 @@ const schema = a.schema({
 
 export type Schema = ClientSchema<typeof schema>;
 
+// No apiKeyAuthorizationMode: nothing in the schema uses allow.publicApiKey()
+// any more (BTP-1) — ContactMessage's public create goes through the guest
+// (unauthenticated identity pool) role instead. Removing this also clears
+// the stale AppSync::ApiKey resource that was permanently stuck in
+// CloudFormation (physical key expired/deleted out-of-band months ago,
+// causing every deploy's UPDATE on it to 404 and roll back the whole stack).
 export const data = defineData({
     schema,
     authorizationModes: {
-        defaultAuthorizationMode: "apiKey",
-        apiKeyAuthorizationMode: {
-            expiresInDays: 30,
-        },
+        defaultAuthorizationMode: "userPool",
     },
 });

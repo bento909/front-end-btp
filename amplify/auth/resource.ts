@@ -11,11 +11,18 @@ import { defineAuth } from '@aws-amplify/backend';
  * custom:role — replaces the old, misused standard "profile" attribute
  * (which OIDC defines as a profile-page URL, not a role). Holds the app's
  * Profile enum value (admin/trainer/trainer_user/basic_user/tester).
+ *
+ * platform-admin — a single static Cognito Group, separate from the
+ * per-org groups (which are dynamic, one per Organization). Not a tenant
+ * boundary — this is cross-org, for the app owner to moderate the shared
+ * public ContactMessage inbox. Membership is manual (AdminAddUserToGroup),
+ * not something createOrgUser ever grants.
  */
 export const auth = defineAuth({
   loginWith: {
     email: true,
   },
+  groups: ['platform-admin'],
   userAttributes: {
     'custom:organizationId': {
       dataType: 'String',
