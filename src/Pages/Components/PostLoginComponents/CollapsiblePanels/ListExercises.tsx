@@ -1,0 +1,99 @@
+import {useState} from "react";
+import CollapsiblePanel, {Button} from "../../../../Styles/CollapsiblePanel.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState, AppDispatch} from "../../../../redux/store.tsx";
+import {fetchExercisesThunk} from "../../../../redux/exercisesSlice.tsx";
+import {ExerciseTypeEnum, ExerciseTypeMetadata} from "../../../../graphql/types.ts";
+import {canCreatePlan} from "../../../../Constants/constants.tsx";
+
+const ListExercises: React.FC = () => {
+    const user = useSelector((state: RootState) => state.auth.user);
+    const {exercises, loading, error} = useSelector((state: RootState) => state.exercises);
+    const dispatch = useDispatch<AppDispatch>();
+    const [isVisible, setIsVisible] = useState(false);
+
+    // Track which exercise panels are expanded
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+    const toggleVisibility = () => {
+        const show = !isVisible;
+        setIsVisible(show);
+        if (show && exercises.length === 0) {
+            dispatch(fetchExercisesThunk());
+        }
+    };
+
+    const toggleExercise = (id: string) => {
+        setExpandedIds((prev) => {
+            const updated = new Set(prev);
+            if (updated.has(id)) {
+                updated.delete(id);
+            } else {
+                updated.add(id);
+            }
+            return updated;
+        });
+    };
+
+    const getExerciseTypeLabel = (type: ExerciseTypeEnum): string => {
+        const match = ExerciseTypeMetadata.find((item) => item.type === type);
+        return match ? match.label : type;
+    };
+
+    // Viewing the exercise catalogue is a "manages plans" concern, not a
+    // "can create exercises" one — gating on createExercise (trainer-only)
+    // meant an admin, who can see every org member and create plans, could
+    // never see what exercises even exist in their own org. canCreatePlan is
+    // true for both staff roles (admin + trainer), matching EditPlans.tsx's
+    // own gate.
+    return user && canCreatePlan(user) ? (
+        <CollapsiblePanel title="List Exercises" isOpen={isVisible} toggle={toggleVisibility}>
+            {loading && <p>Loading exercises...</p>}
+            {error && <p style={{color: "red"}}>{error}</p>}
+            {!loading && exercises.length === 0 && <p>No exercises found.</p>}
+            {!loading && exercises.length > 0 && (
+                <ul>
+                    {exercises.map((ex) => {
+                        const id = ex.id ?? "";
+                        const isOpen = expandedIds.has(id);
+                        return (
+                            <li key={id}>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        marginBottom: isOpen ? "4px" : "0", // minimal spacing before details
+                                    }}
+                                >
+                                    <div>
+                                        <strong>{ex.name}</strong>{ex.type && ` (${getExerciseTypeLabel(ex.type as ExerciseTypeEnum)})`}
+                                    </div>
+                                    <Button isOpen={isOpen} onClick={() => toggleExercise(id)}>
+                                        {isOpen ? "Hide Details" : "Show Details"}
+                                    </Button>
+                                </div>
+                                {isOpen && (
+                                    <div style={{marginTop: "4px"}}>
+                                        {ex.tips && (
+                                            <div style={{marginBottom: ex.notes ? "2px" : 0}}>
+                                                <em>Tip:</em> {ex.tips}
+                                            </div>
+                                        )}
+                                        {ex.notes && (
+                                            <div>
+                                                <em>Notes:</em> {ex.notes}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </CollapsiblePanel>
+    ) : null;
+};
+
+export default ListExercises;
