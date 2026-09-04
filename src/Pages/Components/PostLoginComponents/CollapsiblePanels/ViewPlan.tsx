@@ -69,13 +69,23 @@ const ViewPlan: React.FC = () => {
     // lazy-load: only the currently expanded day's exercises are fetched —
     // matches the collapsible-panel-per-day UI, which only ever shows one
     // day's exercises at a time anyway.
+    //
+    // `canView` gates this fetch too, not just the render below — ViewPlan is
+    // unconditionally mounted on the training menu for every role
+    // (Routes.tsx's Menu), and `days`/planDays/planExercises are GLOBAL redux
+    // slices shared with PlanEditor. Without this guard, a trainer/admin
+    // opening a *client's* plan populates those same slices, and this
+    // effect's "auto-expand today" logic would fire its own unrelated
+    // listPlanExercises fetch here too — found live via E2E testing,
+    // 2026-09-04 (an extra network call, not a data-correctness bug, since
+    // the render below still correctly shows nothing for non-basic_user).
     const expandedPlanDay = expandedDay ? days.find((d) => d.dayOfWeek === expandedDay) : undefined;
     const expandedPlanDayId = expandedPlanDay?.id;
     useEffect(() => {
-        if (expandedPlanDayId && !loadedDayIds[expandedPlanDayId] && !loadingDayIds[expandedPlanDayId]) {
+        if (canView && expandedPlanDayId && !loadedDayIds[expandedPlanDayId] && !loadingDayIds[expandedPlanDayId]) {
             dispatch(fetchPlanExercisesThunk(expandedPlanDayId));
         }
-    }, [expandedPlanDayId, loadedDayIds, loadingDayIds, dispatch]);
+    }, [canView, expandedPlanDayId, loadedDayIds, loadingDayIds, dispatch]);
 
     if (!canView) return null;
     if (planLoading || daysLoading || exercisesLoading) return <p>Loading plan…</p>;
