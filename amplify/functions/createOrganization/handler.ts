@@ -22,10 +22,33 @@ const cfn = new CloudFormationClient();
 // (allow.group('platform-admin') in amplify/data/resource.ts) — same pattern
 // as ContactMessage's admin moderation, no re-check needed here.
 
+// Picking 20 chars uniformly at random from a mixed charset does NOT
+// guarantee every category Cognito's policy requires (upper/lower/digit/
+// symbol) actually appears — with this charset that was roughly a 1-in-6
+// chance of failing "Password did not conform with password policy"
+// (reproduced live while provisioning the QA fixture, 2026-09-04). Fixed by
+// guaranteeing one char from each required category up front, then filling
+// the rest randomly and shuffling so the guaranteed chars aren't always in
+// the first four positions.
 function generateTemporaryPassword(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*';
-  const bytes = randomBytes(20);
-  return Array.from(bytes, (b) => chars[b % chars.length]).join('');
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghijkmnopqrstuvwxyz';
+  const digits = '23456789';
+  const symbols = '!@#$%^&*';
+  const all = upper + lower + digits + symbols;
+
+  const randomChar = (set: string) => set[randomBytes(1)[0] % set.length];
+
+  const required = [randomChar(upper), randomChar(lower), randomChar(digits), randomChar(symbols)];
+  const rest = Array.from(randomBytes(16), (b) => all[b % all.length]);
+  const combined = [...required, ...rest];
+
+  const shuffleBytes = randomBytes(combined.length);
+  for (let i = combined.length - 1; i > 0; i--) {
+    const j = shuffleBytes[i] % (i + 1);
+    [combined[i], combined[j]] = [combined[j], combined[i]];
+  }
+  return combined.join('');
 }
 
 // The exact table name (Amplify appends a random per-deploy suffix:

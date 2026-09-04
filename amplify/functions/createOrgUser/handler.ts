@@ -36,15 +36,40 @@ function staffGroupName(orgId: string): string {
   return `${orgId}-staff`;
 }
 
+// Random per-user password instead of the old hardcoded "Pa55w0rd!" shared
+// across every account. Cognito emails it via DesiredDeliveryMediums below,
+// so nobody needs to know or communicate it manually. Uses node:crypto
+// explicitly — the bare `crypto` global (Web Crypto API) isn't reliably
+// present on every Lambda Node runtime version.
+//
+// Picking 20 chars uniformly at random from a mixed charset does NOT
+// guarantee every category Cognito's policy requires (upper/lower/digit/
+// symbol) actually appears — with this charset that was roughly a 1-in-6
+// chance of failing "Password did not conform with password policy" on any
+// given account creation (reproduced live provisioning a QA fixture,
+// 2026-09-04 — this is the exact code path every real trainer/admin hits
+// creating a client). Fixed by guaranteeing one char from each required
+// category up front, then filling the rest randomly and shuffling so the
+// guaranteed chars aren't always in the first four positions.
 function generateTemporaryPassword(): string {
-  // Random per-user password instead of the old hardcoded "Pa55w0rd!"
-  // shared across every account. Cognito emails it via DesiredDeliveryMediums
-  // below, so nobody needs to know or communicate it manually.
-  // Uses node:crypto explicitly — the bare `crypto` global (Web Crypto API)
-  // isn't reliably present on every Lambda Node runtime version.
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*';
-  const bytes = randomBytes(20);
-  return Array.from(bytes, (b) => chars[b % chars.length]).join('');
+  const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const lower = 'abcdefghijkmnopqrstuvwxyz';
+  const digits = '23456789';
+  const symbols = '!@#$%^&*';
+  const all = upper + lower + digits + symbols;
+
+  const randomChar = (set: string) => set[randomBytes(1)[0] % set.length];
+
+  const required = [randomChar(upper), randomChar(lower), randomChar(digits), randomChar(symbols)];
+  const rest = Array.from(randomBytes(16), (b) => all[b % all.length]);
+  const combined = [...required, ...rest];
+
+  const shuffleBytes = randomBytes(combined.length);
+  for (let i = combined.length - 1; i > 0; i--) {
+    const j = shuffleBytes[i] % (i + 1);
+    [combined[i], combined[j]] = [combined[j], combined[i]];
+  }
+  return combined.join('');
 }
 
 export const handler: Schema['createOrgUser']['functionHandler'] = async (event) => {
