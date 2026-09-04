@@ -1,40 +1,35 @@
 // components/UserPlan/PlanEditor.tsx
 
-import {DayOfWeek, ListPlansQuery} from "../../../../graphql/types.ts";
-import PlanDayItem from "./PlanDayItem.tsx";
-import {client} from "../../../../graphql/graphqlClient.ts";
-import {GraphQLResult} from "@aws-amplify/api-graphql";
-
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../redux/store.tsx";
+import { dataClient } from "../../../../graphql/dataClient.ts";
 import {
-    CreatePlanExerciseInput,
-    CreatePlanExerciseMutation,
-    PlanExerciseDeletionInput,
-    UpdatePlanExerciseOrderMutation
-} from "../../../../graphql/PlanExercise/planExerciseTypes.ts";
-import {createPlanExercise, deletePlanExercise, updatePlanExercise} from "../../../../graphql/PlanExercise/planExerciseMutations.ts";
-import {useState} from "react"; // <-- Import your mutation
+    fetchPlanExercisesThunk,
+    exerciseAdded,
+    exerciseUpdated,
+    exerciseRemoved,
+    exercisesReordered,
+} from "../../../../redux/planExercisesSlice.tsx";
+import type { Plan } from "../../../../redux/plansSlice.tsx";
+import PlanDayItem from "./PlanDayItem.tsx";
 
-const WEEK_DAYS: DayOfWeek[] = [
+const WEEK_DAYS = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY",
-];
+] as const;
 
 interface Props {
-    plan: ListPlansQuery["listPlans"]["items"][0];
+    plan: Plan;
     userName: string;
     onRefreshPlan: () => void;
     expandedDays: Set<string>;
     setExpandedDays: React.Dispatch<React.SetStateAction<Set<string>>>;
 }
 
-const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDays, setExpandedDays}) => {
-    const [planDays, setPlanDays] = useState(() =>
-        plan.planDays.items.map(day => ({
-            ...day,
-            planExercises: {
-                items: [...day.planExercises.items].sort((a, b) => a.order - b.order),
-            },
-        }))
-    );
+const PlanEditor: React.FC<Props> = ({ plan, userName, expandedDays, setExpandedDays }) => {
+    const dispatch = useDispatch<AppDispatch>();
+    const { days } = useSelector((state: RootState) => state.planDays);
+    const { byDayId } = useSelector((state: RootState) => state.planExercises);
+
     const onToggle = (id: string) =>
         setExpandedDays((prev) => {
             const next = new Set(prev);
@@ -42,46 +37,22 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             return next;
         });
 
-    const usesDayOfWeek = plan.planDays.items.every((d) => Boolean(d.dayOfWeek));
-    const sortedDays = [...planDays].sort((a, b) =>
+    const usesDayOfWeek = days.every((d) => Boolean(d.dayOfWeek));
+    const sortedDays = [...days].sort((a, b) =>
         usesDayOfWeek
-            ? WEEK_DAYS.indexOf(a.dayOfWeek!) - WEEK_DAYS.indexOf(b.dayOfWeek!)
-            : a.dayNumber - b.dayNumber
+            ? WEEK_DAYS.indexOf(a.dayOfWeek as (typeof WEEK_DAYS)[number]) - WEEK_DAYS.indexOf(b.dayOfWeek as (typeof WEEK_DAYS)[number])
+            : (a.dayNumber ?? 0) - (b.dayNumber ?? 0)
     );
 
-    const handleDeleteExercise = async (
-        id: string,
-        dayId: string
-    ) => {
-        setPlanDays((currentDays) =>
-            currentDays.map((day) => {
-                if (day.id !== dayId) return day;
-
-                return {
-                    ...day,
-                    planExercises: {
-                        items: day.planExercises.items.filter((ex) => ex.id !== id),
-                    },
-                };
-            })
-        );
-        setExpandedDays((prev) => {
-            const next = new Set(prev);
-            next.add(dayId);
-            return next;
-        });
-        const input: PlanExerciseDeletionInput = {
-            id: id
-        };
+    const handleDeleteExercise = async (id: string, dayId: string) => {
+        // Optimistic — roll back by refetching just this day if the delete fails.
+        dispatch(exerciseRemoved({ planDayId: dayId, id }));
         try {
-            await client.graphql({
-                query: deletePlanExercise,
-                variables: {input},
-                authMode: "userPool",
-            }) as GraphQLResult<PlanExerciseDeletionInput>
+            const res = await dataClient.models.PlanExercise.delete({ id });
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
         } catch (error) {
             console.error("Failed to delete exercise:", error);
-            onRefreshPlan();
+            dispatch(fetchPlanExercisesThunk(dayId));
         }
     };
 
@@ -93,38 +64,18 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             suggestedWeight?: number;
             suggestedSets?: number;
             order?: number;
-        }) => {
-        // 1. Optimistically update local state
-        setPlanDays(currentDays =>
-            currentDays.map(day =>
-                day.id === dayId
-                    ? {
-                        ...day,
-                        planExercises: {
-                            items: day.planExercises.items.map(ex =>
-                                ex.id === exerciseId ? { ...ex, ...updates } : ex
-                            ),
-                        },
-                    }
-                    : day
-            )
-        );
-
-        // 2. Send update to backend
+        }
+    ) => {
         try {
-            await client.graphql({
-                query: updatePlanExercise,
-                variables: { input: { id: exerciseId, ...updates } },
-                authMode: "userPool",
-            }) as GraphQLResult<UpdatePlanExerciseOrderMutation>;
-
+            const res = await dataClient.models.PlanExercise.update({ id: exerciseId, ...updates });
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            if (res.data) dispatch(exerciseUpdated(res.data));
         } catch (error) {
-            console.error("❌ Failed to update exercise:", error);
-            await onRefreshPlan(); // rollback with fresh data
+            console.error("Failed to update exercise:", error);
+            dispatch(fetchPlanExercisesThunk(dayId));
         }
     };
 
-    // The handler to add an exercise to a plan day
     const handleAddExercise = async (
         dayId: string,
         exerciseId: string,
@@ -133,83 +84,28 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
         suggestedWeight: number,
         suggestedSets: number
     ) => {
-        const newExercise = {
-            id: `temp-${Math.random()}`, // temporary ID until backend returns real ID
-            exerciseId,
-            order,
-            suggestedReps,
-            suggestedWeight,
-            suggestedSets
-        };
-
-        setPlanDays(currentDays =>
-            currentDays.map(day =>
-                day.id === dayId
-                    ? {
-                        ...day,
-                        planExercises: {items: [...day.planExercises.items, newExercise]}
-                    }
-                    : day
-            )
-        );
-        // Re-expand the modified day
         setExpandedDays((prev) => {
             const next = new Set(prev);
-            next.add(dayId);  // <- Ensure it stays open
+            next.add(dayId);
             return next;
         });
-
-        const input: CreatePlanExerciseInput = {
-            planDayId: dayId,
-            planId: plan.id,
-            exerciseId,
-            order,
-            suggestedReps,
-            suggestedWeight,
-            suggestedSets,
-            organizationId: plan.organizationId,
-            staffGroup: `${plan.organizationId}-staff`,
-        };
         try {
-            const result = await client.graphql({
-                query: createPlanExercise,
-                variables: {input},
-                authMode: "userPool",
-            }) as GraphQLResult<CreatePlanExerciseMutation>;
-
-            const realId = result.data?.createPlanExercise?.id;
-            if (realId) {
-                // 3. Replace temporary ID with real ID from backend
-                setPlanDays(currentDays =>
-                    currentDays.map(day =>
-                        day.id === dayId
-                            ? {
-                                ...day,
-                                planExercises: {
-                                    items: day.planExercises.items.map(ex =>
-                                        ex.id.startsWith("temp-") ? {...ex, id: realId} : ex
-                                    ),
-                                },
-                            }
-                            : day
-                    )
-                );
-            }
+            const res = await dataClient.models.PlanExercise.create({
+                planId: plan.id!,
+                planDayId: dayId,
+                exerciseId,
+                order,
+                suggestedReps,
+                suggestedWeight,
+                suggestedSets,
+                organizationId: plan.organizationId,
+                staffGroup: plan.staffGroup,
+            });
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            if (res.data) dispatch(exerciseAdded(res.data));
         } catch (error) {
             console.error("Failed to add exercise:", error);
-            setPlanDays(currentDays =>
-                currentDays.map(day =>
-                    day.id === dayId
-                        ? {
-                            ...day,
-                            planExercises: {
-                                items: day.planExercises.items.filter(ex => !ex.id.startsWith("temp-")),
-                            },
-                        }
-                        : day
-                )
-            );
-            await onRefreshPlan();
+            dispatch(fetchPlanExercisesThunk(dayId));
         }
     };
 
@@ -220,38 +116,25 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
             order: number;
             suggestedReps?: number;
             suggestedWeight?: number;
-            suggestedSets?: number
+            suggestedSets?: number;
         }[]
     ) => {
-        setPlanDays(currentDays =>
-            currentDays.map(day => {
-                if (day.id !== dayId) return day;
-                return {
-                    ...day,
-                    planExercises: {
-                        items: day.planExercises.items
-                            .map(exercise => {
-                                const updated = reorderedItems.find(i => i.id === exercise.id);
-                                return updated ? {...exercise, order: updated.order} : exercise;
-                            })
-                            .sort((a, b) => a.order - b.order),
-                    },
-                };
+        const current = byDayId[dayId] ?? [];
+        const updatedList = current
+            .map((exercise) => {
+                const updated = reorderedItems.find((i) => i.id === exercise.id);
+                return updated ? { ...exercise, order: updated.order } : exercise;
             })
-        );
+            .sort((a, b) => a.order - b.order);
+        dispatch(exercisesReordered({ planDayId: dayId, exercises: updatedList }));
         try {
-            await Promise.all(
-                reorderedItems.map((item) =>
-                    client.graphql({
-                        query: updatePlanExercise,
-                        variables: {input: {id: item.id, order: item.order}},
-                        authMode: "userPool",
-                    }) as Promise<GraphQLResult<UpdatePlanExerciseOrderMutation>>
-                )
+            const results = await Promise.all(
+                reorderedItems.map((item) => dataClient.models.PlanExercise.update({ id: item.id, order: item.order }))
             );
+            if (results.some((r) => r.errors?.length)) throw new Error("One or more exercise order updates failed");
         } catch (error) {
-            console.error("❌ Error updating exercise order", error);
-            await onRefreshPlan()
+            console.error("Error updating exercise order", error);
+            dispatch(fetchPlanExercisesThunk(dayId));
         }
     };
 
@@ -264,8 +147,8 @@ const PlanEditor: React.FC<Props> = ({plan, userName, onRefreshPlan, expandedDay
                         key={day.id}
                         day={day}
                         usesDayOfWeek={usesDayOfWeek}
-                        expanded={expandedDays.has(day.id)}
-                        onToggle={() => onToggle(day.id)}
+                        expanded={expandedDays.has(day.id!)}
+                        onToggle={() => onToggle(day.id!)}
                         onAddExercise={handleAddExercise}
                         onDeleteExercise={handleDeleteExercise}
                         onReorderExercises={handleReorderExercises}

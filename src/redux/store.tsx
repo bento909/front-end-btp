@@ -5,6 +5,8 @@ import exercisesReducer from "./exercisesSlice";
 import contactMessagesReducer from "./contactMessagesSlice"
 import plansReducer from "./plansSlice.tsx"
 import exerciseLogsReducer from "./exerciseLogSlice.tsx"
+import planDaysReducer from "./planDaysSlice.tsx"
+import planExercisesReducer from "./planExercisesSlice.tsx"
 
 const store = configureStore({
     reducer: {
@@ -13,7 +15,9 @@ const store = configureStore({
         exercises: exercisesReducer,
         contactMessages: contactMessagesReducer,
         plans: plansReducer,
-        exerciseLogs: exerciseLogsReducer
+        exerciseLogs: exerciseLogsReducer,
+        planDays: planDaysReducer,
+        planExercises: planExercisesReducer
     },
 });
 

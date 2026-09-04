@@ -1,10 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { client } from "../graphql/graphqlClient";
-import { GraphQLQueries } from "../graphql/queries";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { ListPlansQuery, Plan } from "../graphql/types";
+import { dataClient } from "../graphql/dataClient.ts";
+import type { Schema } from "../../amplify/data/resource";
 
-// Define state type
+export type Plan = Schema["Plan"]["type"];
+
+// Flat — no nested planDays/planExercises. Those are fetched separately
+// (planDaysSlice, planExercisesSlice) so a plan with many days doesn't pull
+// every day's exercises just to show the plan itself.
 interface PlansState {
     plan: Plan | null;
     loading: boolean;
@@ -17,23 +19,17 @@ const initialState: PlansState = {
     error: null,
 };
 
-// Async thunk: fetch plan for a given clientEmail
 export const fetchPlanByClientEmailThunk = createAsyncThunk<
-    Plan | null, // return type
-    string,      // arg type (clientEmail)
+    Plan | null,
+    string,
     { rejectValue: string }
 >(
     "plans/fetchPlanByClientEmail",
     async (clientEmail, { rejectWithValue }) => {
         try {
-            const resp = (await client.graphql({
-                query: GraphQLQueries.listPlans,
-                variables: { filter: { clientEmail: { eq: clientEmail } } },
-                authMode: "userPool",
-            })) as GraphQLResult<ListPlansQuery>;
-
-            const items = resp.data?.listPlans?.items ?? [];
-            return items[0] ?? null;
+            const res = await dataClient.models.Plan.list({ filter: { clientEmail: { eq: clientEmail } } });
+            if (res.errors?.length) throw new Error(res.errors.map((e) => e.message).join("; "));
+            return res.data[0] ?? null;
         } catch (err) {
             console.error(err);
             return rejectWithValue("Failed to fetch plan");
@@ -41,7 +37,6 @@ export const fetchPlanByClientEmailThunk = createAsyncThunk<
     }
 );
 
-// Slice
 const plansSlice = createSlice({
     name: "plans",
     initialState,

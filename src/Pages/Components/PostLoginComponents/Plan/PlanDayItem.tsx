@@ -1,15 +1,16 @@
-import React, {useEffect} from "react";
-import {ListPlansQuery} from "../../../../graphql/types.ts";
-import {ExerciseTypeEnum} from "../../../../graphql/types.ts";
-import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../../../../redux/store.tsx";
-import {fetchExercisesThunk} from "../../../../redux/exercisesSlice.tsx";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { PlanDay } from "../../../../redux/planDaysSlice.tsx";
+import { fetchPlanExercisesThunk } from "../../../../redux/planExercisesSlice.tsx";
+import { AppDispatch, RootState } from "../../../../redux/store.tsx";
+import { ExerciseTypeEnum } from "../../../../graphql/types.ts";
+import { fetchExercisesThunk } from "../../../../redux/exercisesSlice.tsx";
 
 import ExerciseListDraggable from "./PlanExerciseListDraggable.tsx";
 import AddExerciseForm from "./AddExerciseForm.tsx";
 
 interface Props {
-    day: NonNullable<ListPlansQuery["listPlans"]["items"][0]>["planDays"]["items"][0];
+    day: PlanDay;
     usesDayOfWeek: boolean;
     expanded: boolean;
     onToggle: () => void;
@@ -61,6 +62,9 @@ const PlanDayItem: React.FC<Props> = ({
                                           onEditExercises
                                       }) => {
     const {exercises} = useSelector((state: RootState) => state.exercises);
+    const dayExercises = useSelector((state: RootState) => state.planExercises.byDayId[day.id!]) ?? [];
+    const loaded = useSelector((state: RootState) => state.planExercises.loadedDayIds[day.id!]);
+    const loading = useSelector((state: RootState) => state.planExercises.loadingDayIds[day.id!]);
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
@@ -68,6 +72,16 @@ const PlanDayItem: React.FC<Props> = ({
             dispatch(fetchExercisesThunk());
         }
     }, [exercises.length, dispatch]);
+
+    // The lazy-load point (BTP-7): a day's exercises are only ever fetched
+    // once that day is actually expanded, not up front with the plan/days —
+    // a plan can have many days each with many exercises, and there's no
+    // reason to pull all of it just to render the collapsed day list.
+    useEffect(() => {
+        if (expanded && !loaded && !loading) {
+            dispatch(fetchPlanExercisesThunk(day.id!));
+        }
+    }, [expanded, loaded, loading, day.id, dispatch]);
 
     // Amplify's generated Exercise type marks id/name/type as nullable
     // (conservative client typing); every persisted record actually has
@@ -79,14 +93,25 @@ const PlanDayItem: React.FC<Props> = ({
         type: ex.type as ExerciseTypeEnum,
     }));
 
+    const draggableExercises = [...dayExercises]
+        .sort((a, b) => a.order - b.order)
+        .map((ex) => ({
+            id: ex.id!,
+            order: ex.order,
+            suggestedReps: ex.suggestedReps ?? undefined,
+            suggestedWeight: ex.suggestedWeight ?? undefined,
+            suggestedSets: ex.suggestedSets ?? undefined,
+            exerciseId: ex.exerciseId,
+        }));
+
     const handleAddExercise = (
         exerciseId: string,
         suggestedReps: number,
         suggestedWeight: number,
         suggestedSets: number
     ) => {
-        const nextOrder = day.planExercises.items.length + 1;
-        onAddExercise(day.id, exerciseId, nextOrder, suggestedReps, suggestedWeight, suggestedSets);
+        const nextOrder = dayExercises.length + 1;
+        onAddExercise(day.id!, exerciseId, nextOrder, suggestedReps, suggestedWeight, suggestedSets);
     };
 
     return (
@@ -98,14 +123,18 @@ const PlanDayItem: React.FC<Props> = ({
 
             {expanded && (
                 <>
-                    <ExerciseListDraggable
-                        dayId={day.id}
-                        exercises={day.planExercises.items}
-                        allExercises={normalizedExercises}
-                        onDeleteExercise={onDeleteExercise}
-                        onReorderExercises={onReorderExercises}
-                        onEditExercises={onEditExercises}
-                    />
+                    {loading && !loaded ? (
+                        <p>Loading exercises…</p>
+                    ) : (
+                        <ExerciseListDraggable
+                            dayId={day.id!}
+                            exercises={draggableExercises}
+                            allExercises={normalizedExercises}
+                            onDeleteExercise={onDeleteExercise}
+                            onReorderExercises={onReorderExercises}
+                            onEditExercises={onEditExercises}
+                        />
+                    )}
                     <AddExerciseForm onAddExercise={handleAddExercise} exercises={normalizedExercises}/>
                 </>
             )}

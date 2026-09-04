@@ -14,10 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import PlanCreator from "./PlanCreator.tsx";
 import PlanEditor from "./PlanEditor.tsx";
 import { fetchPlanByClientEmailThunk } from "../../../../redux/plansSlice.tsx";
+import { fetchPlanDaysThunk } from "../../../../redux/planDaysSlice.tsx";
 import { AppDispatch, RootState } from "../../../../redux/store.tsx";
-
-// import { useSelector } from "react-redux";
-// import { RootState } from "../../redux/store";
 
 interface Props {
     userName: string;
@@ -27,6 +25,7 @@ interface Props {
 const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { plan, loading, error } = useSelector((state: RootState) => state.plans);
+    const { loading: daysLoading } = useSelector((state: RootState) => state.planDays);
     const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
     useEffect(() => {
@@ -35,19 +34,32 @@ const PlanLoader: React.FC<Props> = ({ userName, userEmail }) => {
         }
     }, [userEmail, dispatch]);
 
-    if (loading) return <p>Loading plan…</p>;
+    useEffect(() => {
+        if (plan) {
+            dispatch(fetchPlanDaysThunk(plan.id!));
+        }
+    }, [plan?.id, dispatch]);
+
+    const refreshPlan = async () => {
+        const refreshed = await dispatch(fetchPlanByClientEmailThunk(userEmail)).unwrap();
+        if (refreshed) {
+            await dispatch(fetchPlanDaysThunk(refreshed.id!));
+        }
+    };
+
+    if (loading || (plan && daysLoading)) return <p>Loading plan…</p>;
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return plan ? (
         <PlanEditor
             plan={plan}
             userName={userName}
-            onRefreshPlan={() => dispatch(fetchPlanByClientEmailThunk(userEmail)).unwrap()}
+            onRefreshPlan={refreshPlan}
             expandedDays={expandedDays}
             setExpandedDays={setExpandedDays}
         />
     ) : (
-        <PlanCreator userName={userName} userEmail={userEmail} onCreated={() => dispatch(fetchPlanByClientEmailThunk(userEmail))} />
+        <PlanCreator userName={userName} userEmail={userEmail} onCreated={refreshPlan} />
     );
 };
 

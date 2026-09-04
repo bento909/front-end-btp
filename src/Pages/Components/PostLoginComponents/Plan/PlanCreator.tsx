@@ -8,18 +8,13 @@
 //
 // Notifying the parent to reload plans via onCreated
 import { useState } from "react";
-import { client } from "../../../../graphql/graphqlClient.ts";
-import { CreatePlanInput, CreatePlanMutation, CreatePlanDayMutation, DayOfWeek } from "../../../../graphql/types.ts";
-import { GraphQLResult } from "@aws-amplify/api-graphql";
-import { createPlan, deletePlan } from "../../../../graphql/mutations.ts";
+import { dataClient } from "../../../../graphql/dataClient.ts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../redux/store.tsx";
-import {CreatePlanDayInput} from "../../../../graphql/PlanDay/planDayTypes.ts";
-import {createPlanDay, deletePlanDay} from "../../../../graphql/PlanDay/planDayMutations.ts";
 
-const WEEK_DAYS: DayOfWeek[] = [
+const WEEK_DAYS = [
     "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
-];
+] as const;
 
 type PlanType = "WEEK" | "CUSTOM";
 
@@ -43,79 +38,64 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
 
         try {
             // 1. Create plan
-            const planInput: CreatePlanInput = {
+            const planRes = await dataClient.models.Plan.create({
                 name: planType === "WEEK" ? `${userName}'s Weekly Plan` : `${userName}'s ${customDays}-Day Plan`,
                 trainerEmail: user.emailAddress,
                 clientEmail: userEmail,
                 organizationId: user.organizationId,
                 staffGroup: `${user.organizationId}-staff`,
-            };
+            });
+            if (planRes.errors?.length) throw new Error(planRes.errors.map((e) => e.message).join("; "));
 
-            const planRes = (await client.graphql({
-                query: createPlan,
-                variables: { input: planInput },
-                authMode: "userPool",
-            })) as GraphQLResult<CreatePlanMutation>;
-
-            const newPlan = planRes.data?.createPlan;
+            const newPlan = planRes.data;
             if (!newPlan) {
                 setError("Failed to create Plan");
                 setCreating(false);
                 return;
             }
+
             // 2. Create days — fired in parallel (BTP-5), not one at a time,
             // since the requests don't depend on each other.
-            const dayInputs: CreatePlanDayInput[] = planType === "WEEK"
+            const planId = newPlan.id!;
+            const dayInputs = planType === "WEEK"
                 ? WEEK_DAYS.map((dayOfWeek, i) => ({
-                    planId: newPlan.id,
+                    planId,
                     dayOfWeek,
                     dayNumber: i + 1,
                     organizationId: user.organizationId,
                     staffGroup: `${user.organizationId}-staff`,
                 }))
                 : Array.from({ length: customDays }, (_, i) => ({
-                    planId: newPlan.id,
+                    planId,
                     dayNumber: i + 1,
                     organizationId: user.organizationId,
                     staffGroup: `${user.organizationId}-staff`,
                 }));
 
             const dayResults = await Promise.allSettled(
-                dayInputs.map((input) =>
-                    client.graphql({
-                        query: createPlanDay,
-                        variables: { input },
-                        authMode: "userPool",
-                    }) as Promise<GraphQLResult<CreatePlanDayMutation>>
-                )
+                dayInputs.map((input) => dataClient.models.PlanDay.create(input))
             );
 
-            const failedCount = dayResults.filter((r) => r.status === "rejected").length;
+            const succeededIds: string[] = [];
+            let failedCount = 0;
+            for (const r of dayResults) {
+                if (r.status === "fulfilled" && !r.value.errors?.length && r.value.data?.id) {
+                    succeededIds.push(r.value.data.id);
+                } else {
+                    failedCount++;
+                }
+            }
+
             if (failedCount > 0) {
                 // Compensating cleanup: not atomic at the API level, so undo
                 // by hand — delete whichever days *did* get created, then
                 // the plan itself, rather than leaving an orphaned partial
                 // plan with no UI recovery path.
-                const succeededIds = dayResults
-                    .filter((r): r is PromiseFulfilledResult<GraphQLResult<CreatePlanDayMutation>> => r.status === "fulfilled")
-                    .map((r) => r.value.data?.createPlanDay?.id)
-                    .filter((id): id is string => !!id);
-
                 await Promise.allSettled(
-                    succeededIds.map((id) =>
-                        client.graphql({
-                            query: deletePlanDay,
-                            variables: { input: { id } },
-                            authMode: "userPool",
-                        })
-                    )
+                    succeededIds.map((id) => dataClient.models.PlanDay.delete({ id }))
                 );
                 try {
-                    await client.graphql({
-                        query: deletePlan,
-                        variables: { input: { id: newPlan.id } },
-                        authMode: "userPool",
-                    });
+                    await dataClient.models.Plan.delete({ id: planId });
                 } catch {
                     // best-effort cleanup; already reporting failure to the user below
                 }

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../../../redux/store.tsx";
 import { fetchPlanByClientEmailThunk } from "../../../../redux/plansSlice.tsx";
+import { fetchPlanDaysThunk } from "../../../../redux/planDaysSlice.tsx";
+import { fetchPlanExercisesThunk } from "../../../../redux/planExercisesSlice.tsx";
 import { fetchExercisesThunk } from "../../../../redux/exercisesSlice.tsx";
 import CollapsiblePanel from "../../../../Styles/CollapsiblePanel.tsx";
 import ExerciseInput from "../Plan/ExerciseInput.tsx";
@@ -24,6 +26,8 @@ const ViewPlan: React.FC = () => {
     const { plan, loading: planLoading, error: planError } = useSelector(
         (state: RootState) => state.plans
     );
+    const { days, loading: daysLoading } = useSelector((state: RootState) => state.planDays);
+    const { byDayId, loadingDayIds, loadedDayIds } = useSelector((state: RootState) => state.planExercises);
     const {
         exercises,
         loading: exercisesLoading,
@@ -48,6 +52,13 @@ const ViewPlan: React.FC = () => {
         }
     }, [dispatch, canView, user?.emailAddress]);
 
+    // fetch this plan's days once the plan itself has loaded
+    useEffect(() => {
+        if (canView && plan) {
+            dispatch(fetchPlanDaysThunk(plan.id!));
+        }
+    }, [dispatch, canView, plan?.id]);
+
     // fetch exercises if not loaded
     useEffect(() => {
         if (canView && exercises.length === 0) {
@@ -55,8 +66,19 @@ const ViewPlan: React.FC = () => {
         }
     }, [dispatch, canView, exercises.length]);
 
+    // lazy-load: only the currently expanded day's exercises are fetched —
+    // matches the collapsible-panel-per-day UI, which only ever shows one
+    // day's exercises at a time anyway.
+    const expandedPlanDay = expandedDay ? days.find((d) => d.dayOfWeek === expandedDay) : undefined;
+    const expandedPlanDayId = expandedPlanDay?.id;
+    useEffect(() => {
+        if (expandedPlanDayId && !loadedDayIds[expandedPlanDayId] && !loadingDayIds[expandedPlanDayId]) {
+            dispatch(fetchPlanExercisesThunk(expandedPlanDayId));
+        }
+    }, [expandedPlanDayId, loadedDayIds, loadingDayIds, dispatch]);
+
     if (!canView) return null;
-    if (planLoading || exercisesLoading) return <p>Loading plan…</p>;
+    if (planLoading || daysLoading || exercisesLoading) return <p>Loading plan…</p>;
     if (planError) return <p style={{ color: "red" }}>{planError}</p>;
     if (exercisesError) return <p style={{ color: "red" }}>{exercisesError}</p>;
     if (!plan) return <p>No plan found.</p>;
@@ -72,12 +94,15 @@ const ViewPlan: React.FC = () => {
             [exerciseId]: data,
         }));
     };
-    
+
     return (
         <div>
             <h3>{plan.name}</h3>
             {DaysOfWeek.map((dayName) => {
-                const planDay = plan.planDays.items.find((d) => d.dayOfWeek === dayName);
+                const planDay = days.find((d) => d.dayOfWeek === dayName);
+                const dayExercises = planDay ? byDayId[planDay.id!] ?? [] : [];
+                const dayLoading = planDay ? loadingDayIds[planDay.id!] : false;
+                const dayLoaded = planDay ? loadedDayIds[planDay.id!] : false;
 
                 return (
                     <CollapsiblePanel
@@ -88,25 +113,31 @@ const ViewPlan: React.FC = () => {
                             setExpandedDay(expandedDay === dayName ? null : dayName)
                         }
                     >
-                        {planDay ? (
+                        {!planDay ? (
+                            <p>No exercises for this day.</p>
+                        ) : dayLoading && !dayLoaded ? (
+                            <p>Loading exercises…</p>
+                        ) : dayExercises.length === 0 ? (
+                            <p>No exercises for this day.</p>
+                        ) : (
                             <div>
-                                {planDay.planExercises.items.map((ex) => (
+                                {[...dayExercises]
+                                    .sort((a, b) => a.order - b.order)
+                                    .map((ex) => (
                                     <ExerciseInput
                                         key={ex.id}
                                         planExercise={{
-                                            id: ex.id,
+                                            id: ex.id!,
                                             exerciseName: exerciseNameMap[ex.exerciseId] ?? `Exercise ${ex.exerciseId}`,
                                             suggestedSets: ex.suggestedSets?? 1,
                                             suggestedReps: ex.suggestedReps?? 1,
                                             suggestedWeight: ex.suggestedWeight?? 1
                                         }}
-                                        savedData={exerciseInputs[ex.id]}
-                                        onChange={(data) => handleExerciseChange(ex.id, data)}
+                                        savedData={exerciseInputs[ex.id!]}
+                                        onChange={(data) => handleExerciseChange(ex.id!, data)}
                                     />
                                 ))}
                             </div>
-                        ) : (
-                            <p>No exercises for this day.</p>
                         )}
                     </CollapsiblePanel>
                 );
