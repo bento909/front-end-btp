@@ -1,20 +1,86 @@
-## AWS Amplify React+Vite Starter Template
+## front-end-btp
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+Ben's personal site: a public landing page (bio, personal training pitch, music player, interval timer, MIDI clock tracker, contact form) plus an authenticated multi-tenant training-plan app where trainers build workout plans for clients and clients log their workouts.
 
-## Overview
+Built on the [AWS Amplify React+Vite Gen2 starter](https://docs.amplify.aws/react/start/quickstart/), since extended well past the starter template.
 
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
+## Tech stack
 
-## Features
+- React 18 + TypeScript + Vite, React Router v6
+- Redux Toolkit (`src/redux/`)
+- Styled-components
+- `@hello-pangea/dnd` for drag-to-reorder exercises
+- **AWS Amplify Gen2** backend (`amplify/`):
+  - Cognito user pool for auth (`amplify/auth/resource.ts`)
+  - AppSync GraphQL API + DynamoDB via `a.model()` schema definitions (`amplify/data/resource.ts`)
+  - Three custom Lambda resolvers: `createOrgUser`, `listOrgUsers`, `createOrganization` (`amplify/functions/`)
+  - All client-side data access goes through Amplify's typed generated client (`generateClient<Schema>()`, wired up in `src/graphql/dataClient.ts`) — there is no hand-written GraphQL in this app
+- Deploys via AWS Amplify Hosting on push to `main` (`amplify.yml`)
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
-- **Database**: Real-time database powered by Amazon DynamoDB.
+## Architecture: multi-tenant organizations
+
+Every trainer/client belongs to an **Organization** — the tenant boundary, enforced server-side via a Cognito Group per org (the group name *is* the org id). `organizationId` is carried on every org-scoped model, with `allow.groupDefinedIn('organizationId')` authorization.
+
+**Roles** (`src/Constants/constants.tsx`):
+
+| Role | Can do |
+|---|---|
+| `admin` | Manage org users (create admin/trainer/basic_user), manage plans, view all org members |
+| `trainer` | Create clients (basic_user only), create exercises, manage plans for their own clients, view only the clients they created |
+| `basic_user` | View their own plan, log completed workouts |
+
+`admin`/`trainer` accounts are also members of a second, per-org `<orgId>-staff` Cognito Group — that's the group `Plan`/`PlanDay`/`PlanExercise`/`Exercise` write authorization actually checks (org members can read; only staff can write).
+
+**`platform-admin`** is a separate, static, cross-org Cognito Group (not tied to any org's own `admin` role) — the only accounts that can create a brand-new Organization (via the `provisionOrganization` mutation) and moderate the public contact form's messages.
+
+## Data model
+
+```
+Organization (id, name)
+
+Plan (name, trainerEmail, clientEmail, organizationId, staffGroup)
+ └─ PlanDay (dayOfWeek, dayNumber, organizationId, staffGroup)
+     └─ PlanExercise (order, suggestedReps/Weight/Sets, organizationId, staffGroup)
+         ├─ belongsTo → Exercise (name, type, tips, notes, organizationId, staffGroup)
+         └─ hasMany → ExerciseLog (date, sets: json, clientNotes, organizationId)
+
+ContactMessage (name, email, message, read) — public contact form submissions
+```
+
+`Plan`/`PlanDay`/`PlanExercise` are fetched **lazily**, not eagerly nested: a plan's days load once when the plan loads, but a day's exercises only fetch the moment that day is expanded in the UI (see `src/redux/planExercisesSlice.tsx`). This is deliberate — a trainer with many clients and plans shouldn't pull every exercise on every plan just to load their dashboard.
+
+## Local development
+
+```
+npm install
+npx ampx sandbox --profile <your-aws-profile>   # spins up a personal backend, writes amplify_outputs.json
+npm run dev
+```
+
+`npm run build` runs `tsc` then `vite build` — always run this (or at least `tsc --noEmit`) before considering a change done; the CI build will fail on type errors.
+
+## Testing
+
+**Type checking:** `npx tsc --noEmit -p .` (frontend) and `npx tsc --noEmit -p amplify` (backend).
+
+**End-to-end (Playwright):** `e2e/` holds a full E2E suite that runs against the **live production URL** (`https://main.d276q2mvykjvwc.amplifyapp.com`), not a local dev server — the point is verifying what's actually deployed. It covers auth, every role's panel visibility, cross-org isolation, ownership scoping, org creation, contact message moderation, and the full plan/exercise CRUD + drag-reorder + lazy-loading behavior.
+
+```
+npm run test:e2e          # run the full suite
+npm run test:e2e:report   # open the HTML report from the last run
+```
+
+The suite authenticates as a set of permanent QA fixture accounts (one per role, across two organizations) rather than creating throwaway users per run. If `.env.qa.json` (gitignored) is missing or the fixture needs to be (re-)created, run:
+
+```
+npm run qa:provision
+```
+
+This creates/repairs the fixture directly in production via the real app mutations (`provisionOrganization`, `createOrgUser`) — safe to re-run, existing accounts are left alone. It targets `scripts/qa/amplify_outputs.json` (generate via `npx ampx generate outputs --app-id d276q2mvykjvwc --branch main --profile <admin-profile> --out-dir ./scripts/qa`), deliberately separate from the sandbox `amplify_outputs.json` used for local dev.
 
 ## Deploying to AWS
 
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
+Push to `main` — Amplify Hosting builds and deploys automatically (`amplify.yml`). For manual backend/CLI operations, see [Amplify's deployment docs](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws).
 
 ## Security
 
@@ -23,227 +89,3 @@ See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more inform
 ## License
 
 This library is licensed under the MIT-0 License. See the LICENSE file.
-
-# 🏋️‍♂️ Training Plan Data Model Guide
-
-This guide explains how the different parts of the data model work together to create a personalized training plan for clients.
-
-## 📦 Overview
-
-Your training app uses a clear data structure to organize:
-
-- Plans
-- Days within plans
-- Exercises on each day
-- Exercise metadata
-- Logged workout data
-
----
-
-## 🧠 Data Hierarchy
-
-```
-Plan
-├── PlanDays (Monday, Tuesday, etc.)
-│   ├── PlanExercises (linked to Exercises)
-│   │   └── Exercise (name, tips, type, notes)
-│   └── ...
-└── Metadata (name, clientEmail, trainerEmail)
-```
-
----
-
-## 🪜 How to Build a Plan
-
-This is the full process to create a structured workout plan:
-
-### 1. Create a Plan
-
-The top-level object that ties the entire program together.
-
-```ts
-await createPlan({
-  name: "6-Week Strength Plan",
-  trainerEmail: "trainer@example.com",
-  clientEmail: "client@example.com"
-});
-```
-
----
-
-### 2. Create PlanDays
-
-Each day in the plan corresponds to a weekday (e.g. "MONDAY").
-
-```ts
-await createPlanDay({
-  planId: "abc123",
-  dayOfWeek: "MONDAY", // Enum: "MONDAY" | "TUESDAY" | ...
-  dayNumber: 1         // Used to sort days
-});
-```
-
----
-
-### 3. Create Exercises (If needed)
-
-Each Exercise is reusable across multiple plans.
-
-```ts
-await createExercise({
-  name: "Barbell Squat",
-  type: "LIFT",
-  tips: "Keep your chest up",
-  notes: "Focus on depth"
-});
-```
-
----
-
-### 4. Link Exercises to Days via PlanExercises
-
-Each PlanExercise connects an Exercise to a PlanDay with configuration:
-
-```ts
-await createPlanExercise({
-  planDayId: "day123",
-  exerciseId: "exercise456",
-  order: 1,
-  suggestedReps: 10,
-  suggestedWeight: 100
-});
-```
-
----
-
-### 5. Display the Plan to a Client
-
-Using `getPlanById`, retrieve all details:
-
-```graphql
-query GetPlanById($id: ID!) {
-  getPlan(id: $id) {
-    name
-    planDays {
-      items {
-        dayOfWeek
-        planExercises {
-          items {
-            order
-            suggestedReps
-            suggestedWeight
-            exercise {
-              name
-              tips
-              type
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-You can now render a full view of what to do on Monday, Tuesday, etc.
-
----
-
-### 6. Log an Exercise (Client Side)
-
-Clients track their workouts via `ExerciseLog`.
-
-```ts
-await createExerciseLog({
-  planExerciseId: "xyz123",
-  date: "2025-06-28",
-  sets: [
-    { reps: 10, weight: 100 },
-    { reps: 10, weight: 100 },
-    { reps: 8, weight: 95 }
-  ],
-  clientNotes: "Felt strong!"
-});
-```
-
----
-
-## 📊 Example Data Structure
-
-```json
-{
-  "name": "6-Week Strength Plan",
-  "planDays": [
-    {
-      "dayOfWeek": "MONDAY",
-      "planExercises": [
-        {
-          "exercise": { "name": "Squat" },
-          "suggestedReps": 10,
-          "suggestedWeight": 100
-        },
-        {
-          "exercise": { "name": "Bench Press" },
-          "suggestedReps": 8,
-          "suggestedWeight": 80,
-          "suggestedSets": 3
-        }
-      ]
-    },
-    {
-      "dayOfWeek": "TUESDAY",
-      "planExercises": [
-        {
-          "exercise": { "name": "5k Run" }
-        }
-      ]
-    }
-  ]
-}
-```
-
----
-
-## 🧩 Data Model Summary
-
-| Entity           | Purpose                                | Linked To               |
-|------------------|----------------------------------------|--------------------------|
-| `Exercise`       | Defines a type of workout              | Used in `PlanExercise`   |
-| `Plan`           | A client's full training program       | Has many `PlanDay`       |
-| `PlanDay`        | A day in the plan (e.g. Monday)        | Has many `PlanExercise`  |
-| `PlanExercise`   | Configured exercise for a specific day | Links `Exercise` & `PlanDay` |
-| `ExerciseLog`    | What the client actually did           | Linked to `PlanExercise` |
-
----
-
-## ✅ Example Workflow
-
-1. **Trainer** creates a `Plan` for a client.
-2. Trainer adds `PlanDay` entries (Monday, Tuesday…).
-3. Trainer links `Exercise` to each day via `PlanExercise`.
-4. **Client** sees a structured weekly workout plan.
-5. Client logs workouts using `ExerciseLog`.
-
----
-
-## 📁 Related Files
-
-| File            | Purpose                                   |
-|------------------|--------------------------------------------|
-| `mutations.ts`  | Create plans, days, exercises, etc.        |
-| `queries.ts`    | Fetch plans, days, exercises, logs         |
-| `types.ts`      | Strong typing for queries and enums        |
-
----
-
-## 💡 Tip
-
-You can preload reusable `Exercise` entries in your database so that trainers can quickly assign them to new plans.
-
----
-
-## 🛠️ Future Ideas
-
-- Add tags or categories to Exercises (e.g. "Upper Body", "Cardio")
-- Track actual vs. suggested weights in ExerciseLogs
-- Add progression rules to Plans (e.g. increase weight weekly)
