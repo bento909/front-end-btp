@@ -11,6 +11,9 @@ import { defineAuth } from '@aws-amplify/backend';
  * custom:role — replaces the old, misused standard "profile" attribute
  * (which OIDC defines as a profile-page URL, not a role). Holds the app's
  * Profile enum value (admin/trainer/basic_user).
+ * custom:createdBy — the `sub` of whichever user called createOrgUser to
+ * create this account (immutable). Backs BTP-12: a trainer's "my users"
+ * view is scoped to accounts they personally created, not the whole org.
  *
  * platform-admin — a single static Cognito Group, separate from the
  * per-org groups (which are dynamic, one per Organization). Not a tenant
@@ -35,6 +38,12 @@ export const auth = defineAuth({
       mutable: true,
       minLen: 1,
       maxLen: 32,
+    },
+    'custom:createdBy': {
+      dataType: 'String',
+      mutable: false,
+      minLen: 1,
+      maxLen: 64,
     },
   },
 });

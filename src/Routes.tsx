@@ -10,6 +10,7 @@ import ListExercises from "./Pages/Components/PostLoginComponents/CollapsiblePan
 import EditPlans from "./Pages/Components/PostLoginComponents/CollapsiblePanels/EditPlans.tsx"
 import ViewPlan from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewPlan.tsx"
 import ViewMessages from "./Pages/Components/PostLoginComponents/CollapsiblePanels/ViewMessages.tsx";
+import CreateOrganization from "./Pages/Components/PostLoginComponents/CollapsiblePanels/CreateOrganization.tsx";
 import {useTimer, WorkoutTimerProvider} from "./Context/WorkoutTimerContext";
 import {WorkoutTimerPopup} from "./PopupComponents/WorkoutTimerPopup.tsx";
 
@@ -61,6 +62,7 @@ const Menu = () => {
     return (
         <main>
             <ViewMessages/>
+            <CreateOrganization/>
             <ViewAllUsers/>
             <SignUp/>
             <CreateExercise/>

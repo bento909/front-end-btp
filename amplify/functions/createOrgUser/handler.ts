@@ -104,6 +104,8 @@ export const handler: Schema['createOrgUser']['functionHandler'] = async (event)
         // so a caller can never create a user in a different organization.
         { Name: 'custom:organizationId', Value: callerOrgId },
         { Name: 'custom:role', Value: role },
+        // BTP-12: backs a trainer's "my users" view.
+        { Name: 'custom:createdBy', Value: callerSub },
       ],
     })
   );

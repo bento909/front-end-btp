@@ -40,6 +40,14 @@ export function canReadMessages(user: User): boolean {
     return user.groups.includes('platform-admin');
 }
 
+// Matches the server-side rule on createOrganization (allow.group('platform-admin'))
+// — see BTP-16. Deliberately the same check as canReadMessages (same group),
+// kept as its own named function since the two are conceptually unrelated
+// features that happen to share a gate.
+export function canCreateOrganization(user: User): boolean {
+    return user.groups.includes('platform-admin');
+}
+
 export function canCreatePlan(user: User): boolean {
     return (
         user.permissions.createPlan === CreatePlan.MY_OWN ||
