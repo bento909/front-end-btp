@@ -1,6 +1,7 @@
 import {a, type ClientSchema, defineData} from "@aws-amplify/backend";
 import {createOrgUser} from "../functions/createOrgUser/resource";
 import {listOrgUsers} from "../functions/listOrgUsers/resource";
+import {createOrganization} from "../functions/createOrganization/resource";
 
 // Multi-tenant design (BTP-10): every org-scoped model carries an
 // `organizationId` field whose value IS the name of a Cognito Group — every
@@ -21,13 +22,20 @@ import {listOrgUsers} from "../functions/listOrgUsers/resource";
 
 const schema = a.schema({
     // === ORGANIZATIONS (tenants) ===
+    // BTP-16: a member of the org itself can read their own Organization
+    // record; `platform-admin` (the platform owner, currently just Ben —
+    // deliberately NOT tied to any org's own `admin` role) has full access
+    // across all of them, matching who's allowed to create one below.
     Organization: a
         .model({
             id: a.id(),
             name: a.string().required(),
             createdAt: a.datetime().required(),
         })
-        .authorization((allow) => [allow.groupDefinedIn("id")]),
+        .authorization((allow) => [
+            allow.groupDefinedIn("id"),
+            allow.group("platform-admin"),
+        ]),
 
     // === CONTACT MESSAGES ===
     // Ungated by org — belongs to the single shared public marketing page,
@@ -178,6 +186,34 @@ const schema = a.schema({
         .returns(a.ref("OrgUser").array())
         .authorization((allow) => [allow.authenticated()])
         .handler(a.handler.function(listOrgUsers)),
+
+    // === CUSTOM MUTATION: bootstrap a brand-new organization (BTP-16) ===
+    // Creates the org's Cognito Group + staff Cognito Group + Organization
+    // row + first admin user, all in one call — the same steps that were
+    // previously done by hand via AWS CLI for every org so far. Restricted
+    // to `platform-admin` here at the schema level (the platform owner,
+    // deliberately separate from any org's own `admin` role) — this is the
+    // only place that's allowed to mint a new tenant.
+    // Named "provisionOrganization", not "createOrganization" — the
+    // Organization a.model() above already auto-generates a createOrganization
+    // CRUD mutation for the model itself, which this would otherwise collide
+    // with.
+    provisionOrganization: a
+        .mutation()
+        .arguments({
+            orgId: a.string().required(),
+            orgName: a.string().required(),
+            adminEmail: a.string().required(),
+            adminName: a.string().required(),
+        })
+        .returns(
+            a.customType({
+                success: a.boolean(),
+                message: a.string(),
+            })
+        )
+        .authorization((allow) => [allow.group("platform-admin")])
+        .handler(a.handler.function(createOrganization)),
 });
 
 export type Schema = ClientSchema<typeof schema>;

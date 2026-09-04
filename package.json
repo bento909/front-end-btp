@@ -15,6 +15,7 @@
     "@aws-amplify/auth": "^6.11.4",
     "@aws-amplify/ui-react": "^6.11.1",
     "@aws-sdk/client-cognito-identity-provider": "^3.760.0",
+    "@aws-sdk/client-dynamodb": "^3.1126.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@reduxjs/toolkit": "^2.6.1",
     "@types/styled-components": "^5.1.34",
