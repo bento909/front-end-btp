@@ -53,12 +53,12 @@ test.describe("Plans & Exercises — trainer flow (BTP-2/5/6/7/11/13)", () => {
         await expect(weekPlanBtn.or(page.getByRole("button", { name: /^Monday/ }))).toBeVisible({ timeout: 15_000 });
 
         if (await weekPlanBtn.count() > 0) {
-            // PlanCreator.tsx has two buttons that share the exact label
-            // "Create Week Plan": the first click only sets planType="WEEK"
-            // (a mode-select, not a create), then a second, differently-wired
-            // button with the identical label actually creates the plan.
+            // "Create Week Plan" is the mode-select (sets planType="WEEK",
+            // doesn't create anything yet); "Confirm: Create Week Plan" is
+            // the distinctly-labeled button that actually creates the plan
+            // (BTP-25 — these used to share one identical label).
             await weekPlanBtn.click();
-            await weekPlanBtn.click();
+            await page.getByRole("button", { name: "Confirm: Create Week Plan", exact: true }).click();
             await expect(page.getByRole("heading", { level: 4 })).toBeVisible({ timeout: 15_000 });
         }
         // 7 day rows, Monday..Sunday, regardless of whether we just created it

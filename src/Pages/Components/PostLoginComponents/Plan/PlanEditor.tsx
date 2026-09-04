@@ -1,5 +1,6 @@
 // components/UserPlan/PlanEditor.tsx
 
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../../redux/store.tsx";
 import { dataClient } from "../../../../graphql/dataClient.ts";
@@ -10,6 +11,7 @@ import {
     exerciseRemoved,
     exercisesReordered,
 } from "../../../../redux/planExercisesSlice.tsx";
+import { fetchExercisesThunk } from "../../../../redux/exercisesSlice.tsx";
 import type { Plan } from "../../../../redux/plansSlice.tsx";
 import PlanDayItem from "./PlanDayItem.tsx";
 
@@ -29,6 +31,17 @@ const PlanEditor: React.FC<Props> = ({ plan, userName, expandedDays, setExpanded
     const dispatch = useDispatch<AppDispatch>();
     const { days } = useSelector((state: RootState) => state.planDays);
     const { byDayId } = useSelector((state: RootState) => state.planExercises);
+    const { exercises } = useSelector((state: RootState) => state.exercises);
+
+    // Fetched once here, at the plan level — not per day-item. A plan can
+    // render up to 7 PlanDayItem instances simultaneously; each one used to
+    // fire its own fetchExercisesThunk() independently on mount, producing
+    // up to 7 duplicate listExercises calls the moment a plan first loads.
+    useEffect(() => {
+        if (exercises.length === 0) {
+            dispatch(fetchExercisesThunk());
+        }
+    }, [exercises.length, dispatch]);
 
     const onToggle = (id: string) =>
         setExpandedDays((prev) => {

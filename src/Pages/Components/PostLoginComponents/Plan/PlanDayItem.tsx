@@ -4,7 +4,6 @@ import type { PlanDay } from "../../../../redux/planDaysSlice.tsx";
 import { fetchPlanExercisesThunk } from "../../../../redux/planExercisesSlice.tsx";
 import { AppDispatch, RootState } from "../../../../redux/store.tsx";
 import { ExerciseTypeEnum } from "../../../../graphql/types.ts";
-import { fetchExercisesThunk } from "../../../../redux/exercisesSlice.tsx";
 
 import ExerciseListDraggable from "./PlanExerciseListDraggable.tsx";
 import AddExerciseForm from "./AddExerciseForm.tsx";
@@ -66,12 +65,6 @@ const PlanDayItem: React.FC<Props> = ({
     const loaded = useSelector((state: RootState) => state.planExercises.loadedDayIds[day.id!]);
     const loading = useSelector((state: RootState) => state.planExercises.loadingDayIds[day.id!]);
     const dispatch = useDispatch<AppDispatch>();
-
-    useEffect(() => {
-        if (exercises.length === 0) {
-            dispatch(fetchExercisesThunk());
-        }
-    }, [exercises.length, dispatch]);
 
     // The lazy-load point (BTP-7): a day's exercises are only ever fetched
     // once that day is actually expanded, not up front with the plan/days —

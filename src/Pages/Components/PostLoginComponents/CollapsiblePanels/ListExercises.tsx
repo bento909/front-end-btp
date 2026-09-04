@@ -40,8 +40,12 @@ const ListExercises: React.FC = () => {
         return match ? match.label : type;
     };
 
-    if (!user || !user.permissions?.createExercise) return null;
-
+    // Viewing the exercise catalogue is a "manages plans" concern, not a
+    // "can create exercises" one — gating on createExercise (trainer-only)
+    // meant an admin, who can see every org member and create plans, could
+    // never see what exercises even exist in their own org. canCreatePlan is
+    // true for both staff roles (admin + trainer), matching EditPlans.tsx's
+    // own gate.
     return user && canCreatePlan(user) ? (
         <CollapsiblePanel title="List Exercises" isOpen={isVisible} toggle={toggleVisibility}>
             {loading && <p>Loading exercises...</p>}

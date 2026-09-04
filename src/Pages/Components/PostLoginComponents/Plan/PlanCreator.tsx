@@ -145,7 +145,7 @@ const PlanCreator: React.FC<Props> = ({ userName, userEmail, onCreated }) => {
                 </>
             ) : (
                 <button onClick={handleCreatePlan} disabled={creating}>
-                    {creating ? "Creating…" : "Create Week Plan"}
+                    {creating ? "Creating…" : "Confirm: Create Week Plan"}
                 </button>
             )}
 
