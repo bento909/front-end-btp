@@ -78,6 +78,40 @@ npm run qa:provision
 
 This creates/repairs the fixture directly in production via the real app mutations (`provisionOrganization`, `createOrgUser`) — safe to re-run, existing accounts are left alone. It targets `scripts/qa/amplify_outputs.json` (generate via `npx ampx generate outputs --app-id d276q2mvykjvwc --branch main --profile <admin-profile> --out-dir ./scripts/qa`), deliberately separate from the sandbox `amplify_outputs.json` used for local dev.
 
+`npm run test:e2e` automatically runs `npm run qa:verify` first (via npm's `pretest:e2e` hook) — it checks the fixture's data-level invariants (most importantly, that the trainer-owned QA client's Monday exercise list is empty, which the self-cleaning exercise CRUD test depends on starting from) and repairs anything that's drifted. Needs no AWS credentials, only the fixture's own login (from `.env.qa.json`) — safe to run as often as you like, including manually: `npm run qa:verify`.
+
+**Don't use the QA fixture accounts for manual poking around** — a stray exercise added "just to look" will break that Monday-must-be-empty invariant and produce confusing test failures later. For that, there's a separate, human-browsable **demo org** with realistic sample data (a trainer, a client, several named exercises, a populated week plan, one logged workout) that no test relies on:
+
+```
+npm run demo:provision
+```
+
+Credentials land in `.env.demo.json` (gitignored). Feel free to click around in it, edit things, log workouts — whenever you want it back to a clean, predictable state:
+
+```
+npm run demo:restore
+```
+
+Since there's no delete-Organization path anywhere in the app, "restore" means reconciling the org's *data* back to the canonical baseline (`scripts/qa/demo-data.ts` — the single source of truth both `demo:provision` and `demo:restore` read from), not recreating the org: it deletes anything that doesn't belong (stray exercises, extra plan-exercise entries, extra logs), fixes anything whose values were edited, and recreates anything deleted.
+
+## Production data snapshot (`scripts/backup/`)
+
+A portable export/import of the **entire** production account — every row of every table, plus every Cognito user/group/membership — not scoped to test data. Built for a "kill the app, take the data, reprovision somewhere else" scenario, not as a substitute for DynamoDB's own Point-in-Time Recovery (that's same-account/same-engine, restores into a new table — a different job; worth turning on separately as unrelated cheap insurance).
+
+```
+npm run backup:grab
+```
+
+Read-only, safe to run any time. Writes a timestamped snapshot to `scripts/backup/snapshots/<timestamp>/` (gitignored — contains real PII: names, emails, workout notes; never commit it).
+
+```
+npm run backup:restore                        # dry run against the most recent snapshot
+npm run backup:restore -- --yes                # actually restore the most recent snapshot
+npm run backup:restore -- <timestamp> --yes    # restore a specific one
+```
+
+**Mode: merge/overwrite, never delete.** Every row in the snapshot gets written back (overwriting anything with a matching id) — but nothing that exists now and *isn't* in the snapshot gets removed. Requires `--yes` or it just prints what it would do. Cognito passwords can never be exported (Cognito doesn't expose them to anyone, including account admins) — a user that has to be recreated gets a random temporary password and must reset it on next sign-in; that's a hard Cognito limitation, not something this script can work around.
+
 ## Deploying to AWS
 
 Push to `main` — Amplify Hosting builds and deploys automatically (`amplify.yml`). For manual backend/CLI operations, see [Amplify's deployment docs](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws).

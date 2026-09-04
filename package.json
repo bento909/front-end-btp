@@ -8,9 +8,15 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "pretest:e2e": "tsx scripts/qa/verify-fixture.ts",
     "test:e2e": "playwright test",
     "test:e2e:report": "playwright show-report",
-    "qa:provision": "tsx scripts/qa/provision-qa-fixture.ts"
+    "qa:provision": "tsx scripts/qa/provision-qa-fixture.ts",
+    "qa:verify": "tsx scripts/qa/verify-fixture.ts",
+    "demo:provision": "tsx scripts/qa/provision-demo-org.ts",
+    "demo:restore": "tsx scripts/qa/restore-demo-org.ts",
+    "backup:grab": "tsx scripts/backup/grab-prod-data.ts",
+    "backup:restore": "tsx scripts/backup/restore-prod-data.ts"
   },
   "dependencies": {
     "@aws-amplify/api": "^6.3.11",
@@ -32,7 +38,9 @@
   "devDependencies": {
     "@aws-amplify/backend": "^1.5.0",
     "@aws-amplify/backend-cli": "^1.2.9",
+    "@aws-sdk/client-cloudformation": "^3.1126.0",
     "@aws-sdk/credential-providers": "^3.1126.0",
+    "@aws-sdk/util-dynamodb": "^3.996.9",
     "@playwright/test": "^1.62.1",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

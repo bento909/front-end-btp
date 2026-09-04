@@ -38,3 +38,8 @@ aws-exports.js
 /playwright/.auth/
 .env.qa
 .env.qa.json
+.env.demo
+.env.demo.json
+
+# production data snapshots — contain real PII, never committed
+scripts/backup/snapshots/
