@@ -17,6 +17,7 @@ export function useWorkoutTimer() {
     const prepIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const autoCloseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const originalDurationRef = useRef<number>(0);
+    const nextNameRef = useRef<string | null>(null);
     const isPausedRef = useRef(false);
 
     const onCompleteRef = useRef<(() => void) | null>(null);
@@ -88,22 +89,35 @@ export function useWorkoutTimer() {
             }
 
             const remainingSeconds = Math.ceil(remainingMs / 1000);
-            setDisplay(getMinSecsString(remainingSeconds));
+
+            const nextName = nextNameRef.current;
+            const inNextUpCountdown =
+                totalSeconds > 10 && !!nextName && remainingSeconds <= 10 && remainingSeconds >= 1;
+
+            setDisplay(
+                inNextUpCountdown
+                    ? `${nextName} in ${remainingSeconds}`
+                    : getMinSecsString(remainingSeconds)
+            );
 
             const crossed = remainingSeconds < lastBeepSecondRef.current;
 
-            const minuteMark =
-                remainingSeconds % 60 === 0 &&
-                remainingSeconds !== totalSeconds;
-
-            const halfMinute =
-                remainingSeconds % 30 === 0 &&
-                remainingSeconds % 60 !== 0 &&
-                remainingSeconds !== totalSeconds;
-
             if (crossed) {
-                if (minuteMark) beep(150, 700);
-                else if (halfMinute) beep(80, 500);
+                if (inNextUpCountdown) {
+                    beep(80, 600);
+                } else {
+                    const minuteMark =
+                        remainingSeconds % 60 === 0 &&
+                        remainingSeconds !== totalSeconds;
+
+                    const halfMinute =
+                        remainingSeconds % 30 === 0 &&
+                        remainingSeconds % 60 !== 0 &&
+                        remainingSeconds !== totalSeconds;
+
+                    if (minuteMark) beep(150, 700);
+                    else if (halfMinute) beep(80, 500);
+                }
             }
 
             lastBeepSecondRef.current = remainingSeconds;
@@ -119,7 +133,7 @@ export function useWorkoutTimer() {
     const start = (
         exerciseName: string,
         durationSeconds: number,
-        options?: { skipPrep?: boolean; isFinal?: boolean }
+        options?: { skipPrep?: boolean; isFinal?: boolean; nextName?: string }
     ) => {
         setTitle(`${exerciseName} - ${getMinSecsString(durationSeconds)}`);
         setOpen(true);
@@ -127,6 +141,7 @@ export function useWorkoutTimer() {
         setIsPaused(false);
 
         originalDurationRef.current = durationSeconds;
+        nextNameRef.current = options?.nextName ?? null;
         lastBeepSecondRef.current = Infinity;
 
         // clear stale timeouts

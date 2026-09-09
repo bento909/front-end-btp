@@ -77,17 +77,30 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
+    box-sizing: border-box;
+
+    @media (max-width: 480px) {
+        padding: 12px;
+        gap: 12px;
+    }
 `;
 
 const TopRow = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
 `;
 
 const ExerciseName = styled.div`
     font-size: 1.6rem;
     font-weight: 800;
+    overflow-wrap: anywhere;
+
+    @media (max-width: 480px) {
+        font-size: 1.15rem;
+    }
 `;
 
 const ButtonRow = styled.div`
@@ -105,6 +118,12 @@ const Time = styled.div`
     font-size: 6rem;      /* MAHOOSIVE */
     font-weight: 900;
     letter-spacing: 2px;
+    text-align: center;
+
+    @media (max-width: 480px) {
+        font-size: 3rem;
+        letter-spacing: 1px;
+    }
 `;
 
 
@@ -115,7 +134,13 @@ const ButtonBase = css`
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
+    min-height: 40px;
     &:active { transform: scale(0.97); }
+
+    @media (max-width: 480px) {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
 `;
 
 const StopButton = styled.button`
