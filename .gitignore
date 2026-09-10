@@ -26,4 +26,20 @@ dist-ssr
 # amplify
 .amplify
 amplify_outputs*
+scripts/qa/amplify_outputs.json
 amplifyconfiguration*
+aws-exports.js
+
+# testing
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+.env.qa
+.env.qa.json
+.env.demo
+.env.demo.json
+
+# production data snapshots — contain real PII, never committed
+scripts/backup/snapshots/

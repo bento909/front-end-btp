@@ -1,0 +1,7 @@
+import { defineFunction } from '@aws-amplify/backend';
+
+export const createOrganization = defineFunction({
+  name: 'createOrganization',
+  entry: './handler.ts',
+  timeoutSeconds: 10,
+});
