@@ -59,6 +59,23 @@ npm run dev
 
 `npm run build` runs `tsc` then `vite build` — always run this (or at least `tsc --noEmit`) before considering a change done; the CI build will fail on type errors.
 
+## Councillor contact tool (unlisted utility pages)
+
+Two standalone pages, not linked from anywhere in the app — reachable only if you have the URL:
+
+- **`/councillors`** — enter a postcode, get a blank email opened in your default mail app, addressed to your three Wirral ward councillors.
+- **`/councillors/peak-cluster`** — enter a name + postcode instead, get a pre-filled letter opened, signed off "Yours sincerely, {name}, {postcode}" (body otherwise blank for you to fill in).
+
+Both resolve the postcode to a Wirral ward via [postcodes.io](https://postcodes.io) (free, no API key) and look that ward up in a static, built-in dataset of all 66 Wirral councillors (`src/data/wirralCouncillors.ts`, shared lookup logic in `src/utils/councillorLookup.ts`). A postcode outside Wirral is rejected with a message rather than silently guessing.
+
+That dataset is a snapshot, not live — it goes stale whenever a councillor changes (election, by-election, resignation, party defection). Refresh it by re-scraping the council's own directory:
+
+```
+npm run councillors:refresh
+```
+
+This fetches `democracy.wirral.gov.uk`'s official councillor-by-ward page, parses it with `cheerio`, and regenerates `src/data/wirralCouncillors.ts` in place — review the diff and commit as normal. No AWS credentials needed, it's a plain public HTTP fetch. Re-run it whenever the list looks wrong (a "ward not found" message on either page is the usual symptom), or just periodically.
+
 ## Testing
 
 **Type checking:** `npx tsc --noEmit -p .` (frontend) and `npx tsc --noEmit -p amplify` (backend).

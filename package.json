@@ -16,7 +16,8 @@
     "demo:provision": "tsx scripts/qa/provision-demo-org.ts",
     "demo:restore": "tsx scripts/qa/restore-demo-org.ts",
     "backup:grab": "tsx scripts/backup/grab-prod-data.ts",
-    "backup:restore": "tsx scripts/backup/restore-prod-data.ts"
+    "backup:restore": "tsx scripts/backup/restore-prod-data.ts",
+    "councillors:refresh": "tsx scripts/refresh-councillors.ts"
   },
   "dependencies": {
     "@aws-amplify/api": "^6.3.11",
@@ -49,6 +50,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "aws-cdk": "^2.138.0",
     "aws-cdk-lib": "^2.138.0",
+    "cheerio": "^1.2.0",
     "constructs": "^10.3.0",
     "esbuild": "^0.20.2",
     "eslint": "^8.57.0",

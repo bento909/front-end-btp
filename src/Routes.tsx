@@ -13,6 +13,8 @@ import ViewMessages from "./Pages/Components/PostLoginComponents/CollapsiblePane
 import CreateOrganization from "./Pages/Components/PostLoginComponents/CollapsiblePanels/CreateOrganization.tsx";
 import {useTimer, WorkoutTimerProvider} from "./Context/WorkoutTimerContext";
 import {WorkoutTimerPopup} from "./PopupComponents/WorkoutTimerPopup.tsx";
+import Councillors from "./Pages/Councillors.tsx";
+import CouncillorsPeakCluster from "./Pages/CouncillorsPeakCluster.tsx";
 
 const WorkoutTimerPopupWrapper = () => {
     const { open, title, display, stop, pause, isPaused, resume } = useTimer();
@@ -37,6 +39,10 @@ function AppRoutes() {
                 <Routes>
                     {/* Public landing page */}
                     <Route path="/" element={<LandingPage/>}/>
+
+                    {/* Unlisted - reachable only via direct link, not linked from anywhere in the app */}
+                    <Route path="/councillors" element={<Councillors/>}/>
+                    <Route path="/councillors/peak-cluster" element={<CouncillorsPeakCluster/>}/>
 
                     {/* Protected routes wrapped in Authenticator */}
                     <Route
