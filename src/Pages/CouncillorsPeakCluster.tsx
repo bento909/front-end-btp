@@ -1,22 +1,21 @@
 import React, { FormEvent, useState } from "react";
 import { Councillor } from "../data/wirralCouncillors.ts";
 import { lookupCouncillorsByPostcode } from "../utils/councillorLookup.ts";
+import letterTemplate from "../data/peakClusterLetterTemplate.txt?raw";
+import { usePageMeta } from "../Hooks/usePageMeta.ts";
+import { CIVIC_FAVICON } from "../utils/civicFavicon.ts";
 
 type Status = "idle" | "loading" | "not-wirral" | "ward-not-found" | "error" | "done";
 
 const buildMailto = (councillors: Councillor[], name: string, postcode: string): string => {
     const to = councillors.map((c) => c.email).join(",");
     const subject = "Message from a constituent";
-    const body =
-        "Dear Councillors,\n\n" +
-        "[Write your message here]\n\n" +
-        "Yours sincerely,\n" +
-        `${name}\n` +
-        `${postcode}`;
+    const body = letterTemplate.replace("{{name}}", name).replace("{{postcode}}", postcode);
     return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
 
 const CouncillorsPeakCluster: React.FC = () => {
+    usePageMeta("Write to Your Councillor", CIVIC_FAVICON);
     const [name, setName] = useState("");
     const [postcode, setPostcode] = useState("");
     const [status, setStatus] = useState<Status>("idle");

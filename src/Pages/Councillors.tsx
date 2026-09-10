@@ -1,6 +1,8 @@
 import React, { FormEvent, useState } from "react";
 import { Councillor } from "../data/wirralCouncillors.ts";
 import { lookupCouncillorsByPostcode } from "../utils/councillorLookup.ts";
+import { usePageMeta } from "../Hooks/usePageMeta.ts";
+import { CIVIC_FAVICON } from "../utils/civicFavicon.ts";
 
 type Status = "idle" | "loading" | "not-wirral" | "ward-not-found" | "error" | "done";
 
@@ -10,6 +12,7 @@ const buildBlankMailto = (councillors: Councillor[]): string => {
 };
 
 const Councillors: React.FC = () => {
+    usePageMeta("Email Your Councillors", CIVIC_FAVICON);
     const [postcode, setPostcode] = useState("");
     const [status, setStatus] = useState<Status>("idle");
     const [wardName, setWardName] = useState<string | null>(null);
