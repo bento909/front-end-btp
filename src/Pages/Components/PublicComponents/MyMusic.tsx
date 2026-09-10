@@ -68,9 +68,6 @@ const MyMusic: React.FC = () => {
 
                 {/* SoundCloud Section */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                    <a href="https://soundcloud.com/benjamin-thomas-162154641" target="_blank" rel="noopener noreferrer" style={{ color: "#1DA1F2" }}>
-                        Visit SoundCloud
-                    </a>
                     {renderSoundcloudEmbeds(soundcloudTracksData)}
                 </div>
 

@@ -15,7 +15,7 @@ const PersonalTraining: React.FC = () => {
             <div>
                 If you would like a personal training programme created for you,
                 or if you are a trainer and would like an app to help you deliver your programmes to your clients,
-                please get in touch with Ben using the Contact Form.
+                please get in touch using the Contact Form.
             </div>
             <button onClick={() => navigate("/app/home")}>
                 Enter

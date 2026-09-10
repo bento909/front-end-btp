@@ -338,7 +338,7 @@ const BensPlan: React.FC = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     return (
         <CollapsiblePanel
-            title="Ben's Plan"
+            title="My Plan"
             isOpen={isOpen}
             toggle={() => setIsOpen((x) => !x)}
         >
